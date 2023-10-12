@@ -6,7 +6,7 @@
 
 ### Developers
 
-### Cameron Making Changes to ReadME
+### Cameron McCoy
 
 #### Yeamin Chowdhury
 
