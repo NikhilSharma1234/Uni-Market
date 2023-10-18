@@ -4,6 +4,8 @@ import 'register.dart';
 import 'verify.dart';
 import 'aboutyou.dart';
 
+// NOTE - to get assets like images to work, you need to run flutter build web then use the asset in code
+
 void main() {
   runApp(const MyApp());
 }
