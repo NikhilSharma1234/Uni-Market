@@ -86,6 +86,13 @@ flutter:
         - asset: fonts/Ubuntu-Medium.ttf
         - asset: fonts/Ubuntu-Regular.ttf
     # - images/a_dot_ham.jpeg
+    - assets/logo.png
+  #   - images/a_dot_ham.jpeg
+  fonts:
+    - family: Ubuntu
+      fonts:
+        - asset: fonts/Ubuntu-Medium.ttf
+        - asset: fonts/Ubuntu-Regular.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
