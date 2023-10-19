@@ -87,7 +87,6 @@ flutter:
         - asset: fonts/Ubuntu-Regular.ttf
     # - images/a_dot_ham.jpeg
     - assets/logo.png
-  #   - images/a_dot_ham.jpeg
   fonts:
     - family: Ubuntu
       fonts:
