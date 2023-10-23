@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     ConstrainedBox(
                         constraints:
-                            const BoxConstraints.tightFor(height: 200.0),
+                            const BoxConstraints.tightFor(height: 400.0),
                         child: Stepper(
                           type: StepperType.horizontal,
                           currentStep: index,
