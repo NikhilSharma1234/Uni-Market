@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'navbar.dart';
 import 'register.dart';
 import 'verify.dart';
@@ -68,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       // sets height of appbar
       appBar: PreferredSize(
@@ -85,25 +88,28 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Expanded(flex: 3, child: Column()),
-              Expanded(
-                  flex: 4,
+              SizedBox(
+                  width: screenWidth < 500
+                      ? screenWidth * 0.95
+                      : screenWidth * 0.5,
                   child: Column(children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(10.0),
-                      child: Text(
+                      child: AutoSizeText(
                         'Welcome to the marketplace made for students.',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 48,
                           fontWeight: FontWeight.w500,
                         ),
+                        minFontSize: 16,
+                        maxLines: 2,
                         textAlign: TextAlign.center,
                       ),
                     ),
                     ConstrainedBox(
-                        constraints:
-                            const BoxConstraints.tightFor(height: 400.0),
+                        constraints: BoxConstraints.tightFor(
+                            height: (screenHeight * 0.6)),
                         child: Stepper(
                           type: StepperType.horizontal,
                           currentStep: index,
@@ -118,7 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                         ))
                   ])),
-              const Expanded(flex: 3, child: Column())
             ],
           ),
         ),
