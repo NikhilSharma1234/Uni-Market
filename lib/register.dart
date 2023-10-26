@@ -28,9 +28,9 @@ class RegisterForm extends StatelessWidget {
             child: Column(children: [
               const NameContainer(),
               const SizedBox(height: 10),
-              EmailContainer(),
+              const EmailContainer(),
               const SizedBox(height: 10),
-              PasswordContainer(),
+              const PasswordContainer(),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
@@ -109,7 +109,8 @@ class NameContainer extends StatelessWidget {
         cursorColor: Colors.white,
         onSaved: (email) {},
         decoration: InputDecoration(
-          prefixIconConstraints: const BoxConstraints(minWidth: 23, maxHeight: 20),
+          prefixIconConstraints:
+              const BoxConstraints(minWidth: 23, maxHeight: 20),
           hintText: "John Doe",
           labelText: "Full Name",
           prefixIcon: const Padding(
@@ -126,7 +127,7 @@ class NameContainer extends StatelessWidget {
 }
 
 class PasswordContainer extends StatefulWidget {
-  PasswordContainer({super.key});
+  const PasswordContainer({super.key});
 
   @override
   State<PasswordContainer> createState() => _MyPasswordContainerState();
