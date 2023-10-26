@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uni_market/constants.dart';
+import 'dialog.dart';
 
 Step Register(index) {
   return Step(
@@ -14,18 +14,38 @@ Step Register(index) {
 
 // Register Form
 class RegisterForm extends StatelessWidget {
-  const RegisterForm({
+  RegisterForm({
     Key? key,
   }) : super(key: key);
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    return const Form(
-        child: Column(children: [
-      NameContainer(),
-      EmailContainer(),
-      PasswordContainer(),
-    ]));
+    return Form(
+        child: Form(
+            key: _formKey,
+            child: Column(children: [
+              const NameContainer(),
+              const SizedBox(height: 10),
+              EmailContainer(),
+              const SizedBox(height: 10),
+              PasswordContainer(),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  // Validate returns true if the form is valid, or false otherwise.
+                  if (_formKey.currentState!.validate()) {
+                    // If the form is valid, display a snackbar. In the real world,
+                    // you'd often call a server or save the information in a database.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Creating your account')),
+                    );
+                  }
+                },
+                child: const Text('Submit'),
+              ),
+            ])));
   }
 }
 
