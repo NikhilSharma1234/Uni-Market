@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                   width: screenWidth < 500
                       ? screenWidth * 0.95
-                      : screenWidth * 0.5,
+                      : screenWidth * 0.45,
                   child: Column(children: <Widget>[
                     const Padding(
                       padding: EdgeInsets.all(10.0),
