@@ -6,7 +6,7 @@ Step Register(index) {
       title: const Text('Register'),
       content: Container(
         alignment: Alignment.centerLeft,
-        child: const RegisterForm(),
+        child: RegisterForm(),
       ),
       isActive: index >= 0,
       state: index >= 0 ? StepState.complete : StepState.disabled);
@@ -125,22 +125,65 @@ class NameContainer extends StatelessWidget {
   }
 }
 
+class PasswordContainer extends StatefulWidget {
+  PasswordContainer({super.key});
+
+  @override
+  State<PasswordContainer> createState() => _MyPasswordContainerState();
+}
+
 // Password Input Field
-class PasswordContainer extends StatelessWidget {
-  const PasswordContainer({
-    Key? key,
-  }) : super(key: key);
+class _MyPasswordContainerState extends State<PasswordContainer> {
+  bool _passwordVisible = false;
+  String? validatePassword(String? value) {
+    const pattern =
+        r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+    final regex = RegExp(pattern);
+
+    return value!.isNotEmpty && !regex.hasMatch(value)
+        ? 'Enter a stronger password.'
+        : null;
+  }
+
+  void togglePassword() {
+    setState(() {
+      _passwordVisible = !_passwordVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
         textInputAction: TextInputAction.done,
-        obscureText: true,
+        obscureText: !_passwordVisible,
         cursorColor: Colors.white,
-        decoration: const InputDecoration(
-            hintText: "Password",
-            prefixIcon: Padding(
-                padding: EdgeInsets.all(defaultPadding),
-                child: Icon(Icons.lock_clock_rounded))));
+        decoration: InputDecoration(
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 23, maxHeight: 20),
+            hintText: "Password@123",
+            labelText: "Password",
+            prefixIcon: const Padding(
+                padding: EdgeInsets.only(right: 20),
+                child: Icon(Icons.lock_clock_rounded)),
+            suffixIcon: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, // added line
+                mainAxisSize: MainAxisSize.min, // added line
+                children: <Widget>[
+                  IconButton(
+                      onPressed: togglePassword,
+                      icon: Icon(_passwordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off)),
+                  IconButton(
+                      onPressed: () => showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) => appDialog(
+                              context,
+                              'Password Input',
+                              'Please input a password that is at least 8 characters and includes one uppercase letter, one lowercase letter, one number and one special character.',
+                              'Ok')),
+                      icon: const Icon(Icons.info_outlined)),
+                ])),
+        validator: validatePassword);
   }
 }
