@@ -108,12 +108,20 @@ class NameContainer extends StatelessWidget {
         textInputAction: TextInputAction.next,
         cursorColor: Colors.white,
         onSaved: (email) {},
-        decoration: const InputDecoration(
-            hintText: "Full Name",
-            prefixIcon: Padding(
-              padding: EdgeInsets.all(defaultPadding),
-              child: Icon(Icons.person_2_rounded),
-            )));
+        decoration: InputDecoration(
+          prefixIconConstraints: const BoxConstraints(minWidth: 23, maxHeight: 20),
+          hintText: "John Doe",
+          labelText: "Full Name",
+          prefixIcon: const Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: Icon(Icons.person_2_rounded)),
+          suffixIcon: IconButton(
+              onPressed: () => showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => appDialog(context,
+                      'Name Input', 'Please input your full name', 'Ok')),
+              icon: const Icon(Icons.info_outlined)),
+        ));
   }
 }
 
