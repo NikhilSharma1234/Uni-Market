@@ -51,6 +51,15 @@ class RegisterForm extends StatelessWidget {
 
 // Email Input Field
 class EmailContainer extends StatelessWidget {
+  String? validateEmail(String? value) {
+    const pattern = r"^[A-Za-z0-9._%+-]+@nevada\.unr\.edu$";
+    final regex = RegExp(pattern);
+
+    return value!.isNotEmpty && !regex.hasMatch(value)
+        ? 'Enter a valid email address.'
+        : null;
+  }
+
   const EmailContainer({
     Key? key,
   }) : super(key: key);
@@ -58,16 +67,31 @@ class EmailContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        keyboardType: TextInputType.emailAddress,
-        textInputAction: TextInputAction.next,
-        cursorColor: Colors.white,
-        onSaved: (email) {},
-        decoration: const InputDecoration(
-            hintText: "Email",
-            prefixIcon: Padding(
-              padding: EdgeInsets.all(defaultPadding),
-              child: Icon(Icons.email_rounded),
-            )));
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      cursorColor: Colors.white,
+      onSaved: (email) {},
+      decoration: InputDecoration(
+        prefixIconConstraints:
+            const BoxConstraints(minWidth: 23, maxHeight: 20),
+        hintText: "johndoe@exampleschool.edu",
+        labelText: "Email",
+        prefixIcon: const Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: Icon(Icons.email_rounded),
+        ),
+        suffixIcon: IconButton(
+            onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => appDialog(
+                    context,
+                    'Email Input',
+                    'Please input your email with a .\'edu\' domain',
+                    'Ok')),
+            icon: const Icon(Icons.info_outlined)),
+      ),
+      validator: validateEmail,
+    );
   }
 }
 
