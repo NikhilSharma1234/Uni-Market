@@ -112,11 +112,12 @@ class _AboutYouContentState extends State<AboutYouContent> {
             ElevatedButton(
               onPressed: () async {
                 FilePickerResult? result = await FilePicker.platform.pickFiles();
-                if (result != null) {
-                  String? uploadedFileURL = await uploadService.uploadFile(
+                if (result != null)//backend is not
+                 {
+                  String? uploadedFileName = await uploadService.uploadFile(
                       result.files.single, 
                       result.files.single.name);
-                  onUpload(uploadedFileURL);
+                  onUpload(uploadedFileName);
                 }
               },
               child: Text('Upload $title'),
