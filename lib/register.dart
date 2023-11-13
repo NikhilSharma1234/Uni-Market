@@ -47,7 +47,6 @@ class RegisterForm extends StatelessWidget {
                   if (_formKey.currentState!.validate()) {
                     // If the form is valid, display a snackbar. In the real world,
                     // you'd often call a server or save the information in a database.
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Creating your account')),
                     );
@@ -60,7 +59,6 @@ class RegisterForm extends StatelessWidget {
               ),
             ])));
   }
-
   // Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)
   Future<void> _createUser(
     BuildContext context,
@@ -88,6 +86,8 @@ class RegisterForm extends StatelessWidget {
     }
   }
 }
+
+
 
 // Email Input Field
 class EmailContainer extends StatefulWidget {
@@ -151,7 +151,7 @@ class NameContainer extends StatefulWidget {
     Key? key,
     required this.nameController,
   }) : super(key: key);
-
+  
   @override
   State<NameContainer> createState() => _NameContainerState();
 }
@@ -181,6 +181,7 @@ class _NameContainerState extends State<NameContainer> {
               icon: const Icon(Icons.info_outlined)),
         ));
   }
+
 }
 
 class PasswordContainer extends StatefulWidget {
@@ -189,7 +190,7 @@ class PasswordContainer extends StatefulWidget {
     Key? key,
     required this.passwordController,
   }) : super(key: key);
-
+  
   @override
   State<PasswordContainer> createState() => _MyPasswordContainerState();
 }
