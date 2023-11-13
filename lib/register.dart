@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dialog.dart';
 
@@ -14,6 +16,12 @@ Step Register(index) {
 
 // Register Form
 class RegisterForm extends StatelessWidget {
+
+  // Initialize controllers for Each Input Container
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   RegisterForm({
     Key? key,
   }) : super(key: key);
@@ -26,11 +34,11 @@ class RegisterForm extends StatelessWidget {
         child: Form(
             key: _formKey,
             child: Column(children: [
-              const NameContainer(),
+              NameContainer(nameController: nameController),
               const SizedBox(height: 10),
-              const EmailContainer(),
+              EmailContainer(emailController: emailController),
               const SizedBox(height: 10),
-              const PasswordContainer(),
+              PasswordContainer(passwordController: passwordController,),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
@@ -38,19 +46,69 @@ class RegisterForm extends StatelessWidget {
                   if (_formKey.currentState!.validate()) {
                     // If the form is valid, display a snackbar. In the real world,
                     // you'd often call a server or save the information in a database.
+                    
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Creating your account')),
                     );
+                    // Attempt to register user input into Firebase
+                    _createUser(context, nameController, emailController,passwordController);
                   }
                 },
                 child: const Text('Submit'),
               ),
             ])));
   }
+  
+  // Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)
+  Future<void> _createUser(
+    BuildContext context,
+    TextEditingController nameController,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+
+  ) async {
+    try {
+
+      // Get user input from text field controllers (Remove ending whitespaces)
+      String userEmail = emailController.text.trim();
+      String password = passwordController.text.trim();
+      String displayName = nameController.text.trim();
+
+    
+      // Use Firebase Authentification to create a user with email and password
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: userEmail, password: password);
+
+      // Add Users' Display Name
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
+
+    } catch (e)
+    {
+      // Handling Create User Errors (Currently Not Viable for Production using print)
+      print("Error creating user: $e");
+    }
+  }
+
 }
 
+
+
 // Email Input Field
-class EmailContainer extends StatelessWidget {
+class EmailContainer extends StatefulWidget {
+
+  final TextEditingController emailController;
+
+  const EmailContainer({
+    Key? key,
+    required this.emailController,
+  }) : super(key: key);
+
+  @override
+  State<EmailContainer> createState() => _EmailContainerState();
+
+}  
+
+class _EmailContainerState extends State<EmailContainer> {
+
   String? validateEmail(String? value) {
     const pattern = r"^[A-Za-z0-9._%+-]+@nevada\.unr\.edu$";
     final regex = RegExp(pattern);
@@ -60,13 +118,10 @@ class EmailContainer extends StatelessWidget {
         : null;
   }
 
-  const EmailContainer({
-    Key? key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.emailController,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       cursorColor: Colors.white,
@@ -96,14 +151,23 @@ class EmailContainer extends StatelessWidget {
 }
 
 // Name Input Field
-class NameContainer extends StatelessWidget {
+class NameContainer extends StatefulWidget {
+  final TextEditingController nameController;
   const NameContainer({
     Key? key,
+    required this.nameController,
   }) : super(key: key);
+  
+  @override
+  State<NameContainer> createState() => _NameContainerState();
+}
+
+class _NameContainerState extends State<NameContainer> {
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+        controller: widget.nameController,
         keyboardType: TextInputType.name,
         textInputAction: TextInputAction.next,
         cursorColor: Colors.white,
@@ -124,11 +188,17 @@ class NameContainer extends StatelessWidget {
               icon: const Icon(Icons.info_outlined)),
         ));
   }
+
 }
 
-class PasswordContainer extends StatefulWidget {
-  const PasswordContainer({super.key});
 
+class PasswordContainer extends StatefulWidget {
+  final TextEditingController passwordController;
+  const PasswordContainer({
+    Key? key,
+    required this.passwordController,
+  }) : super(key: key);
+  
   @override
   State<PasswordContainer> createState() => _MyPasswordContainerState();
 }
@@ -155,6 +225,7 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.passwordController,
         textInputAction: TextInputAction.done,
         obscureText: !_passwordVisible,
         cursorColor: Colors.white,
