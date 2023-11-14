@@ -86,8 +86,6 @@ class RegisterForm extends StatelessWidget {
   }
 }
 
-
-
 // Email Input Field
 class EmailContainer extends StatefulWidget {
   final TextEditingController emailController;
@@ -150,7 +148,7 @@ class NameContainer extends StatefulWidget {
     Key? key,
     required this.nameController,
   }) : super(key: key);
-  
+
   @override
   State<NameContainer> createState() => _NameContainerState();
 }
@@ -180,7 +178,6 @@ class _NameContainerState extends State<NameContainer> {
               icon: const Icon(Icons.info_outlined)),
         ));
   }
-
 }
 
 class PasswordContainer extends StatefulWidget {
@@ -189,7 +186,7 @@ class PasswordContainer extends StatefulWidget {
     Key? key,
     required this.passwordController,
   }) : super(key: key);
-  
+
   @override
   State<PasswordContainer> createState() => _MyPasswordContainerState();
 }
