@@ -23,11 +23,13 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
             textStyle: const TextStyle(fontSize: 20),
           ),
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const MyHomePage(title: 'SignUp'),
-              ),
-            );
+            // Get the current route
+            var currentRoute = ModalRoute.of(context)?.settings.name;
+
+            // Check if the current route is not the one you are trying to navigate to
+            if (currentRoute != '/signUp') {
+              Navigator.pushReplacementNamed(context, '/signIn');
+            }
           },
           child: const Text('Sign Up'),
         ),
@@ -43,11 +45,13 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
                 textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const SignInPage(title: 'Sign In'),
-                  ),
-                );
+                // Get the current route
+                var currentRoute = ModalRoute.of(context)?.settings.name;
+
+                // Check if the current route is not the one you are trying to navigate to
+                if (currentRoute != '/signIn') {
+                  Navigator.pushReplacementNamed(context, '/signIn');
+                }
               },
               child: const Text('Sign In'),
             ),
