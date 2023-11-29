@@ -57,6 +57,8 @@ dev_dependencies:
 
   file_picker: ^6.0.0
 
+  firebase_storage: ^11.5.3
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
