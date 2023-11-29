@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_market/sign_in.dart';
 import 'navbar.dart';
 import 'register.dart';
 import 'verify.dart';
@@ -40,7 +41,13 @@ class MyApp extends StatelessWidget {
         textTheme: const TextTheme().apply(bodyColor: Colors.white),
       ),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialRoute: '/signUp',
+      routes: {
+        '/signUp': (context) => const MyHomePage(title: 'Sign In'),
+        '/signIn': (context) => const SignInPage(title: 'Sign Up'),
+        // TEMP ROUTE BELOW, TO SHOW SIGN IN FUNCTIONALITY W/FIREBASE
+        '/home': (context) => const MyHomePage(title: 'HOME'),
+      },
     );
   }
 }
