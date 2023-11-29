@@ -28,7 +28,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
 
             // Check if the current route is not the one you are trying to navigate to
             if (currentRoute != '/signUp') {
-              Navigator.pushReplacementNamed(context, '/signIn');
+              Navigator.pushReplacementNamed(context, '/signUp');
             }
           },
           child: const Text('Sign Up'),
