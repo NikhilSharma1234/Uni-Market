@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import '/services/UploadService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseUploadService extends UploadService {
   @override
@@ -24,8 +23,7 @@ class FirebaseUploadService extends UploadService {
   }
 
   @override
-  Future<String?> uploadFileFromBytes(
-      Uint8List fileBytes, String fileName) async {
+  Future<String?> uploadFileFromBytes(Uint8List fileBytes, String fileName) async {
     try {
       var fileRef = FirebaseStorage.instance.ref().child('uploads/$fileName');
       var uploadTask = fileRef.putData(fileBytes);
@@ -37,19 +35,6 @@ class FirebaseUploadService extends UploadService {
     } catch (e) {
       print('Error uploading file: $e');
       return null;
-    }
-  }
-
-  Future<void> uploadSelectedSchool(String schoolName) async {
-    var user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      // await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-      //   'school': schoolName,
-      // }, SetOptions(merge: true));
-      print(schoolName);
-      // Optionally, handle successful upload
-    } else {
-      // Optionally, handle the case where there is no user logged in
     }
   }
 }
