@@ -29,8 +29,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
   String? firstFileName;
   String? secondFileName;
 
-  FirebaseUploadService uploadService =
-      FirebaseUploadService(); // Using mock service for now, just replace with firebase upload service like: UploadService uploadService = FireBaseloadService(); name FireBaseloadService() as appropriate. Create firebase upload service with function: "Future<String?> uploadFile(Object file, String fileName); // Return the name of the file"
+  FirebaseUploadService uploadService = FirebaseUploadService();
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
       'Test School',
       "Test School 2",
       "Test School 3"
-    ]; // Replace with list of schools from database
+    ];
     String? dropdownValue;
 
     return Column(
@@ -80,36 +79,32 @@ class _AboutYouContentState extends State<AboutYouContent> {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          value: dropdownValue, // The initial value of the dropdown
+          value: dropdownValue,
           decoration: const InputDecoration(
-            // The box decoration of the dropdown
             border: OutlineInputBorder(),
             filled: true,
             fillColor: Color.fromARGB(71, 11, 26, 103),
-            hintText: "Select your school", // Added hint text
-            hintStyle: TextStyle(
-                fontSize: 16, color: Colors.white), // Style for the hint text
+            hintText: "Select your school",
+            hintStyle: TextStyle(fontSize: 16, color: Colors.white),
           ),
           items: list.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(
                 value,
-                style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white), // Set font size for dropdown items
+                style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
             );
           }).toList(),
           onChanged: (String? newValue) {
-            // This is called when the user selects an item.
             setState(() {
               dropdownValue = newValue!;
             });
+            if (newValue != null) {
+              uploadService.uploadSelectedSchool(newValue);
+            }
           },
-          style: const TextStyle(
-              fontSize:
-                  16), // Set font size for the selected item displayed in the dropdown
+          style: const TextStyle(fontSize: 16),
         ),
       ],
     );
@@ -119,6 +114,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
     required String title,
     required Function(String? url) onUpload,
   }) {
+    ValueNotifier<bool> isUploading = ValueNotifier(false);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -136,37 +133,46 @@ class _AboutYouContentState extends State<AboutYouContent> {
             children: [
               ElevatedButton(
                 onPressed: () async {
+                  
                   FilePickerResult? result =
                       await FilePicker.platform.pickFiles();
+                  isUploading.value = true;
                   if (result != null) {
                     String? uploadedFileName;
                     if (kIsWeb) {
-                      // For web, use bytes
                       Uint8List? fileBytes = result.files.single.bytes;
                       String fileName = result.files.single.name;
-                      // Implement a method to handle file upload using bytes
                       if (fileBytes != null) {
                         uploadedFileName = await uploadService
                             .uploadFileFromBytes(fileBytes, fileName);
-                      } else {
-                        // Handle the case when fileBytes is null
-                        // This could be an error or a fallback behavior
                       }
                     } else {
-                      // For mobile/desktop, use file path
                       File file = File(result.files.single.path!);
                       uploadedFileName = await uploadService.uploadFile(
                           file, result.files.single.name);
                     }
                     onUpload(uploadedFileName);
+                    isUploading.value = false;
+                  } else {
+                    isUploading.value = false;
                   }
                 },
                 child: Text('Upload $title'),
               ),
               const SizedBox(width: 10),
-              if ((title == 'File 1' && firstFileName != null) ||
-                  (title == 'File 2' && secondFileName != null))
-                Text(title == 'File 1' ? firstFileName! : secondFileName!),
+              ValueListenableBuilder<bool>(
+                valueListenable: isUploading,
+                builder: (context, value, child) {
+                  if (value) {
+                    return CircularProgressIndicator();
+                  } else if ((title == 'File 1' && firstFileName != null) ||
+                      (title == 'File 2' && secondFileName != null)) {
+                    return Text(
+                        title == 'File 1' ? firstFileName! : secondFileName!);
+                  }
+                  return Container();
+                },
+              ),
             ],
           ),
         ),
