@@ -100,6 +100,7 @@ packages:
       sha256: "4e42aacde3b993c5947467ab640882c56947d9d27342a5b6f2895b23956954a6"
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
     version: "6.0.0"
   ffi:
     dependency: transitive
@@ -117,6 +118,9 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
+=======
+    version: "6.1.1"
+>>>>>>> 4c2ba49 (Uploads files to firebase properly)
   firebase_auth:
     dependency: "direct main"
     description:
