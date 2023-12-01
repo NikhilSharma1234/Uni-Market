@@ -63,10 +63,6 @@ dev_dependencies:
 
   firebase_storage: ^11.5.3
 
-  cloud_firestore: ^4.13.3
-
-  firebase_storage: ^11.5.3
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
