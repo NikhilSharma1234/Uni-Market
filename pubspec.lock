@@ -124,27 +124,7 @@ packages:
       sha256: "4e42aacde3b993c5947467ab640882c56947d9d27342a5b6f2895b23956954a6"
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-    version: "6.0.0"
-  ffi:
-    dependency: transitive
-    description:
-      name: ffi
-      sha256: "7bf0adc28a23d395f19f3f1eb21dd7cfd1dd9f8e1c50051c069122e6853bc878"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
-  file_picker:
-    dependency: "direct dev"
-    description:
-      name: file_picker
-      sha256: "903dd4ba13eae7cef64acc480e91bf54c3ddd23b5b90b639c170f3911e489620"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
-=======
     version: "6.1.1"
->>>>>>> 4c2ba49 (Uploads files to firebase properly)
   firebase_auth:
     dependency: "direct main"
     description:
