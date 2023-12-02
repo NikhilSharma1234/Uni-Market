@@ -8,7 +8,7 @@ Step AboutYou(int index) {
     title: const Text('About You'),
     content: Container(
       alignment: Alignment.centerLeft,
-      child: AboutYouContent(),
+      child: const AboutYouContent(),
     ),
     isActive: index >= 0,
     state: index >= 2 ? StepState.complete : StepState.disabled,

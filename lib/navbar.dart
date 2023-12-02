@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
+  NavBar({super.key});
+
   @override
   State<NavBar> createState() => _NavBarState();
 }
@@ -15,10 +17,9 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.all(16.0),
+              textStyle: const TextStyle(fontSize: 20)),
           onPressed: () {
             // Get the current route
             var currentRoute = ModalRoute.of(context)?.settings.name;

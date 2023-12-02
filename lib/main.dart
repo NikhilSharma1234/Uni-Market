@@ -5,6 +5,7 @@ import 'navbar.dart';
 import 'register.dart';
 import 'verify.dart';
 import 'aboutyou.dart';
+import 'search.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/signIn': (context) => const SignInPage(title: 'Sign Up'),
         // TEMP ROUTE BELOW, TO SHOW SIGN IN FUNCTIONALITY W/FIREBASE
         '/home': (context) => const MyHomePage(title: 'HOME'),
+        '/search': (context) => const SearchPage(title: 'Search'),
       },
     );
   }
