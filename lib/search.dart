@@ -18,25 +18,37 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  late List<Widget> items;
+
+  // redraws the items on the page based on search results
+  redraw(List<Widget> newItems) {
+    setState(() {
+      items = newItems;
+    });
+  }
+
+  // called just after initstate, used to set the initial items displayed
+  @override
+  void didChangeDependencies() {
+    items = generateItems(10, context);
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(screenWidth * 0.25, 110),
-        child: NavBar(), // Include NavBar if needed
-      ),
+      appBar: NavBar(),
       // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
       body: Column(children: <Widget>[
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
+            const Padding(
                 padding: EdgeInsets.only(right: 60),
-                child: Text("Filters Go here")),
-            MySearchBar(),
+                child: Row(children: <Widget>[
+                  Text("Filters Go here"),
+                ])),
+            MySearchBar(setPageState: redraw),
           ],
         ),
         Expanded(
@@ -44,7 +56,7 @@ class _SearchPageState extends State<SearchPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 50),
                 child: GridView.count(
                   crossAxisCount: 6,
-                  children: generateItems(20, context),
+                  children: items,
                 )))
       ]),
     );
@@ -52,7 +64,14 @@ class _SearchPageState extends State<SearchPage> {
 }
 
 class MySearchBar extends StatefulWidget {
-  const MySearchBar({super.key});
+  // passing a function from the parent down so we can use its setState to redraw the items
+  final Function(List<Widget> newItems) setPageState;
+
+  // requiring the function
+  const MySearchBar({
+    super.key,
+    required this.setPageState,
+  });
 
   @override
   State<MySearchBar> createState() => _MySearchBarState();
@@ -71,9 +90,10 @@ class _MySearchBarState extends State<MySearchBar> {
           searchController: controller,
           // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
           viewOnSubmitted: (value) {
-            search(value, context);
-            // closes the view and sets text to ""
+            // calls the function to redraw items and feeds it the new items via search()
+            widget.setPageState(search(value, context));
             controller.closeView("");
+            // closes the view and sets text to ""
           },
           builder: (BuildContext context, SearchController controller) {
             // attempting to get the search bar to take an enter key to submit search
@@ -138,8 +158,5 @@ getNextItem() {
 }
 
 search(String value, context) {
-  print(value);
-  generateItems(2, context);
-  // figure out how to redraw items page
-  // SearchPage.setState();
+  return generateItems(2, context);
 }
