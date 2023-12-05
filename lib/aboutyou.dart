@@ -133,7 +133,6 @@ class _AboutYouContentState extends State<AboutYouContent> {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  
                   FilePickerResult? result =
                       await FilePicker.platform.pickFiles();
                   isUploading.value = true;
