@@ -59,13 +59,6 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
   file_picker: ^6.1.1
-<<<<<<< HEAD
-
-  firebase_storage: ^11.5.3
-
-  cloud_firestore: ^4.13.3
-=======
->>>>>>> a6d7b89 (Uploads files to firebase properly)
 
   firebase_storage: ^11.5.3
 

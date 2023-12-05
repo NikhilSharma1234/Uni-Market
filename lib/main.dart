@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_market/posting_form.dart';
 import 'package:uni_market/sign_in.dart';
 import 'navbar.dart';
 import 'register.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         '/signIn': (context) => const SignInPage(title: 'Sign Up'),
         // TEMP ROUTE BELOW, TO SHOW SIGN IN FUNCTIONALITY W/FIREBASE
         '/home': (context) => const MyHomePage(title: 'HOME'),
+        '/createPost': (context) => const PostingForm(),
       },
     );
   }
