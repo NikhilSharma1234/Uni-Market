@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/SignUp.dart';
+import 'package:uni_market/sign_in.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
@@ -20,13 +22,11 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
             textStyle: const TextStyle(fontSize: 20),
           ),
           onPressed: () {
-            // Get the current route
-            var currentRoute = ModalRoute.of(context)?.settings.name;
-
-            // Check if the current route is not the one you are trying to navigate to
-            if (currentRoute != '/signUp') {
-              Navigator.pushReplacementNamed(context, '/signUp');
-            }
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const MyHomePage(title: 'SignUp'),
+              ),
+            );
           },
           child: const Text('Sign Up'),
         ),
@@ -42,13 +42,11 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
                 textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
-                // Get the current route
-                var currentRoute = ModalRoute.of(context)?.settings.name;
-
-                // Check if the current route is not the one you are trying to navigate to
-                if (currentRoute != '/signIn') {
-                  Navigator.pushReplacementNamed(context, '/signIn');
-                }
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const SignInPage(title: 'Sign In'),
+                  ),
+                );
               },
               child: const Text('Sign In'),
             ),
