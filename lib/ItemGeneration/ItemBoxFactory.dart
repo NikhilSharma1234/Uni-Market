@@ -7,11 +7,11 @@ import 'MobileItemBox.dart';
 class ItemBoxFactory {
   late ItemBox item;
   makeItemBox(Data data, BuildContext context) {
-    bool isWeb = Theme.of(context) == TargetPlatform.windows ||
-        Theme.of(context) == TargetPlatform.macOS;
+    bool isWeb = Theme.of(context).platform == TargetPlatform.windows ||
+        Theme.of(context).platform == TargetPlatform.macOS;
     isWeb
-        ? item = MobileItemBox(itemData: data, context: context)
-        : item = WebItemBox(itemData: data, context: context);
+        ? item = WebItemBox(itemData: data, context: context)
+        : item = MobileItemBox(itemData: data, context: context);
 
     // should build the itemBox
     return item;

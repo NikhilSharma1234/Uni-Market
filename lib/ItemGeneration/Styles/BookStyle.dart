@@ -3,7 +3,7 @@ import 'Style.dart';
 
 class BookStyle implements Style {
   @override
-  Color backgroundColor = Colors.purple;
+  Color backgroundColor = Colors.orange;
   @override
   Color textColor = Colors.pink;
   @override

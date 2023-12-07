@@ -19,34 +19,54 @@ class MobileItemBox extends ItemBox {
 }
 
 class _MobileItemBoxState extends State<MobileItemBox> {
-  late Style style;
+  late Style theme;
 
   @override
   Widget build(BuildContext context) {
     Map<String, Style> styleType = {
-      "Book": BookStyle(context: context),
-      "Default": DefaultStyle(context: context)
+      "book": BookStyle(context: context),
+      "default": DefaultStyle(context: context)
     };
 
     // getting the correct style type - maybe combine colors down the line?
     bool found = false;
     for (var key in styleType.keys) {
       if (widget.itemData.tags.contains(key)) {
-        style = styleType[key]!;
+        theme = styleType[key]!;
         found = true;
         break;
       }
     }
     if (!found) {
-      style = styleType["Default"]!;
+      theme = styleType["Default"]!;
     }
 
+    var style = theme.getThemeData();
+    var item = widget.itemData;
+
     // use the style here when creating box
-    return SizedBox(
-        width: 10,
-        child: Text(
-          widget.itemData.name,
-          style: style.getThemeData().textTheme.headlineMedium,
-        ));
+    return InkWell(
+        // for future use to link each item to a unique page based on its id
+        // onTap: () {
+        //   Navigator.pushReplacementNamed(context, "$id");
+        // },
+        child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.lightBlue),
+                    color: style.colorScheme.background),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(child: Image.asset(item.imagePath)),
+                      Center(
+                          child: Text(item.name,
+                              style: const TextStyle(fontSize: 20))),
+                    ],
+                  ),
+                ))));
   }
 }

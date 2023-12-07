@@ -65,6 +65,7 @@ class _SearchPageState extends State<SearchPage> {
                 child: GridView.count(
                   crossAxisCount: 6,
                   children: items,
+                  childAspectRatio: 2 / 3,
                 )))
       ]),
     );
@@ -91,6 +92,8 @@ class _MySearchBarState extends State<MySearchBar> {
   final SearchController controller = SearchController();
   List<ListTile> suggestions = [];
 
+  PageController ctrl = PageController();
+
   void updateSuggestions(String typedText) {
     setState(() {
       suggestions = List<ListTile>.generate(5, (int index) {
@@ -100,7 +103,7 @@ class _MySearchBarState extends State<MySearchBar> {
           onTap: () {
             setState(() {
               // redraw the page when the search has been done
-              search(item, context).then((value) {
+              ctrl.search(item, context).then((value) {
                 widget.setPageState(value, false);
               });
               controller.closeView(item);
@@ -120,7 +123,7 @@ class _MySearchBarState extends State<MySearchBar> {
           // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
           viewOnSubmitted: (value) {
             // redraw the page when the search has been done
-            search(value, context).then((value) {
+            ctrl.search(value, context).then((value) {
               widget.setPageState(value, false);
             });
             controller.closeView("");
@@ -148,20 +151,24 @@ class _MySearchBarState extends State<MySearchBar> {
   }
 }
 
-search(String value, context) async {
-  // do some search logic here r smthn
-  return await generateItems(2, context);
-}
-
-generateItems(int num, BuildContext context) async {
+class PageController {
   AbstractItemFactory factory = AbstractItemFactory();
   ItemModel model = ItemModel();
-  List<Widget> widgets = [];
 
-  for (Data item in await model.getData('assets/items.csv', num)) {
-    widgets.add(factory.buildItemBox(item, context));
+  search(String value, BuildContext context) async {
+    // do some search logic here r smthn
+    return await generateItems(2, context);
   }
-  return widgets;
+
+  generateItems(int num, BuildContext context) async {
+    List<Widget> widgets = [];
+    for (Data item in await model.getData('assets/items.csv', num)) {
+      if (context.mounted) {
+        widgets.add(factory.buildItemBox(item, context));
+      }
+    }
+    return widgets;
+  }
 }
 
 class ItemModel {
@@ -179,8 +186,8 @@ class ItemModel {
       if (numLines == 0) {
         break;
       }
-      items.add(Data(field[0], field[1], field[2], field[3],
-          List<String>.from(field.sublist(4, field.length))));
+      items.add(Data(field[0], field[1], field[2], field[3], field[4],
+          List<String>.from(field.sublist(5))));
       numLines -= 1;
     }
     return items;
