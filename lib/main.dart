@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           physics: const ScrollPhysics(),
                           steps: <Step>[
                             Register(index, () => tapped(1)),
-                            Verify(index),
+                            Verify(index, () => tapped(2)),
                             AboutYou(index),
                           ],
                         ))
