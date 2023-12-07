@@ -89,25 +89,9 @@ Future<void> _signInUser(
     String userEmail = emailController.text.trim();
     String password = passwordController.text.trim();
 
-    // Capture the current route
-    var currentRoute = ModalRoute.of(context)?.settings.name;
-
     // Use Firebase Authentication to sign in the user
-    UserCredential userCredential = await FirebaseAuth.instance
+    await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: userEmail, password: password);
-
-    // Route user to home page if Sign In is successful and email is verified
-    if (userCredential.user?.emailVerified == true) {
-      // Check if the current route is not the one you are trying to navigate to
-      if (currentRoute != '/home') {
-        // Use the captured current route in the callback
-        Future.delayed(Duration.zero, () {
-          Navigator.pushReplacementNamed(context, '/home');
-        });
-      }
-    } else {
-      print("Account in db but email is not verified");
-    }
   } on FirebaseAuthException catch (e) {
     // Handling Create User Errors (Currently Not Viable for Production using print)
     if (e.code == 'user-not-found') {
