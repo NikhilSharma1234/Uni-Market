@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
   const UserNavBar({super.key});
@@ -43,6 +44,23 @@ class _UserNavBarState extends State<UserNavBar> {
                 });
               }),
             ],
+          ),
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Container(
+            color: Colors.white,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF041E42),
+                padding: const EdgeInsets.all(16.0),
+                textStyle: const TextStyle(fontSize: 20),
+              ),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+              child: const Text('Sign Out'),
+            ),
           ),
         ),
       ],
