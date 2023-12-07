@@ -124,12 +124,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Stepper(
                           type: StepperType.horizontal,
                           currentStep: index,
+                          controlsBuilder: (context, controller) {
+                            return const SizedBox();
+                          },
                           onStepCancel: cancel,
                           onStepContinue: continued,
                           onStepTapped: (step) => tapped(step),
                           physics: const ScrollPhysics(),
                           steps: <Step>[
-                            Register(index),
+                            Register(index, () => tapped(1)),
                             Verify(index),
                             AboutYou(index),
                           ],
