@@ -3,15 +3,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dialog.dart';
 
-Step Register(index) {
+Step Register(index, tapped) {
   return Step(
       title: const Text('Register'),
       content: Container(
         alignment: Alignment.centerLeft,
-        child: RegisterForm(),
+        child: RegisterForm(tapped: tapped),
       ),
-      isActive: index >= 0,
-      state: index >= 0 ? StepState.complete : StepState.disabled);
+      isActive: index == 0,
+      state: index > 0 ? StepState.complete : StepState.disabled);
 }
 
 // Register Form
@@ -20,8 +20,10 @@ class RegisterForm extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final Function() tapped;
 
   RegisterForm({
+    required this.tapped,
     Key? key,
   }) : super(key: key);
 
@@ -41,30 +43,30 @@ class RegisterForm extends StatelessWidget {
                 passwordController: passwordController,
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Creating your account')),
-                    );
-                    // Attempt to register user input into Firebase
-                    _createUser(context, nameController, emailController,
-                        passwordController);
-                  }
-                },
-                child: const Text('Submit'),
+              Padding(
+                padding: const EdgeInsets.only(top: 32),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Validate returns true if the form is valid, or false otherwise.
+                    if (_formKey.currentState!.validate()) {
+                      // Attempt to register user input into Firebase
+                      _createUser(context, nameController, emailController,
+                          passwordController, tapped);
+                    }
+                  },
+                  child: const Text('Submit'),
+                ),
               ),
             ])));
   }
+
   // Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)
   Future<void> _createUser(
     BuildContext context,
     TextEditingController nameController,
     TextEditingController emailController,
     TextEditingController passwordController,
+    Function() tapped,
   ) async {
     try {
       // Get user input from text field controllers (Remove ending whitespaces)
@@ -76,13 +78,26 @@ class RegisterForm extends StatelessWidget {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: userEmail, password: password);
 
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Creating your account')),
+      );
+
       // Add Users' Display Name
       await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
 
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+
+      tapped();
     } catch (e) {
       // Handling Create User Errors (Currently Not Viable for Production using print)
       print("Error creating user: $e");
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error Creating User')),
+      );
     }
   }
 }
