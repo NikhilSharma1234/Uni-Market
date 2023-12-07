@@ -1,10 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'dart:async';
 
-Step Verify(index) {
+Step Verify(index, tapped) {
   return Step(
     title: const Text('Verify'),
-    content: Center(child: Verification()),
+    content: Center(child: Verification(tapped: tapped)),
     isActive: index >= 0,
     state: index >= 1 ? StepState.complete : StepState.disabled,
   );
@@ -13,48 +14,77 @@ Step Verify(index) {
 // verification code needs to have a state, which step doesnt have.
 // this means it needs it's own class that gets made in the return of the step
 class Verification extends StatefulWidget {
+  final Function() tapped;
+  const Verification({required this.tapped, Key? key}) : super(key: key);
   @override
   State<Verification> createState() => _VerificationState();
 }
 
 class _VerificationState extends State<Verification>
     with TickerProviderStateMixin {
+  bool buttonPressed = false;
+  bool userVerified = false;
+
+  toggleVerification() {
+    setState(() => buttonPressed = !buttonPressed);
+  }
+
+  setVerified() {
+    setState(() => userVerified = true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool _onEditing = true;
-    String? _code;
-
-    return VerificationCode(
-      textStyle: TextStyle(fontSize: 20.0, color: Colors.red[900]),
-      keyboardType: TextInputType.number,
-      underlineColor: Colors
-          .amber, // If this is null it will use primaryColor: Colors.red from Theme
-      length: 6,
-      cursorColor:
-          Colors.blue, // If this is null it will default to the ambient
-      // clearAll is NOT required, you can delete it
-      // takes any widget, so you can implement your design
-      clearAll: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          'clear all',
-          style: TextStyle(
-              fontSize: 14.0,
-              decoration: TextDecoration.underline,
-              color: Colors.blue[700]),
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 32),
+            child: Text(
+              'Please check your email for a verification link.\n Once you\'ve clicked the link, come back here and press the button below!',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              toggleVerification();
+              Timer(const Duration(seconds: 4), () async {
+                await FirebaseAuth.instance.currentUser?.reload();
+                bool isVerified =
+                    FirebaseAuth.instance.currentUser!.emailVerified;
+                print(isVerified);
+                if (isVerified) {
+                  setVerified();
+                  toggleVerification();
+                  Timer(const Duration(seconds: 2), () async {
+                  widget.tapped();
+                  });
+                  return;
+                }
+                toggleVerification();
+              });
+            },
+            style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                padding: const EdgeInsets.all(20),
+                backgroundColor: !buttonPressed && !userVerified
+                    ? Colors.red
+                    : buttonPressed && !userVerified
+                        ? Colors.black
+                        : Colors.green,
+                foregroundColor: Colors.white),
+            child: buttonPressed && !userVerified
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  )
+                : userVerified
+                    ? const Icon(Icons.check, color: Colors.white)
+                    : const Icon(Icons.close, color: Colors.white),
+          )
+        ],
       ),
-      onCompleted: (String value) {
-        setState(() {
-          _code = value;
-        });
-      },
-      onEditing: (bool value) {
-        setState(() {
-          _onEditing = value;
-        });
-        if (!_onEditing) FocusScope.of(context).unfocus();
-      },
     );
   }
 }
