@@ -57,10 +57,14 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
         ),
       ],
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      title: Image.asset(
-          (darkModeOn) ? 'assets/logo_dark.png' : 'assets/logo_light.png',
-          fit: BoxFit.contain,
-          height: 48),
+      title: GestureDetector(
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          child: Image.asset(
+              (darkModeOn) ? 'assets/logo_dark.png' : 'assets/logo_light.png',
+              fit: BoxFit.contain,
+              height: 48)),
     );
   }
 }

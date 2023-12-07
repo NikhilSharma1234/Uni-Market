@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'navbar.dart'; // Import NavBar if needed
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'register.dart';
+import 'navbar.dart';
+import 'ItemGeneration/data.dart';
+import '/ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
+
+import 'package:flutter/services.dart' show rootBundle;
+
+import 'package:csv/csv.dart';
 
 class SearchPage extends StatefulWidget {
   final String title;
@@ -21,21 +24,24 @@ class _SearchPageState extends State<SearchPage> {
   late List<Widget> items;
 
   // redraws the items on the page based on search results
-  redraw(List<Widget> newItems) {
+  redrawItems(List<Widget> newItems, bool append) {
     setState(() {
-      items = newItems;
+      append ? items = items + newItems : items = newItems;
     });
   }
 
   // called just after initstate, used to set the initial items displayed
   @override
   void didChangeDependencies() {
-    items = generateItems(10, context);
+    items = generateFakeItems(30, context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: NavBar(),
       // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
@@ -48,7 +54,9 @@ class _SearchPageState extends State<SearchPage> {
                 child: Row(children: <Widget>[
                   Text("Filters Go here"),
                 ])),
-            MySearchBar(setPageState: redraw),
+            SizedBox(
+                width: .5 * screenWidth,
+                child: MySearchBar(setPageState: redrawItems)),
           ],
         ),
         Expanded(
@@ -65,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
 
 class MySearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
-  final Function(List<Widget> newItems) setPageState;
+  final Function(List<Widget> newItems, bool append) setPageState;
 
   // requiring the function
   const MySearchBar({
@@ -81,6 +89,27 @@ class _MySearchBarState extends State<MySearchBar> {
   bool isDark = true;
   late String searchVal;
   final SearchController controller = SearchController();
+  List<ListTile> suggestions = [];
+
+  void updateSuggestions(String typedText) {
+    setState(() {
+      suggestions = List<ListTile>.generate(5, (int index) {
+        final String item = '$typedText$index';
+        return ListTile(
+          title: Text(item),
+          onTap: () {
+            setState(() {
+              // redraw the page when the search has been done
+              search(item, context).then((value) {
+                widget.setPageState(value, false);
+              });
+              controller.closeView(item);
+            });
+          },
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,10 +119,14 @@ class _MySearchBarState extends State<MySearchBar> {
           searchController: controller,
           // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
           viewOnSubmitted: (value) {
-            // calls the function to redraw items and feeds it the new items via search()
-            widget.setPageState(search(value, context));
+            // redraw the page when the search has been done
+            search(value, context).then((value) {
+              widget.setPageState(value, false);
+            });
             controller.closeView("");
-            // closes the view and sets text to ""
+          },
+          viewOnChanged: (value) {
+            updateSuggestions(value);
           },
           builder: (BuildContext context, SearchController controller) {
             // attempting to get the search bar to take an enter key to submit search
@@ -109,24 +142,53 @@ class _MySearchBarState extends State<MySearchBar> {
           },
           suggestionsBuilder:
               (BuildContext context, SearchController controller) {
-            return List<ListTile>.generate(5, (int index) {
-              final String item = 'item $index';
-              return ListTile(
-                title: Text(item),
-                onTap: () {
-                  setState(() {
-                    controller.closeView(item);
-                  });
-                },
-              );
-            });
+            return suggestions;
           }),
     );
   }
 }
 
-generateItems(int num, BuildContext context) {
-  List items = <Widget>[];
+search(String value, context) async {
+  // do some search logic here r smthn
+  return await generateItems(2, context);
+}
+
+generateItems(int num, BuildContext context) async {
+  AbstractItemFactory factory = AbstractItemFactory();
+  ItemModel model = ItemModel();
+  List<Widget> widgets = [];
+
+  for (Data item in await model.getData('assets/items.csv', num)) {
+    widgets.add(factory.buildItemBox(item, context));
+  }
+  return widgets;
+}
+
+class ItemModel {
+  // get the data from the text file
+  getData(String fileName, int num) async {
+    List<Data> items = [];
+    int numLines = num;
+    var rawFileString = await rootBundle.loadString(fileName);
+    // return rawFileString;
+    List<List<dynamic>> dataFile =
+        const CsvToListConverter().convert(rawFileString);
+
+    for (var field in dataFile) {
+      // do a certain number of lines
+      if (numLines == 0) {
+        break;
+      }
+      items.add(Data(field[0], field[1], field[2], field[3],
+          List<String>.from(field.sublist(4, field.length))));
+      numLines -= 1;
+    }
+    return items;
+  }
+}
+
+generateFakeItems(int num, BuildContext context) {
+  List<Widget> items = [];
   for (int i = 0; i < num; i++) {
     // temporary bit for testing
     items.add(Container(
@@ -135,28 +197,10 @@ generateItems(int num, BuildContext context) {
         decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
         child: Center(
           child: Text(
-            abstractItemFactory(getNextItem(), "Web", context),
+            "Text",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
         )));
-
-    // this should return the preformatted widget and wont need above stuff
-    // items.add(abstractItemFactory(getNextItem(), "Web", context));
   }
-  // print(items);
   return items;
-}
-
-// placeholder for function that will generate the item tiles
-abstractItemFactory(param, String str, BuildContext context) {
-  return param;
-}
-
-// should get the next item from the database
-getNextItem() {
-  return "Item";
-}
-
-search(String value, context) {
-  return generateItems(2, context);
 }
