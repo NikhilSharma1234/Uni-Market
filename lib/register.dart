@@ -89,6 +89,9 @@ class RegisterForm extends StatelessWidget {
 
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: userEmail, password: password);
+
       tapped();
     } catch (e) {
       // Handling Create User Errors (Currently Not Viable for Production using print)
