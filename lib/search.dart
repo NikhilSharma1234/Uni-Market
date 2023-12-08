@@ -21,7 +21,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  late List<Widget> items;
+  late List<Widget> items = [const Text("")];
 
   // redraws the items on the page based on search results
   redrawItems(List<Widget> newItems, bool append) {
@@ -32,8 +32,11 @@ class _SearchPageState extends State<SearchPage> {
 
   // called just after initstate, used to set the initial items displayed
   @override
-  void didChangeDependencies() {
-    items = generateFakeItems(30, context);
+  void didChangeDependencies() async {
+    PageController ctrl = PageController();
+    ctrl.search("", 30, context).then((value) {
+      redrawItems(value, false);
+    });
     super.didChangeDependencies();
   }
 
@@ -41,6 +44,17 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    Widget body = GridView.count(
+      crossAxisCount: 6,
+      childAspectRatio: 2 / 3,
+      children: items,
+    );
+
+    if (items.isEmpty) {
+      body =
+          const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
+    }
 
     return Scaffold(
       appBar: NavBar(),
@@ -62,11 +76,7 @@ class _SearchPageState extends State<SearchPage> {
         Expanded(
             child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: GridView.count(
-                  crossAxisCount: 6,
-                  children: items,
-                  childAspectRatio: 2 / 3,
-                )))
+                child: body))
       ]),
     );
   }
@@ -103,7 +113,7 @@ class _MySearchBarState extends State<MySearchBar> {
           onTap: () {
             setState(() {
               // redraw the page when the search has been done
-              ctrl.search(item, context).then((value) {
+              ctrl.search(item, 30, context).then((value) {
                 widget.setPageState(value, false);
               });
               controller.closeView(item);
@@ -123,7 +133,7 @@ class _MySearchBarState extends State<MySearchBar> {
           // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
           viewOnSubmitted: (value) {
             // redraw the page when the search has been done
-            ctrl.search(value, context).then((value) {
+            ctrl.search(value, 30, context).then((value) {
               widget.setPageState(value, false);
             });
             controller.closeView("");
@@ -155,16 +165,23 @@ class PageController {
   AbstractItemFactory factory = AbstractItemFactory();
   ItemModel model = ItemModel();
 
-  search(String value, BuildContext context) async {
-    // do some search logic here r smthn
-    return await generateItems(2, context);
+  search(String searchTerm, int number, BuildContext context) async {
+    return await generateItems(searchTerm, number, context);
   }
 
-  generateItems(int num, BuildContext context) async {
+  generateItems(String searchTerm, int num, BuildContext context) async {
     List<Widget> widgets = [];
+    int i = 0;
     for (Data item in await model.getData('assets/items.csv', num)) {
+      if (!item.tags.contains(searchTerm) && searchTerm != "") {
+        continue;
+      }
+      if (i >= num) {
+        break;
+      }
       if (context.mounted) {
         widgets.add(factory.buildItemBox(item, context));
+        i++;
       }
     }
     return widgets;

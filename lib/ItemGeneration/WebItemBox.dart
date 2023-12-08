@@ -53,14 +53,23 @@ class _WebItemBoxState extends State<WebItemBox> {
             padding: const EdgeInsets.all(5.0),
             child: Container(
                 decoration: BoxDecoration(
-                    border: Border.all(color: Colors.lightBlue),
-                    color: style.colorScheme.background),
+                    border: Border.all(color: style.colorScheme.onPrimary),
+                    color: style.colorScheme.background,
+                    borderRadius: const BorderRadius.all(Radius.circular(20))),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(child: Image.asset(item.imagePath)),
+                      Center(
+                        child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            child: Image.asset(
+                              item.imagePath,
+                              fit: BoxFit.fitWidth,
+                            )),
+                      ),
                       Center(
                           child: Text(item.name,
                               style: const TextStyle(fontSize: 20))),

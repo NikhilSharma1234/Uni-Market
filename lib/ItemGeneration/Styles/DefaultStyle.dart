@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'Style.dart';
 
 class DefaultStyle implements Style {
+  Color borderColor = Colors.pink;
   @override
-  Color backgroundColor = Colors.purple;
+  Color backgroundColor = Colors.blueGrey;
   @override
   Color textColor = Colors.blue;
   @override
@@ -14,8 +15,9 @@ class DefaultStyle implements Style {
   @override
   ThemeData getThemeData() {
     // copying base color scheme and adding differences
-    ColorScheme cs =
-        Theme.of(context).colorScheme.copyWith(background: backgroundColor);
+    ColorScheme cs = Theme.of(context)
+        .colorScheme
+        .copyWith(background: backgroundColor, onPrimary: borderColor);
     return ThemeData(colorScheme: cs);
   }
 }
