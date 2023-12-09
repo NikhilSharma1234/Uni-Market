@@ -66,10 +66,10 @@ class _AboutYouContentState extends State<AboutYouContent> {
               valueListenable: isSubmitting,
               builder: (context, isLoading, child) {
                 return isLoading
-                    ? CircularProgressIndicator() // Show loading indicator
+                    ? const CircularProgressIndicator() // Show loading indicator
                     : ElevatedButton(
                         onPressed: checkUpload,
-                        child: Text('Submit'),
+                        child: const Text('Submit'),
                       );
               },
             ),
@@ -196,7 +196,6 @@ class _AboutYouContentState extends State<AboutYouContent> {
   }
 
   Future<void> checkUpload() async {
-    //call isSubmitting.value = true; when the upload starts
     isSubmitting.value = true;
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
       try {
@@ -227,10 +226,9 @@ class _AboutYouContentState extends State<AboutYouContent> {
     } else {
       // Handle the case where not all information is present
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please complete all fields before submitting')),
+        const SnackBar(content: Text('Please complete all fields before submitting')),
       );
     }
-    //call isSubmitting.value = false; when the upload is complete
     isSubmitting.value = false;
   }
 }
