@@ -57,58 +57,57 @@ class _AboutYouContentState extends State<AboutYouContent> {
     );
   }
 
-  Widget _buildSchoolDropdown() {
-    List<String> list = [
-      'University of Nevada, Reno',
-      'Test School',
-      "Test School 2",
-      "Test School 3"
-    ];
-    String? dropdownValue;
+Widget _buildSchoolDropdown() {
+  List<String> list = [
+    'University of Nevada, Reno',
+    'Test School',
+    "Test School 2",
+    "Test School 3"
+  ];
+  String? dropdownValue = selectedSchool; // Ensure dropdown reflects the current state
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'School*',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'School*',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
         ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          value: dropdownValue,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            filled: true,
-            fillColor: Color.fromARGB(71, 11, 26, 103),
-            hintText: "Select your school",
-            hintStyle: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-          items: list.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-            if (newValue != null) {
-              uploadService.uploadSelectedSchool(newValue);
-            }
-          },
-          style: const TextStyle(fontSize: 16),
+      ),
+      const SizedBox(height: 12),
+      DropdownButtonFormField<String>(
+        value: dropdownValue,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Color.fromARGB(71, 11, 26, 103),
+          hintText: "Select your school",
+          hintStyle: TextStyle(fontSize: 16, color: Colors.white),
         ),
-      ],
-    );
-  }
+        items: list.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedSchool = newValue; // Update the selectedSchool state variable
+            dropdownValue = newValue; // Update dropdownValue for UI consistency
+          });
+        },
+        style: const TextStyle(fontSize: 16),
+      ),
+    ],
+  );
+}
+
 
   Widget _buildFileUpload({
     required String title,
