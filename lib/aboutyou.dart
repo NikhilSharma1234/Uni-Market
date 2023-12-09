@@ -28,6 +28,9 @@ class _AboutYouContentState extends State<AboutYouContent> {
   String? selectedSchool;
   String? firstFileName;
   String? secondFileName;
+  FilePickerResult? fileResult1;
+  FilePickerResult? fileResult2;
+
 
   FirebaseUploadService uploadService = FirebaseUploadService();
 
@@ -40,6 +43,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
         const SizedBox(height: 32),
         _buildFileUpload(
             title: 'File 1',
+            fileNumber: 1,  // Added fileNumber argument
             onUpload: (url) {
               setState(() {
                 firstFileName = url;
@@ -48,6 +52,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
         const SizedBox(height: 32),
         _buildFileUpload(
             title: 'File 2',
+            fileNumber: 2,  // Added fileNumber argument
             onUpload: (url) {
               setState(() {
                 secondFileName = url;
@@ -111,7 +116,8 @@ Widget _buildSchoolDropdown() {
 
   Widget _buildFileUpload({
     required String title,
-    required Function(String? url) onUpload,
+    required int fileNumber,
+    required Function(String) onUpload,
   }) {
     ValueNotifier<bool> isUploading = ValueNotifier(false);
 
@@ -131,32 +137,26 @@ Widget _buildSchoolDropdown() {
           child: Row(
             children: [
               ElevatedButton(
-                onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles();
-                  isUploading.value = true;
-                  if (result != null) {
-                    String? uploadedFileName;
-                    if (kIsWeb) {
-                      Uint8List? fileBytes = result.files.single.bytes;
-                      String fileName = result.files.single.name;
-                      if (fileBytes != null) {
-                        uploadedFileName = await uploadService
-                            .uploadFileFromBytes(fileBytes, fileName);
-                      }
-                    } else {
-                      File file = File(result.files.single.path!);
-                      uploadedFileName = await uploadService.uploadFile(
-                          file, result.files.single.name);
-                    }
-                    onUpload(uploadedFileName);
-                    isUploading.value = false;
-                  } else {
-                    isUploading.value = false;
-                  }
-                },
-                child: Text('Upload $title'),
-              ),
+      onPressed: () async {
+        FilePickerResult? result = await FilePicker.platform.pickFiles();
+        isUploading.value = true;
+        if (result != null) {
+          setState(() {
+            if (fileNumber == 1) {
+              fileResult1 = result;
+              firstFileName = result.files.single.name;
+            } else {
+              fileResult2 = result;
+              secondFileName = result.files.single.name;
+            }
+          });
+          isUploading.value = false;
+        } else {
+          isUploading.value = false;
+        }
+      },
+      child: Text('Upload $title'),
+    ),
               const SizedBox(width: 10),
               ValueListenableBuilder<bool>(
                 valueListenable: isUploading,
