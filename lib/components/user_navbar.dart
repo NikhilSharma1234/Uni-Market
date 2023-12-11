@@ -76,7 +76,8 @@ class NavItem extends StatelessWidget {
   final ValueChanged<int> onHover;
 
   const NavItem(
-      this.title, this.route, this.index, this.hoveredIndex, this.onHover, {super.key});
+      this.title, this.route, this.index, this.hoveredIndex, this.onHover,
+      {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -216,7 +216,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
             SnackBar(content: Text('Upload successful!')),
           );
           isSubmitting.value = false;
-          Navigator.of(context).push(
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => const PostingForm(),
             ),
