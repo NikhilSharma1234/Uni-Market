@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'navbar.dart'; // Import NavBar if needed
+import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'register.dart';
+import 'package:uni_market/components/register.dart';
 
 class SignInPage extends StatefulWidget {
   final String title;

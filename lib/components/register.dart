@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dialog.dart';
-import 'helpers/stepper_states.dart';
+import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
 
 Step register(index, tapped) {

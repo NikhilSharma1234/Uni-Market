@@ -1,10 +1,8 @@
-export 'FirebaseUploadService.dart';
+export 'firebase_upload_service.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import '/services/UploadService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseUploadService extends UploadService {

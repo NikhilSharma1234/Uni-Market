@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'sign_up.dart';
-import 'posting_form.dart';
+import 'package:uni_market/pages/sign_up.dart';
+import 'package:uni_market/pages/posting_form.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({Key? key}) : super(key: key);

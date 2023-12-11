@@ -39,6 +39,7 @@ dependencies:
   file_picker: any
   firebase_auth: ^4.12.0
   firebase_core: ^2.20.0
+  firebase_storage: any
   flutter_form_builder: ^6.1.1
 
 dependency_overrides:
