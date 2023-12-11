@@ -7,7 +7,7 @@ class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
   State<UserNavBar> createState() => _UserNavBarState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _UserNavBarState extends State<UserNavBar> {
@@ -16,10 +16,10 @@ class _UserNavBarState extends State<UserNavBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('Uni-Market'),
+      title: const Text('Uni-Market'),
       actions: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             children: [
               NavItem('Home', '/home', 0, hoveredIndex, (int index) {
@@ -76,7 +76,7 @@ class NavItem extends StatelessWidget {
   final ValueChanged<int> onHover;
 
   const NavItem(
-      this.title, this.route, this.index, this.hoveredIndex, this.onHover);
+      this.title, this.route, this.index, this.hoveredIndex, this.onHover, {super.key});
 
   @override
   Widget build(BuildContext context) {
