@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:uni_market/posting_form.dart';
 import 'package:uni_market/services/FirebaseUploadService.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -214,17 +215,25 @@ class _AboutYouContentState extends State<AboutYouContent> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Upload successful!')),
           );
+          isSubmitting.value = false;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const PostingForm(),
+            ),
+          );
         } else {
           // Handle the case where file upload failed
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('File upload failed. Please try again.')),
           );
+          isSubmitting.value = false;
         }
       } catch (e) {
         // Handle errors in file upload
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error during file upload: $e')),
         );
+        isSubmitting.value = false;
       }
     } else {
       // Handle the case where not all information is present
@@ -232,7 +241,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
         const SnackBar(
             content: Text('Please complete all fields before submitting')),
       );
+      isSubmitting.value = false;
     }
-    isSubmitting.value = false;
   }
 }
