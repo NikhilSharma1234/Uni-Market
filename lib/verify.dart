@@ -1,13 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'helpers/stepper_states.dart';
 
 Step Verify(index, tapped) {
   return Step(
     title: const Text('Verify'),
     content: Center(child: Verification(tapped: tapped)),
-    isActive: index >= 0,
-    state: index >= 1 ? StepState.complete : StepState.disabled,
+    isActive: index == 1,
+    state: stepperState(index, 1),
   );
 }
 

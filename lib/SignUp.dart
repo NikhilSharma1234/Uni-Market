@@ -6,9 +6,9 @@ import 'verify.dart';
 import 'aboutyou.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
   final String title;
+  final int? signUpStep;
+  const MyHomePage({super.key, required this.title, required this.signUpStep});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -16,6 +16,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int index = 0;
+  bool returningUser = false;
 
   tapped(int step) {
     setState(() => index = step);
@@ -27,6 +28,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   cancel() {
     index > 0 ? setState(() => index -= 1) : null;
+  }
+
+  currentStep() {
+    if (widget.signUpStep != null && !returningUser) {
+      index = widget.signUpStep!;
+      setState(() => returningUser = true);
+    }
+    return index;
   }
 
   @override
@@ -74,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             height: (screenHeight * 0.6)),
                         child: Stepper(
                           type: StepperType.horizontal,
-                          currentStep: index,
+                          currentStep: currentStep(),
                           controlsBuilder: (context, controller) {
                             return const SizedBox();
                           },

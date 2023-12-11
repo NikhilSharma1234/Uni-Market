@@ -4,16 +4,17 @@ import 'package:uni_market/services/FirebaseUploadService.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'helpers/stepper_states.dart';
 
 Step AboutYou(int index) {
   return Step(
     title: const Text('About You'),
     content: Container(
       alignment: Alignment.centerLeft,
-      child: AboutYouContent(),
+      child: const AboutYouContent(),
     ),
-    isActive: index >= 0,
-    state: index >= 2 ? StepState.complete : StepState.disabled,
+    isActive: index == 2,
+    state: stepperState(index, 2),
   );
 }
 
@@ -200,8 +201,10 @@ class _AboutYouContentState extends State<AboutYouContent> {
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
       try {
         // Use uploadFile function for both files
-        String? uploadedFileName1 = await uploadFile(fileResult1!, firstFileName!);
-        String? uploadedFileName2 = await uploadFile(fileResult2!, secondFileName!);
+        String? uploadedFileName1 =
+            await uploadFile(fileResult1!, firstFileName!);
+        String? uploadedFileName2 =
+            await uploadFile(fileResult2!, secondFileName!);
 
         if (uploadedFileName1 != null && uploadedFileName2 != null) {
           // Upload logic for the selected school
@@ -226,7 +229,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
     } else {
       // Handle the case where not all information is present
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields before submitting')),
+        const SnackBar(
+            content: Text('Please complete all fields before submitting')),
       );
     }
     isSubmitting.value = false;

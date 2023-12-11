@@ -25,7 +25,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const MyHomePage(title: 'SignUp'),
+                builder: (context) => const MyHomePage(title: 'SignUp', signUpStep: null),
               ),
             );
           },
