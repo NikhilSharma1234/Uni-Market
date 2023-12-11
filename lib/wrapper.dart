@@ -24,13 +24,13 @@ class _WrapperState extends State<Wrapper> {
   //Updates state when user state changes in the app
   updateUserState(event) {
     if (mounted && event != null && event.emailVerified) {
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => const PostingForm(),
         ),
       );
     } else if (event != null && !event.emailVerified) {
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) =>
               const MyHomePage(title: 'Sign Up', signUpStep: 1),
