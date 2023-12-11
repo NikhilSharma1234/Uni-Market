@@ -4,7 +4,7 @@ import 'dialog.dart';
 import 'helpers/stepper_states.dart';
 import 'dart:async';
 
-Step Register(index, tapped) {
+Step register(index, tapped) {
   return Step(
       title: const Text('Register'),
       content: Container(

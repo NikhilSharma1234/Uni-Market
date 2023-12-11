@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:uni_market/SignUp.dart';
+import 'package:uni_market/sign_up.dart';
 import 'package:uni_market/sign_in.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
+  NavBar({super.key});
+
   @override
   State<NavBar> createState() => _NavBarState();
 }

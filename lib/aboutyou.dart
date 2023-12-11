@@ -5,9 +5,9 @@ import 'package:uni_market/services/FirebaseUploadService.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'helpers/stepper_states.dart';
+import 'package:uni_market/helpers/stepper_states.dart';
 
-Step AboutYou(int index) {
+Step aboutYou(int index) {
   return Step(
     title: const Text('About You'),
     content: Container(
@@ -23,7 +23,7 @@ class AboutYouContent extends StatefulWidget {
   const AboutYouContent({Key? key}) : super(key: key);
 
   @override
-  _AboutYouContentState createState() => _AboutYouContentState();
+  State<AboutYouContent> createState() => _AboutYouContentState();
 }
 
 class _AboutYouContentState extends State<AboutYouContent> {
