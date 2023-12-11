@@ -162,7 +162,7 @@ packages:
     source: hosted
     version: "2.9.0"
   firebase_storage:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_storage
       sha256: ef1974043d48b0aa081ad055944ec74cad3a665545849cc6232f8ac1691fd901

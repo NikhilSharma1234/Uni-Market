@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uni_market/constants.dart';
+import 'package:uni_market/helpers/constants.dart';
 
 // Web Register Form
 class RegisterForm extends StatelessWidget {

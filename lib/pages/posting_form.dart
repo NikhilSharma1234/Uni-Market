@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'user_navbar.dart';
+import 'package:uni_market/components/user_navbar.dart';
 
 class PostingForm extends StatefulWidget {
   const PostingForm({Key? key}) : super(key: key);
