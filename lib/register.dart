@@ -2,30 +2,33 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dialog.dart';
 import 'helpers/stepper_states.dart';
+import 'dart:async';
 
 Step Register(index, tapped) {
   return Step(
       title: const Text('Register'),
       content: Container(
         alignment: Alignment.centerLeft,
-        child: RegisterForm(tapped: tapped),
+        child: Registiration(tapped: tapped),
       ),
       isActive: index == 0,
       state: stepperState(index, 0));
 }
 
+class Registiration extends StatefulWidget {
+  final Function() tapped;
+  const Registiration({required this.tapped, Key? key}) : super(key: key);
+  @override
+  State<Registiration> createState() => _RegistirationState();
+}
+
 // Register Form
-class RegisterForm extends StatelessWidget {
+class _RegistirationState extends State<Registiration> {
   // Initialize controllers for Each Input Container
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final Function() tapped;
-
-  RegisterForm({
-    required this.tapped,
-    Key? key,
-  }) : super(key: key);
+  bool submitting = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -45,17 +48,23 @@ class RegisterForm extends StatelessWidget {
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(top: 32),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Validate returns true if the form is valid, or false otherwise.
-                    if (_formKey.currentState!.validate()) {
-                      // Attempt to register user input into Firebase
-                      _createUser(context, nameController, emailController,
-                          passwordController, tapped);
-                    }
-                  },
-                  child: const Text('Submit'),
-                ),
+                child: submitting
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () {
+                          // Validate returns true if the form is valid, or false otherwise.
+                          if (_formKey.currentState!.validate()) {
+                            // Attempt to register user input into Firebase
+                            _createUser(
+                                context,
+                                nameController,
+                                emailController,
+                                passwordController,
+                                widget.tapped);
+                          }
+                        },
+                        child: const Text('Submit'),
+                      ),
               ),
             ])));
   }
@@ -69,6 +78,10 @@ class RegisterForm extends StatelessWidget {
     Function() tapped,
   ) async {
     try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Creating your account')),
+      );
+      setState(() => submitting = true);
       // Get user input from text field controllers (Remove ending whitespaces)
       String userEmail = emailController.text.trim();
       String password = passwordController.text.trim();
@@ -80,9 +93,6 @@ class RegisterForm extends StatelessWidget {
 
       // If the form is valid, display a snackbar. In the real world,
       // you'd often call a server or save the information in a database.
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Creating your account')),
-      );
 
       // Add Users' Display Name
       await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
@@ -91,8 +101,10 @@ class RegisterForm extends StatelessWidget {
 
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: userEmail, password: password);
-
-      tapped();
+      Timer(const Duration(seconds: 2), () async {
+        submitting = false;
+        tapped();
+      });
     } catch (e) {
       // Handling Create User Errors (Currently Not Viable for Production using print)
       print("Error creating user: $e");
@@ -101,6 +113,7 @@ class RegisterForm extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error Creating User')),
       );
+      setState(() => submitting = false);
     }
   }
 }
