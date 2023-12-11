@@ -4,6 +4,7 @@ import 'data.dart';
 import 'Styles/Style.dart';
 import 'Styles/BookStyle.dart';
 import 'Styles/DefaultStyle.dart';
+import 'Styles/KitStyle.dart';
 
 class WebItemBox extends ItemBox {
   @override
@@ -25,7 +26,8 @@ class _WebItemBoxState extends State<WebItemBox> {
   Widget build(BuildContext context) {
     Map<String, Style> styleType = {
       "book": BookStyle(context: context),
-      "default": DefaultStyle(context: context)
+      "default": DefaultStyle(context: context),
+      "kit": KitStyle(context: context)
     };
 
     // getting the correct style type - maybe combine colors down the line?
@@ -68,6 +70,7 @@ class _WebItemBoxState extends State<WebItemBox> {
                             child: Image.asset(
                               item.imagePath,
                               fit: BoxFit.fitWidth,
+                              height: 300,
                             )),
                       ),
                       Center(

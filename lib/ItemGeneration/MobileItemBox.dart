@@ -4,6 +4,7 @@ import 'data.dart';
 import 'Styles/Style.dart';
 import 'Styles/BookStyle.dart';
 import 'Styles/DefaultStyle.dart';
+import 'Styles/KitStyle.dart';
 
 class MobileItemBox extends ItemBox {
   @override
@@ -25,7 +26,8 @@ class _MobileItemBoxState extends State<MobileItemBox> {
   Widget build(BuildContext context) {
     Map<String, Style> styleType = {
       "book": BookStyle(context: context),
-      "default": DefaultStyle(context: context)
+      "default": DefaultStyle(context: context),
+      "kit": KitStyle(context: context)
     };
 
     // getting the correct style type - maybe combine colors down the line?
@@ -38,7 +40,7 @@ class _MobileItemBoxState extends State<MobileItemBox> {
       }
     }
     if (!found) {
-      theme = styleType["Default"]!;
+      theme = styleType["default"]!;
     }
 
     var style = theme.getThemeData();
