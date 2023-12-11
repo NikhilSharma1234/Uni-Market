@@ -30,11 +30,17 @@ class _WrapperState extends State<Wrapper> {
         ),
       );
     } else if (event != null && !event.emailVerified) {
-      return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) =>
+              const MyHomePage(title: 'Sign Up', signUpStep: 1),
+        ),
+      );
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Sign Up'),
+          builder: (context) =>
+              const MyHomePage(title: 'Sign Up', signUpStep: null),
         ),
       );
     }

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dialog.dart';
+import 'helpers/stepper_states.dart';
 
 Step Register(index, tapped) {
   return Step(
@@ -11,7 +11,7 @@ Step Register(index, tapped) {
         child: RegisterForm(tapped: tapped),
       ),
       isActive: index == 0,
-      state: index > 0 ? StepState.complete : StepState.disabled);
+      state: stepperState(index, 0));
 }
 
 // Register Form
