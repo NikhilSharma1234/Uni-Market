@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uni_market/pages/home.dart';
+import 'package:uni_market/pages/posting_form.dart';
 
 class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
   const UserNavBar({super.key});
@@ -17,34 +19,51 @@ class _UserNavBarState extends State<UserNavBar> {
   Widget build(BuildContext context) {
     return AppBar(
       title: const Text('Uni-Market'),
-      actions: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              NavItem('Home', '/home', 0, hoveredIndex, (int index) {
-                setState(() {
-                  hoveredIndex = index;
-                });
-              }),
-              NavItem('Profile', '/profile', 1, hoveredIndex, (int index) {
-                setState(() {
-                  hoveredIndex = index;
-                });
-              }),
-              NavItem('Settings', '/settings', 2, hoveredIndex, (int index) {
-                setState(() {
-                  hoveredIndex = index;
-                });
-              }),
-              NavItem('Create Post', '/createPost', 3, hoveredIndex,
-                  (int index) {
-                setState(() {
-                  hoveredIndex = index;
-                });
-              }),
-            ],
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
           ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const Home(),
+              ),
+            );
+          },
+          child: const Text('Home'),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const PostingForm(),
+              ),
+            );
+          },
+          child: const Text('Create Post'),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const Home(),
+              ),
+            );
+          },
+          child: const Text('Profile'),
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
