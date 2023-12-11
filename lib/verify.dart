@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'helpers/stepper_states.dart';
 
-Step Verify(index, tapped) {
+Step verify(index, tapped) {
   return Step(
     title: const Text('Verify'),
     content: Center(child: Verification(tapped: tapped)),

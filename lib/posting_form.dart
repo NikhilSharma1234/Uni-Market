@@ -32,7 +32,7 @@ class _PostingFormState extends State<PostingForm> {
                     FormBuilderTextField(
                       name: 'title',
                       style: const TextStyle(fontSize: 13),
-                      decoration: InputDecoration(labelText: 'Title'),
+                      decoration: const InputDecoration(labelText: 'Title'),
                       validator: FormBuilderValidators.required(context),
                       maxLines: 1,
                       maxLength: 30, // Set a maximum character limit
@@ -41,7 +41,7 @@ class _PostingFormState extends State<PostingForm> {
                     FormBuilderTextField(
                       name: 'description',
                       maxLines: 3,
-                      decoration: InputDecoration(labelText: 'Description'),
+                      decoration: const InputDecoration(labelText: 'Description'),
                       validator: FormBuilderValidators.required(context),
                       maxLength: 150, // Set a maximum character limit
                     ),
