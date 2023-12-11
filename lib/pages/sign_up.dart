@@ -1,9 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'navbar.dart';
-import 'register.dart';
-import 'verify.dart';
-import 'aboutyou.dart';
+import 'package:uni_market/components/navbar.dart';
+import 'package:uni_market/components/register.dart';
+import 'package:uni_market/components/verify.dart';
+import 'package:uni_market/components/about_you.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;

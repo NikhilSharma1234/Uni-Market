@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:uni_market/posting_form.dart';
-import 'package:uni_market/services/FirebaseUploadService.dart';
+import 'package:uni_market/pages/posting_form.dart';
+import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
