@@ -45,3 +45,6 @@ app.*.map.json
 
 # Vulnerable Firebase Details
 lib/firebase_options.dart
+macos/Flutter/*
+windows/flutter/*
+linux/flutter/*
