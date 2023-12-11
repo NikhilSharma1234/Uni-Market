@@ -24,7 +24,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
             textStyle: const TextStyle(fontSize: 20),
           ),
           onPressed: () {
-            Navigator.of(context).push(
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) =>
                     const MyHomePage(title: 'SignUp', signUpStep: null),
@@ -45,7 +45,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
                 textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
-                Navigator.of(context).push(
+                Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const SignInPage(title: 'Sign In'),
                   ),
