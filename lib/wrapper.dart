@@ -37,7 +37,7 @@ class _WrapperState extends State<Wrapper> {
         ),
       );
     } else {
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) =>
               const MyHomePage(title: 'Sign Up', signUpStep: null),

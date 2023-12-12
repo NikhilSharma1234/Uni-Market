@@ -41,6 +41,7 @@ dependencies:
   firebase_core: ^2.20.0
   firebase_storage: any
   flutter_form_builder: ^6.1.1
+  csv: ^5.1.1
 
 dependency_overrides:
   intl: ^0.17.0
@@ -77,6 +78,8 @@ flutter:
     - assets/logo_dark.png
     - assets/logo_light.png
     - assets/logo.png
+    - assets/ItemImages/
+    - assets/
   fonts:
     - family: Ubuntu
       fonts:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/posting_form.dart';
+import 'package:uni_market/pages/search.dart';
 
 class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
   const UserNavBar({super.key});
@@ -19,6 +20,7 @@ class _UserNavBarState extends State<UserNavBar> {
   Widget build(BuildContext context) {
     return AppBar(
       title: const Text('Uni-Market'),
+      automaticallyImplyLeading: false,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
@@ -34,6 +36,23 @@ class _UserNavBarState extends State<UserNavBar> {
             );
           },
           child: const Text('Home'),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const SearchPage(
+                  title: 'adsa',
+                ),
+              ),
+            );
+          },
+          child: const Text('Search'),
         ),
         TextButton(
           style: TextButton.styleFrom(
