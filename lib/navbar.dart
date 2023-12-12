@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/SignUp.dart';
 import 'package:uni_market/sign_in.dart';
+import 'package:uni_market/search.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
@@ -51,6 +52,21 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
               child: const Text('Sign In'),
             ),
           ),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const SearchPage(title: 'Search'),
+              ),
+            );
+          },
+          child: const Text('Search'),
         ),
       ],
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
