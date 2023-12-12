@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'navbar.dart';
+import '../components/navbar.dart';
 import 'ItemGeneration/data.dart';
-import '/ItemGeneration/AbstractItemFactory.dart';
+import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
