@@ -24,7 +24,6 @@ class _UserNavBarState extends State<UserNavBar> {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
             padding: const EdgeInsets.all(16.0),
             textStyle: const TextStyle(fontSize: 20),
           ),
@@ -39,7 +38,6 @@ class _UserNavBarState extends State<UserNavBar> {
         ),
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
             padding: const EdgeInsets.all(16.0),
             textStyle: const TextStyle(fontSize: 20),
           ),
@@ -56,7 +54,6 @@ class _UserNavBarState extends State<UserNavBar> {
         ),
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
             padding: const EdgeInsets.all(16.0),
             textStyle: const TextStyle(fontSize: 20),
           ),
@@ -71,7 +68,6 @@ class _UserNavBarState extends State<UserNavBar> {
         ),
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
             padding: const EdgeInsets.all(16.0),
             textStyle: const TextStyle(fontSize: 20),
           ),
@@ -87,7 +83,6 @@ class _UserNavBarState extends State<UserNavBar> {
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: Container(
-            color: Colors.white,
             child: TextButton(
               style: TextButton.styleFrom(
                 foregroundColor: const Color(0xFF041E42),

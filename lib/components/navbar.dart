@@ -20,7 +20,8 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white,
+            foregroundColor:
+                darkModeOn ? Colors.white : const Color(0xFF041E42),
             padding: const EdgeInsets.all(16.0),
             textStyle: const TextStyle(fontSize: 20),
           ),
@@ -38,10 +39,11 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: Container(
-            color: Colors.white,
+            color: darkModeOn ? Colors.white : const Color(0xFF041E42),
             child: TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF041E42),
+                foregroundColor:
+                    darkModeOn ? const Color(0xFF041E42) : Colors.white,
                 padding: const EdgeInsets.all(16.0),
                 textStyle: const TextStyle(fontSize: 20),
               ),

@@ -41,7 +41,8 @@ class _PostingFormState extends State<PostingForm> {
                     FormBuilderTextField(
                       name: 'description',
                       maxLines: 3,
-                      decoration: const InputDecoration(labelText: 'Description'),
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
                       validator: FormBuilderValidators.required(context),
                       maxLength: 150, // Set a maximum character limit
                     ),
@@ -80,21 +81,17 @@ class _PostingFormState extends State<PostingForm> {
                       validator: FormBuilderValidators.required(context),
                     ),
                     const SizedBox(height: 50),
-                    MaterialButton(
-                      color: Colors.white,
+                    ElevatedButton(
                       child: const Text("Upload Image",
                           style: TextStyle(
-                            color: Colors.blueGrey,
                             fontSize: 12,
                           )),
                       onPressed: () {},
                     ),
                     const SizedBox(height: 25),
-                    MaterialButton(
-                      color: Colors.white,
+                    ElevatedButton(
                       child: const Text("Take Photo",
                           style: TextStyle(
-                            color: Colors.blueGrey,
                             fontSize: 12,
                           )),
                       onPressed: () {},
