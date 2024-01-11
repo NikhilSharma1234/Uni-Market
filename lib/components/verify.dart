@@ -55,7 +55,6 @@ class _VerificationState extends State<Verification>
                 await FirebaseAuth.instance.currentUser?.reload();
                 bool isVerified =
                     FirebaseAuth.instance.currentUser!.emailVerified;
-                print(isVerified);
                 if (isVerified) {
                   // Update user to email verified in db
                   await FirebaseFirestore.instance
