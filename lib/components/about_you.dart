@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uni_market/pages/posting_form.dart';
@@ -6,6 +7,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:uni_market/helpers/stepper_states.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Step aboutYou(int index) {
   return Step(
@@ -33,16 +35,30 @@ class _AboutYouContentState extends State<AboutYouContent> {
   FilePickerResult? fileResult1;
   FilePickerResult? fileResult2;
   ValueNotifier<bool> isSubmitting = ValueNotifier(false);
+  Future<Map<String, String>>? _list;
 
   FirebaseUploadService uploadService = FirebaseUploadService();
+  @override
+  void initState() {
+    super.initState();
+    _list = getListOfSchools();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSchoolDropdown(),
-        const SizedBox(height: 32),
+        FutureBuilder(
+            future: _list,
+            builder: (BuildContext context,
+                AsyncSnapshot<Map<String, String>> snapshot) {
+              if (snapshot.hasData) {
+                return _buildSchoolDropdown(snapshot.data);
+              }
+              return const Text('Loading');
+            }),
+        const SizedBox(height: 8),
         _buildFileUpload(
             title: 'File 1*',
             fileNumber: 1, // Added fileNumber argument
@@ -51,7 +67,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
                 firstFileName = url;
               });
             }),
-        const SizedBox(height: 32),
+        const SizedBox(height: 8),
         _buildFileUpload(
             title: 'File 2*',
             fileNumber: 2, // Added fileNumber argument
@@ -61,7 +77,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
               });
             }),
         Padding(
-          padding: const EdgeInsets.only(top: 48), // Add more padding
+          padding: const EdgeInsets.only(top: 16), // Add more padding
           child: Center(
             // Center the button
             child: ValueListenableBuilder<bool>(
@@ -81,15 +97,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
     );
   }
 
-  Widget _buildSchoolDropdown() {
-    List<String> list = [
-      'University of Nevada, Reno',
-      'Test School',
-      "Test School 2",
-      "Test School 3"
-    ];
-    String? dropdownValue =
-        selectedSchool; // Ensure dropdown reflects the current state
+  Widget _buildSchoolDropdown(list) {
+    String? dropdownValue; // Ensure dropdown reflects the current state
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,7 +106,6 @@ class _AboutYouContentState extends State<AboutYouContent> {
         const Text(
           'School*',
           style: TextStyle(
-            color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
@@ -108,23 +116,22 @@ class _AboutYouContentState extends State<AboutYouContent> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             filled: true,
-            fillColor: Color.fromARGB(71, 11, 26, 103),
             hintText: "Select your school",
-            hintStyle: TextStyle(fontSize: 16, color: Colors.white),
+            hintStyle: TextStyle(fontSize: 16),
           ),
-          items: list.map<DropdownMenuItem<String>>((String value) {
+          items: list.keys.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(
                 value,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
+                style: const TextStyle(fontSize: 16),
               ),
             );
           }).toList(),
           onChanged: (String? newValue) {
             setState(() {
               selectedSchool =
-                  newValue; // Update the selectedSchool state variable
+                  list[newValue]; // Update the selectedSchool state variable
               dropdownValue =
                   newValue; // Update dropdownValue for UI consistency
             });
@@ -146,7 +153,6 @@ class _AboutYouContentState extends State<AboutYouContent> {
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
@@ -197,6 +203,18 @@ class _AboutYouContentState extends State<AboutYouContent> {
     return null;
   }
 
+  Future<Map<String, String>> getListOfSchools() async {
+    final Map<String, String> list = {};
+    await FirebaseFirestore.instance
+        .collection('schools')
+        .get()
+        .then((value) => value.docs.forEach((doc) {
+              final name = doc.data()['name'];
+              list[name] = doc.id.toString();
+            }));
+    return list;
+  }
+
   Future<void> checkUpload() async {
     isSubmitting.value = true;
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
@@ -208,8 +226,19 @@ class _AboutYouContentState extends State<AboutYouContent> {
             await uploadFile(fileResult2!, secondFileName!);
 
         if (uploadedFileName1 != null && uploadedFileName2 != null) {
-          // Upload logic for the selected school
-          await uploadService.uploadSelectedSchool(selectedSchool!);
+          var marketplaceId = '';
+          //  Get marketplace id and save to variable
+          await FirebaseFirestore.instance
+              .collection('marketplace')
+              .where('schoolIds', arrayContains: selectedSchool)
+              .get()
+              .then((value) => marketplaceId = value.docs[0].id);
+          // Update the user with marketplace and school id
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser?.email)
+              .update(
+                  {'schoolId': selectedSchool, 'marketplaceId': marketplaceId});
 
           // Additional actions after successful upload
           ScaffoldMessenger.of(context).showSnackBar(

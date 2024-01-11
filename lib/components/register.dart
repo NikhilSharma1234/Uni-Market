@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dialog.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Step register(index, tapped) {
   return Step(
@@ -99,6 +100,22 @@ class _RegistirationState extends State<Registiration> {
 
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
+      final user = <String, dynamic>{
+        "createdAt": Timestamp.now(),
+        "updatedAt": Timestamp.now(),
+        "deletedAt": null,
+        "name": displayName,
+        "email": userEmail,
+        "schoolId": null,
+        "marketplaceId": null,
+        "darkMode": null,
+        "emailVerified": null,
+        "verifiedUniStudent": false
+      };
+
+      // Add user to users database
+      FirebaseFirestore.instance.collection('users').doc(userEmail).set(user);
+
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: userEmail, password: password);
       Timer(const Duration(seconds: 2), () async {
@@ -147,7 +164,6 @@ class _EmailContainerState extends State<EmailContainer> {
       controller: widget.emailController,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
-      cursorColor: Colors.white,
       onSaved: (email) {},
       decoration: InputDecoration(
         prefixIconConstraints:
@@ -192,7 +208,6 @@ class _NameContainerState extends State<NameContainer> {
         controller: widget.nameController,
         keyboardType: TextInputType.name,
         textInputAction: TextInputAction.next,
-        cursorColor: Colors.white,
         onSaved: (email) {},
         decoration: InputDecoration(
           prefixIconConstraints:
@@ -248,7 +263,6 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
         controller: widget.passwordController,
         textInputAction: TextInputAction.done,
         obscureText: !_passwordVisible,
-        cursorColor: Colors.white,
         decoration: InputDecoration(
             prefixIconConstraints:
                 const BoxConstraints(minWidth: 23, maxHeight: 20),

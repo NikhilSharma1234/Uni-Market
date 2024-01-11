@@ -29,7 +29,6 @@ class EmailContainer extends StatelessWidget {
     return TextFormField(
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.next,
-        cursorColor: Colors.white,
         onSaved: (email) {},
         decoration: const InputDecoration(
             hintText: "Email",
@@ -51,7 +50,6 @@ class NameContainer extends StatelessWidget {
     return TextFormField(
         keyboardType: TextInputType.name,
         textInputAction: TextInputAction.next,
-        cursorColor: Colors.white,
         onSaved: (email) {},
         decoration: const InputDecoration(
             hintText: "Full Name",
@@ -73,7 +71,6 @@ class PasswordContainer extends StatelessWidget {
     return TextFormField(
         textInputAction: TextInputAction.done,
         obscureText: true,
-        cursorColor: Colors.white,
         decoration: const InputDecoration(
             hintText: "Password",
             prefixIcon: Padding(
