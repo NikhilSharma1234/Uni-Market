@@ -100,6 +100,9 @@ class _RegistirationState extends State<Registiration> {
 
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: userEmail, password: password);
+
       final user = <String, dynamic>{
         "createdAt": Timestamp.now(),
         "updatedAt": Timestamp.now(),
@@ -114,10 +117,10 @@ class _RegistirationState extends State<Registiration> {
       };
 
       // Add user to users database
-      FirebaseFirestore.instance.collection('users').doc(userEmail).set(user);
-
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: userEmail, password: password);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userEmail)
+          .set(user);
       Timer(const Duration(seconds: 2), () async {
         submitting = false;
         tapped();
