@@ -33,14 +33,14 @@ class _WrapperState extends State<Wrapper> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) =>
-              const MyHomePage(title: 'Sign Up', signUpStep: 1),
+              const SignUpPage(title: 'Sign Up', signUpStep: 1),
         ),
       );
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) =>
-              const MyHomePage(title: 'Sign Up', signUpStep: null),
+              const SignUpPage(title: 'Sign Up', signUpStep: null),
         ),
       );
     }

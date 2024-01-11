@@ -5,16 +5,16 @@ import 'package:uni_market/components/register.dart';
 import 'package:uni_market/components/verify.dart';
 import 'package:uni_market/components/about_you.dart';
 
-class MyHomePage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   final String title;
   final int? signUpStep;
-  const MyHomePage({super.key, required this.title, required this.signUpStep});
+  const SignUpPage({super.key, required this.title, required this.signUpStep});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SignUpPageState extends State<SignUpPage> {
   int index = 0;
   bool returningUser = false;
 
@@ -42,55 +42,64 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
+    //  More defined screen width for applicable form UI
+    widthScreen(double screenWidth) {
+      if (screenWidth < 600) {
+        return screenWidth * 0.95;
+      }
+      if (screenWidth < 800) {
+        return screenWidth * 0.75;
+      }
+      if (screenWidth < 1200) {
+        return screenWidth * 0.65;
+      }
+      return screenWidth * 0.45;
+    }
+
     return Scaffold(
       // sets height of appbar
-      appBar: PreferredSize(
-          // width not working
-          preferredSize: Size(screenWidth * 0.25, 110),
-          child: NavBar()),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-                width:
-                    screenWidth < 500 ? screenWidth * 0.95 : screenWidth * 0.45,
-                child: Column(children: <Widget>[
-                  const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: AutoSizeText(
-                      'Welcome to the marketplace made for students.',
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      minFontSize: 16,
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
+      appBar: NavBar(),
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          SizedBox(
+              width: widthScreen(screenWidth),
+              child: Column(children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 10.0),
+                  child: AutoSizeText(
+                    'Welcome to the marketplace made for students.',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w500,
                     ),
+                    minFontSize: 16,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
                   ),
-                  ConstrainedBox(
-                      constraints:
-                          BoxConstraints.tightFor(height: (screenHeight * 0.6)),
-                      child: Stepper(
-                        type: StepperType.horizontal,
-                        currentStep: currentStep(),
-                        controlsBuilder: (context, controller) {
-                          return const SizedBox();
-                        },
-                        onStepCancel: cancel,
-                        onStepContinue: continued,
-                        onStepTapped: (step) => tapped(step),
-                        physics: const ScrollPhysics(),
-                        steps: <Step>[
-                          register(index, () => tapped(1)),
-                          verify(index, () => tapped(2)),
-                          aboutYou(index),
-                        ],
-                      ))
-                ])),
-          ],
-        ),
+                ),
+                ConstrainedBox(
+                    constraints:
+                        BoxConstraints.tightFor(height: (screenHeight * 0.6)),
+                    child: Stepper(
+                      type: StepperType.horizontal,
+                      currentStep: currentStep(),
+                      controlsBuilder: (context, controller) {
+                        return const SizedBox();
+                      },
+                      onStepCancel: cancel,
+                      onStepContinue: continued,
+                      onStepTapped: (step) => tapped(step),
+                      physics: const ScrollPhysics(),
+                      steps: <Step>[
+                        register(index, () => tapped(1)),
+                        verify(index, () => tapped(2)),
+                        aboutYou(index),
+                      ],
+                    ))
+              ])),
+        ],
       ),
     );
   }
