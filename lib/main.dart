@@ -20,22 +20,31 @@ class MyApp extends StatelessWidget {
         home: const Wrapper(),
         title: 'Uni-Market',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-        ),
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF041E42),
+              brightness: Brightness.light,
+            ),
+            textTheme: const TextTheme(
+                bodyMedium: TextStyle(
+                    color: Color(0xFF041E42), fontWeight: FontWeight.w500)),
+            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFAF9F6FF),
+            fontFamily: 'Ubuntu',
+            hoverColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            canvasColor: Colors.white),
         darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF041E42),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFF041E42),
-          fontFamily: 'Ubuntu',
-          textTheme: const TextTheme().apply(bodyColor: Colors.white),
-        ),
+            colorScheme: const ColorScheme.dark(
+                brightness: Brightness.dark,
+                primary: Colors.white,
+                secondary: Colors.white),
+            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFF041E42),
+            fontFamily: 'Ubuntu',
+            textTheme: const TextTheme().apply(bodyColor: Colors.white),
+            hoverColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            canvasColor: const Color(0xFF041E42)),
         themeMode: ThemeMode.system);
   }
 }

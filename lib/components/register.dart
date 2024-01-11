@@ -47,7 +47,7 @@ class _RegistirationState extends State<Registiration> {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(top: 32),
+                padding: const EdgeInsets.only(top: 24),
                 child: submitting
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
