@@ -3,6 +3,8 @@ import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:uni_market/components/register.dart';
+import 'package:uni_market/pages/forgot_password.dart';
+// import 'package:uni_market/pages/forgot_password.dart';
 
 class SignInPage extends StatefulWidget {
   final String title;
@@ -136,7 +138,14 @@ class SignInForm extends StatelessWidget {
               // Account Recovery Gestuer
               const SizedBox(height: 20),
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ForgotPasswordPage(),
+                    ),
+                  );
+
+                },
                 child: const Text("Forgot Password?",
                     style: TextStyle(
                       fontSize: 12,
