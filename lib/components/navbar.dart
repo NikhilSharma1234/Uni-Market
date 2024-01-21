@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/pages/search.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
 
@@ -34,6 +35,22 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
             );
           },
           child: const Text('Sign Up'),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor:
+                darkModeOn ? Colors.white : const Color(0xFF041E42),
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const SearchPage(title: 'Search'),
+              ),
+            );
+          },
+          child: const Text('Search'),
         ),
         const SizedBox(height: 20),
         ClipRRect(
