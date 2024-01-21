@@ -46,6 +46,11 @@ class _WebItemBoxState extends State<WebItemBox> {
     var style = theme.getThemeData();
     var item = widget.itemData;
 
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double fontSize = screenHeight * 0.015;
+
     return InkWell(
         // for future use to link each item to a unique page based on its id
         // onTap: () {
@@ -53,35 +58,67 @@ class _WebItemBoxState extends State<WebItemBox> {
         // },
         child: Padding(
             padding: const EdgeInsets.all(5.0),
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: style.colorScheme.onPrimary),
-                    color: style.colorScheme.background,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            child: Image.asset(
-                              item.imagePath,
-                              fit: BoxFit.fitWidth,
-                              height: 300,
-                            )),
-                      ),
-                      Center(
-                          child: Text(item.name,
-                              style: const TextStyle(fontSize: 20))),
-                      Text(item.price.toString()),
-                      Text(item.owner),
-                      Text(item.dateListed),
-                      Text('Tags: ${item.tags.toString()}')
-                    ],
-                  ),
-                ))));
+            child: Stack(children: <Widget>[
+              Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: style.colorScheme.onPrimary),
+                      color: style.colorScheme.background,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Flexible(
+                            flex: 8,
+                            child: Center(
+                                child: ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    child: Image.asset(
+                                      item.imagePath,
+                                      fit: BoxFit.fitWidth,
+                                      // height: screenWidth * 0.1,
+                                    )))),
+                        Flexible(
+                            flex: 1,
+                            child: Center(
+                                child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: Text(item.name))))
+                      ],
+                    ),
+                  )),
+              LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                return _buildPriceIndicatior(constraints.maxWidth * 0.18,
+                    constraints.maxHeight * 0.08, '\$${item.price}');
+              }),
+            ])));
+  }
+
+  Widget _buildPriceIndicatior(double width, double height, String itemPrice) {
+    return Align(
+        alignment: Alignment.topLeft,
+        child: Padding(
+            padding: const EdgeInsets.only(left: 1, top: 1),
+            child: SizedBox(
+                width: width,
+                height: height,
+                child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(10)),
+                        color: Colors.grey.shade800),
+                    child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 1),
+                            child: Text(
+                              itemPrice,
+                              textAlign: TextAlign.center,
+                            )))))));
   }
 }

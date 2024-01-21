@@ -46,8 +46,8 @@ class _SearchPageState extends State<SearchPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     Widget body = GridView.count(
-      crossAxisCount: 6,
-      childAspectRatio: 2 / 3,
+      crossAxisCount: (screenWidth / 320).round(),
+      childAspectRatio: 2 / 2,
       children: items,
     );
 
