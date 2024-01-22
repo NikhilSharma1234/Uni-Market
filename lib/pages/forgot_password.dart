@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart';
-import 'package:uni_market/services/email_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
@@ -12,18 +10,6 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
   final ValueNotifier<bool> submitEnabled = ValueNotifier<bool>(false);
-  late EmailManager emailManager;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize emailManager here
-    emailManager = EmailManager(
-      FirebaseAuth.instance,
-      FirebaseFirestore.instance,
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +59,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     submitEnabled.value = true;
     String email = emailController.text.trim();
     try {
-      await emailManager.submitEmail(context, email);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      _showSnackBar(context, 'A password reset email will be sent to $email if it has an account');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-email') {
+        _showSnackBar(context, 'Invalid email format');
+      } else {
+        _showSnackBar(context, 'Failed to send password reset email');
+      }
     } finally {
       submitEnabled.value = false;
     }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 }
