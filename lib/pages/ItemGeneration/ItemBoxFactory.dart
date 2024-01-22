@@ -12,8 +12,6 @@ class ItemBoxFactory {
     isWeb
         ? item = WebItemBox(itemData: data, context: context)
         : item = MobileItemBox(itemData: data, context: context);
-
-    // should build the itemBox
     return item;
   }
 }
