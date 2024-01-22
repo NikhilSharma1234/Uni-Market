@@ -40,6 +40,8 @@ class _SearchPageState extends State<SearchPage> {
     super.didChangeDependencies();
   }
 
+  List<bool> _isOpen = [true, false, false];
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -59,24 +61,48 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       appBar: const UserNavBar(),
       // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
-      body: Column(children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Padding(
-                padding: EdgeInsets.only(right: 60),
-                child: Row(children: <Widget>[
-                  Text("Filters Go here"),
-                ])),
-            SizedBox(
-                width: .5 * screenWidth,
-                child: MySearchBar(setPageState: redrawItems)),
-          ],
-        ),
+      body: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
         Expanded(
-            child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: body))
+            flex: 1,
+            child: Align(
+                alignment: Alignment.center,
+                child: ListView(children: [
+                  ExpansionPanelList(
+                      children: [
+                        ExpansionPanel(
+                            headerBuilder: (BuildContext context, bool isOpen) {
+                              return Text("Filter1");
+                            },
+                            body: Text("HERE"),
+                            isExpanded: _isOpen[0]),
+                        ExpansionPanel(
+                            headerBuilder: (context, isOpen) {
+                              return Text("Filter2");
+                            },
+                            body: Text("THERE"),
+                            isExpanded: _isOpen[1]),
+                        ExpansionPanel(
+                            headerBuilder: (context, isOpen) {
+                              return Text("Filter3");
+                            },
+                            body: Text("EVERYWHERE"),
+                            isExpanded: _isOpen[2]),
+                      ],
+                      expansionCallback: (int i, bool isOpen) => setState(() {
+                            _isOpen[i] = !_isOpen[i];
+                          }))
+                ]))),
+        Expanded(
+            flex: 14,
+            child: Column(children: <Widget>[
+              SizedBox(
+                  width: .5 * screenWidth,
+                  child: MySearchBar(setPageState: redrawItems)),
+              Expanded(
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      child: body))
+            ])),
       ]),
     );
   }
@@ -136,12 +162,12 @@ class _MySearchBarState extends State<MySearchBar> {
             ctrl.search(value, 30, context).then((value) {
               widget.setPageState(value, false);
             });
-            controller.closeView("");
+            controller.closeView(value);
           },
           viewOnChanged: (value) {
             updateSuggestions(value);
           },
-          builder: (BuildContext context, SearchController controller) {
+          builder: (BuildContext context, controller) {
             // attempting to get the search bar to take an enter key to submit search
             return SearchBar(
               controller: controller,
@@ -153,8 +179,7 @@ class _MySearchBarState extends State<MySearchBar> {
               leading: const Icon(Icons.search),
             );
           },
-          suggestionsBuilder:
-              (BuildContext context, SearchController controller) {
+          suggestionsBuilder: (BuildContext context, controller) {
             return suggestions;
           }),
     );
@@ -173,7 +198,9 @@ class PageController {
     List<Widget> widgets = [];
     int i = 0;
     for (Data item in await model.getData('assets/items.csv', num)) {
-      if (!item.tags.contains(searchTerm) && searchTerm != "") {
+      if (!item.tags.contains(searchTerm.toLowerCase()) &&
+          !item.name.toLowerCase().contains(searchTerm.toLowerCase()) &&
+          searchTerm != "") {
         continue;
       }
       if (i >= num) {
