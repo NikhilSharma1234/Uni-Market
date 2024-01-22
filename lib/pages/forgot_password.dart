@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:uni_market/components/register.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   @override
@@ -10,6 +12,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
   final ValueNotifier<bool> submitEnabled = ValueNotifier<bool>(false);
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -18,55 +21,68 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Scaffold(
       appBar: NavBar(),
       body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              width: screenWidth < 500 ? screenWidth * 0.95 : screenWidth * 0.45,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  TextField(
-                    controller: emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+        child: Form(
+          key: _formKey,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                width:
+                    screenWidth < 500 ? screenWidth * 0.95 : screenWidth * 0.45,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                  const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: AutoSizeText(
+                    'Trouble Logging In? Enter your email to reset your password.',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w500,
                     ),
-                    keyboardType: TextInputType.emailAddress,
+                    minFontSize: 16,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 20),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: submitEnabled,
-                    builder: (context, isSubmitting, child) {
-                      return isSubmitting
-                        ? CircularProgressIndicator() // Show loading indicator when submitting
-                        : ElevatedButton(
-                            onPressed: () => _submitEmail(context),
-                            child: Text('Submit'),
-                          );
-                    },
-                  ),
-                ],
+                ),
+
+                SizedBox(height: 20),
+                EmailContainer(emailController: emailController),
+        
+                    SizedBox(height: 20),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: submitEnabled,
+                      builder: (context, isSubmitting, child) {
+                        return isSubmitting
+                            ? CircularProgressIndicator() // Show loading indicator when submitting
+                            : ElevatedButton(
+                                onPressed: () => _submitEmail(context),
+                                child: Text('Submit'),
+                              );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _submitEmail(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) return;
+
     submitEnabled.value = true;
     String email = emailController.text.trim();
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      _showSnackBar(context, 'A password reset email will be sent to $email if it has an account');
+      _showSnackBar(context,
+          'If your email: $email is registered with us, you will receive a password reset link.');
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        _showSnackBar(context, 'Invalid email format');
-      } else {
-        _showSnackBar(context, 'Failed to send password reset email');
-      }
+      // Display a generic error message
+      _showSnackBar(context, 'There was a problem handling your request.');
     } finally {
       submitEnabled.value = false;
     }
