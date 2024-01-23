@@ -115,8 +115,7 @@ class SignInForm extends StatelessWidget {
               EmailContainer(emailController: emailController),
               const SizedBox(height: 10),
               PasswordContainer(
-                passwordController: passwordController,
-              ),
+                  passwordController: passwordController, isSignIn: true),
               const SizedBox(height: 25),
               ElevatedButton(
                 onPressed: () {
@@ -144,7 +143,6 @@ class SignInForm extends StatelessWidget {
                       builder: (context) => ForgotPasswordPage(),
                     ),
                   );
-
                 },
                 child: const Text("Forgot Password?",
                     style: TextStyle(
