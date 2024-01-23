@@ -45,6 +45,7 @@ class _RegistirationState extends State<Registiration> {
               const SizedBox(height: 10),
               PasswordContainer(
                 passwordController: passwordController,
+                isSignIn: false,
               ),
               const SizedBox(height: 10),
               Padding(
@@ -232,10 +233,10 @@ class _NameContainerState extends State<NameContainer> {
 
 class PasswordContainer extends StatefulWidget {
   final TextEditingController passwordController;
-  const PasswordContainer({
-    Key? key,
-    required this.passwordController,
-  }) : super(key: key);
+  final bool isSignIn;
+  const PasswordContainer(
+      {Key? key, required this.passwordController, required this.isSignIn})
+      : super(key: key);
 
   @override
   State<PasswordContainer> createState() => _MyPasswordContainerState();
@@ -283,16 +284,18 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
                       icon: Icon(_passwordVisible
                           ? Icons.visibility
                           : Icons.visibility_off)),
-                  IconButton(
-                      onPressed: () => showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => appDialog(
-                              context,
-                              'Password Input',
-                              'Please input a password that is at least 8 characters and includes one uppercase letter, one lowercase letter, one number and one special character.',
-                              'Ok')),
-                      icon: const Icon(Icons.info_outlined)),
+                  widget.isSignIn
+                      ? const SizedBox.shrink() // Empty (Don't show this when in sign in)
+                      : IconButton(
+                          onPressed: () => showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => appDialog(
+                                  context,
+                                  'Password Input',
+                                  'Please input a password that is at least 8 characters and includes one uppercase letter, one lowercase letter, one number and one special character.',
+                                  'Ok')),
+                          icon: const Icon(Icons.info_outlined)),
                 ])),
-        validator: validatePassword);
+        validator: widget.isSignIn ? null : validatePassword); // No validation while in sign in
   }
 }
