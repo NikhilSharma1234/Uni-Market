@@ -3,6 +3,7 @@ import 'package:uni_market/components/user_navbar.dart';
 import 'ItemGeneration/data.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
+import 'package:uni_market/helpers/filters.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -23,7 +24,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   late List<Widget> items = [const Text("")];
 
-  // redraws the items on the page based on search results
+  // redraws the items on the page based on search results - callback function for search bar
   redrawItems(List<Widget> newItems, bool append) {
     setState(() {
       append ? items = items + newItems : items = newItems;
@@ -40,64 +41,156 @@ class _SearchPageState extends State<SearchPage> {
     super.didChangeDependencies();
   }
 
-  List<bool> _isOpen = [true, false, false];
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+    // handles loading of items
     Widget body = GridView.count(
       crossAxisCount: (screenWidth / 320).round(),
       childAspectRatio: 2 / 2,
       children: items,
     );
-
     if (items.isEmpty) {
       body =
           const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
     }
 
+    // filter stuff
+    Filters filter = Filters(0, 999999999, [false, false, false]);
+    final lowerPrice = TextEditingController();
+    final upperPrice = TextEditingController();
+
+    void clearFilters() {
+      setState(() {
+        filter = Filters(0, 999999999, [false, false, false]);
+        lowerPrice.value = TextEditingValue.empty;
+        upperPrice.value = TextEditingValue.empty;
+      });
+    }
+
+    // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
+    void applyFilters() {}
+
     return Scaffold(
       appBar: const UserNavBar(),
-      // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
+      drawer: Theme(
+          data: Theme.of(context).copyWith(cardColor: Colors.blueGrey),
+          child: Drawer(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: ListView(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 55),
+                        child: Container(
+                            color: Theme.of(context).primaryColor,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: Text("Price Range")),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        controller: lowerPrice,
+                                        onChanged: ((value) {
+                                          filter.lowerPrice =
+                                              int.parse(lowerPrice.text);
+                                        }),
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Lower",
+                                        ),
+                                      )),
+                                      Expanded(
+                                          child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        controller: upperPrice,
+                                        onChanged: ((value) {
+                                          filter.upperPrice =
+                                              int.parse(upperPrice.text);
+                                        }),
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(),
+                                          labelText: "Upper",
+                                        ),
+                                      ))
+                                    ],
+                                  ),
+                                  const Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: Text("Tags")),
+                                  CheckboxListTile(
+                                      title: const Text("Kit"),
+                                      value: filter.tags[0],
+                                      onChanged: (value) => setState(
+                                          () => filter.tags[0] = value)),
+                                  CheckboxListTile(
+                                      title: const Text("Desk"),
+                                      value: filter.tags[1],
+                                      onChanged: (value) => setState(
+                                          () => filter.tags[1] = value)),
+                                  CheckboxListTile(
+                                      title: const Text("Computer"),
+                                      value: filter.tags[2],
+                                      onChanged: (value) => setState(
+                                          () => filter.tags[2] = value)),
+                                  Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: TextButton(
+                                          style: const ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStatePropertyAll<Color>(
+                                                    Colors.green),
+                                          ),
+                                          onPressed: () =>
+                                              applyFilters(), // use this to call a function to update filters
+                                          child: const Text('Apply Filters')))
+                                ])),
+                      ),
+                    ]),
+              ))),
       body: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
         Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.center,
-                child: ListView(children: [
-                  ExpansionPanelList(
-                      children: [
-                        ExpansionPanel(
-                            headerBuilder: (BuildContext context, bool isOpen) {
-                              return Text("Filter1");
-                            },
-                            body: Text("HERE"),
-                            isExpanded: _isOpen[0]),
-                        ExpansionPanel(
-                            headerBuilder: (context, isOpen) {
-                              return Text("Filter2");
-                            },
-                            body: Text("THERE"),
-                            isExpanded: _isOpen[1]),
-                        ExpansionPanel(
-                            headerBuilder: (context, isOpen) {
-                              return Text("Filter3");
-                            },
-                            body: Text("EVERYWHERE"),
-                            isExpanded: _isOpen[2]),
-                      ],
-                      expansionCallback: (int i, bool isOpen) => setState(() {
-                            _isOpen[i] = !_isOpen[i];
-                          }))
-                ]))),
-        Expanded(
-            flex: 14,
+            flex: 10,
             child: Column(children: <Widget>[
-              SizedBox(
-                  width: .5 * screenWidth,
-                  child: MySearchBar(setPageState: redrawItems)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Builder(
+                      builder: (context) => TextButton(
+                          style: const ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll<Color>(
+                                Colors.blueAccent),
+                          ),
+                          onPressed: () => Scaffold.of(context)
+                              .openDrawer(), // use this to call a function to update filters
+                          child: const Text('Open Filters'))),
+                  SizedBox(
+                      width: .5 * screenWidth,
+                      child: MySearchBar(
+                          setPageState: redrawItems, filters: filter)),
+                  TextButton(
+                      style: const ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll<Color>(Colors.red),
+                      ),
+                      onPressed: () =>
+                          clearFilters(), // use this to call a function to update filters
+                      child: const Text('Clear Filters'))
+                ],
+              ),
               Expanded(
                   child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -112,11 +205,11 @@ class MySearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
   final Function(List<Widget> newItems, bool append) setPageState;
 
+  final Filters filters;
+
   // requiring the function
-  const MySearchBar({
-    super.key,
-    required this.setPageState,
-  });
+  const MySearchBar(
+      {super.key, required this.setPageState, required this.filters});
 
   @override
   State<MySearchBar> createState() => _MySearchBarState();
@@ -138,7 +231,7 @@ class _MySearchBarState extends State<MySearchBar> {
           title: Text(item),
           onTap: () {
             setState(() {
-              // redraw the page when the search has been done
+              // TODO - update the search function to include the now passed in filters using widget.filters
               ctrl.search(item, 30, context).then((value) {
                 widget.setPageState(value, false);
               });
@@ -148,6 +241,10 @@ class _MySearchBarState extends State<MySearchBar> {
         );
       });
     });
+  }
+
+  String getText() {
+    return controller.text;
   }
 
   @override
@@ -255,3 +352,55 @@ generateFakeItems(int num, BuildContext context) {
   }
   return items;
 }
+
+// I was working on an expansionpanel list on the side of the main page in the body but pivoted to the drawer approach, saving this in case we decide to go back to it
+
+//   List<bool> _isOpen = [true, false, false];
+// ExpansionPanelList(
+//                                   dividerColor: Colors.black,
+//                                   expandIconColor: Colors.white,
+//                                   expandedHeaderPadding:
+//                                       const EdgeInsets.all(0),
+//                                   materialGapSize: 0,
+//                                   children: [
+//                                     ExpansionPanel(
+//                                         headerBuilder: (BuildContext context,
+//                                             bool isOpen) {
+//                                           return const Text("Price");
+//                                         },
+//                                         body: Row(children: [
+//                                           Expanded(
+//                                               child: TextField(
+//                                             controller: lowerPrice,
+//                                             decoration: const InputDecoration(
+//                                               border: OutlineInputBorder(),
+//                                               labelText: "Lower",
+//                                             ),
+//                                           )),
+//                                           Expanded(
+//                                               child: TextField(
+//                                             controller: upperPrice,
+//                                             decoration: const InputDecoration(
+//                                               border: OutlineInputBorder(),
+//                                               labelText: "Upper",
+//                                             ),
+//                                           )),
+//                                         ]),
+//                                         isExpanded: _isOpen[0]),
+//                                     ExpansionPanel(
+//                                         headerBuilder: (context, isOpen) {
+//                                           return Text("Filter2");
+//                                         },
+//                                         body: Text("THERE"),
+//                                         isExpanded: _isOpen[1]),
+//                                     ExpansionPanel(
+//                                         headerBuilder: (context, isOpen) {
+//                                           return Text("Filter3");
+//                                         },
+//                                         body: Text("EVERYWHERE"),
+//                                         isExpanded: _isOpen[2]),
+//                                   ],
+//                                   expansionCallback: (int i, bool isOpen) =>
+//                                       setState(() {
+//                                         _isOpen[i] = !_isOpen[i];
+//                                       }))
