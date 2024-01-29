@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:uni_market/pages/posting_form.dart';
+import 'package:uni_market/pages/posting_page.dart';
 import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -247,7 +247,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
           isSubmitting.value = false;
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const PostingForm(),
+              builder: (context) => const PostingPage(),
             ),
           );
         } else {

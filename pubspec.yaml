@@ -44,6 +44,9 @@ dependencies:
   flutter_form_builder: ^6.1.1
   csv: ^5.1.1
   cloud_firestore: ^4.14.0
+  image_picker_web: any
+  image_picker: ^1.0.7
+  carousel_slider: ^4.2.1
 
 dependency_overrides:
   intl: ^0.17.0
@@ -59,9 +62,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
-  file_picker: ^6.1.1
 
-  firebase_storage: ^11.5.3
+
+ 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
