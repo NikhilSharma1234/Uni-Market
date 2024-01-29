@@ -20,7 +20,7 @@ class _UserNavBarState extends State<UserNavBar> {
   Widget build(BuildContext context) {
     return AppBar(
       title: const Text('Uni-Market'),
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
