@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/pages/home.dart';
-import 'package:uni_market/pages/posting_form.dart';
+import 'package:uni_market/pages/posting_page.dart';
 import 'package:uni_market/pages/search.dart';
 
 class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
@@ -60,7 +60,7 @@ class _UserNavBarState extends State<UserNavBar> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const PostingForm(),
+                builder: (context) => const PostingPage(),
               ),
             );
           },
