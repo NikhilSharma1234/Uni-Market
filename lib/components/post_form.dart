@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'dart:convert';
+import 'dialog.dart';
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -95,7 +96,7 @@ class _PostFormState extends State<PostForm> {
           ElevatedButton(
             onPressed: () async {
               if (kIsWeb) {
-                List<XFile> clientImageFiles = await multiImagePicker();
+                List<XFile> clientImageFiles = await multiImagePicker(context);
 
                 if (clientImageFiles.isNotEmpty) {
                   List<String> dataUrls =
@@ -319,7 +320,7 @@ Future uploadImages(
   completer.complete(imageNames);
 }
 
-Future<List<XFile>> multiImagePicker() async {
+Future<List<XFile>> multiImagePicker(context) async {
   List<XFile>? images = await ImagePicker().pickMultiImage();
   if (images.isNotEmpty && images.length <= 3) {
     return images;
@@ -327,6 +328,10 @@ Future<List<XFile>> multiImagePicker() async {
     if (kDebugMode) {
       print("Error: No images selected or more than 3 images selected!");
     }
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => appDialog(context, 'Too many Images',
+            'Please select only three images to upload with your post.', 'Ok'));
   }
   return [];
 }
