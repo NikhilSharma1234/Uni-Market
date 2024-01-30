@@ -7,7 +7,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'dart:convert';
 
 class PostForm extends StatefulWidget {
@@ -102,27 +102,28 @@ class _PostFormState extends State<PostForm> {
                       await convertXFilesToDataUrls(clientImageFiles);
 
                   // Show the pop-up dialog for image confirmation
-                  BuildContext? dialogContext;
-                  bool confirmSelection = await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      // Assign the captured context
-                      dialogContext = context;
+                  if (context.mounted) {
+                    bool confirmSelection = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // Assign the captured context
+                        return ImageCarouselDialog(imageDataUrls: dataUrls);
+                      },
+                    );
 
-                      return ImageCarouselDialog(imageDataUrls: dataUrls);
-                    },
-                  );
-
-                  // Check if the user confirmed the selection
-                  if (confirmSelection == true) {
-                    setState(() {
-                      _imageDataUrls = dataUrls;
-                    });
+                    // Check if the user confirmed the selection
+                    if (confirmSelection == true) {
+                      setState(() {
+                        _imageDataUrls = dataUrls;
+                      });
+                    }
                   }
                 }
               } else {
                 // HERE LIES MOBILE IMAGE SELECTION CODE
-                print("not on web");
+                if (kDebugMode) {
+                  print("not on web");
+                }
               }
             },
             child: Column(
@@ -181,7 +182,9 @@ class _PostFormState extends State<PostForm> {
         List<String> downloadUrls = await completer.future;
         formData["images"] = downloadUrls;
       } catch (e) {
-        print("Error uploading images: $e");
+        if (kDebugMode) {
+          print("Error uploading images: $e");
+        }
         return;
       }
 
@@ -213,14 +216,13 @@ class _PostFormState extends State<PostForm> {
 
       // create userPost map for firebase document data
       final userPost = <String, dynamic>{
-        "buyerId": "",
+        "buyerId": null,
         "condition": formData["condition"],
-        "dateDeleted": Timestamp(0, 0),
+        "dateDeleted": null,
         "dateListed": Timestamp.now(),
-        "dateUpdated": Timestamp(0, 0),
+        "dateUpdated": Timestamp.now(),
         "description": formData["description"],
         "images": formData["images"],
-        "itemId": "",
         "marketplaceId": marketplaceId,
         "name": formData["title"],
         "price": double.parse(formData["price"]),
@@ -235,32 +237,36 @@ class _PostFormState extends State<PostForm> {
       await FirebaseFirestore.instance.collection("items").doc().set(userPost);
 
       // show see post dialog upon successful creation
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Congratulations!'),
-            content: Text('You have successfully created a post.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  // Close the success dialog
-                  Navigator.of(context).pop();
-                  // Navigate to view post screen or any other logic
-                  // For example, you can use Navigator.push to navigate to a new screen
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => ViewPostScreen()));
-                },
-                child: Text('Click here to view your post'),
-              ),
-            ],
-          );
-        },
-      );
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Congratulations!'),
+              content: const Text('You have successfully created a post.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    // Close the success dialog
+                    Navigator.of(context).pop();
+                    // Navigate to view post screen or any other logic
+                    // For example, you can use Navigator.push to navigate to a new screen
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) => ViewPostScreen()));
+                  },
+                  child: const Text('Click here to view your post'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       // Show failure snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create post')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to create post')),
+        );
+      }
       throw ("failed async for create post");
     }
   }
@@ -279,8 +285,8 @@ class _PostFormState extends State<PostForm> {
 // Helper functions Converting XFile to String
 Future<String> convertImageToDataUrl(XFile imageFile) async {
   List<int> imageBytes = await imageFile.readAsBytes();
-  String dataUrl = 'data:image/${imageFile.name.split('.').last};base64,' +
-      base64Encode(Uint8List.fromList(imageBytes));
+  String dataUrl =
+      'data:image/${imageFile.name.split('.').last};base64,${base64Encode(Uint8List.fromList(imageBytes))}';
   return dataUrl;
 }
 
@@ -304,7 +310,9 @@ Future uploadImages(
       await imageRef.putData(imageBytes);
     } on FirebaseException catch (e) {
       // Undeveloped catch case for firebase write error
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   });
 
@@ -312,11 +320,13 @@ Future uploadImages(
 }
 
 Future<List<XFile>> multiImagePicker() async {
-  List<XFile>? _images = await ImagePicker().pickMultiImage();
-  if (_images.isNotEmpty && _images.length <= 3) {
-    return _images;
+  List<XFile>? images = await ImagePicker().pickMultiImage();
+  if (images.isNotEmpty && images.length <= 3) {
+    return images;
   } else {
-    print("Error: No images selected or more than 3 images selected!");
+    if (kDebugMode) {
+      print("Error: No images selected or more than 3 images selected!");
+    }
   }
   return [];
 }

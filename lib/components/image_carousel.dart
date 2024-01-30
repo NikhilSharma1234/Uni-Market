@@ -5,12 +5,12 @@ import 'dart:convert';
 class ImageCarouselDialog extends StatelessWidget {
   final List<String> imageDataUrls;
 
-  ImageCarouselDialog({required this.imageDataUrls});
+  const ImageCarouselDialog({super.key, required this.imageDataUrls});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Container(
+      content: SizedBox(
         width: 300, // Set a fixed width
         height: 300, // Set a fixed height
         child: CarouselSlider(
@@ -25,7 +25,7 @@ class ImageCarouselDialog extends StatelessWidget {
               builder: (BuildContext context) {
                 return Container(
                   width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.symmetric(horizontal: 5.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: Image.memory(
                     base64Decode(imageUrl.split(',')[1]),
                     fit: BoxFit.cover,
@@ -41,13 +41,13 @@ class ImageCarouselDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop(false); // Cancel
           },
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(true); // Confirm
           },
-          child: Text('Confirm'),
+          child: const Text('Confirm'),
         ),
       ],
     );
