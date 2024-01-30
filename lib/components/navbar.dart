@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:uni_market/pages/search.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
 
