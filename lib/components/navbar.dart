@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/pages/about_us.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
 
@@ -18,6 +19,22 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
     return AppBar(
       automaticallyImplyLeading: false,
       actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor:
+                darkModeOn ? Colors.white : const Color(0xFF041E42),
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const AboutUsPage(),
+              ),
+            );
+          },
+          child: const Text('About Us'),
+        ),
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor:
