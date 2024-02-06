@@ -125,9 +125,9 @@ class _AboutUsPageState extends State<AboutUsPage> {
                     ),
                     TeamMemberCard(
                       name: 'Cameron McCoy',
-                      role: 'CEO',
+                      role: 'Full Stack Development',
                       bio:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                          'B.S. Computer Science & Engineering / Biology \nExpected Graduation: May 2024',
                       image: 'assets/portraits/cameron.webp',
                     ),
                     TeamMemberCard(
