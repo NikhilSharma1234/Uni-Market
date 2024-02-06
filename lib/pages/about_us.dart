@@ -132,9 +132,9 @@ class _AboutUsPageState extends State<AboutUsPage> {
                     ),
                     TeamMemberCard(
                       name: 'Yeamin Chowdhury',
-                      role: 'CTO',
+                      role: 'Full Stack Development',
                       bio:
-                          'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                          'Bachelors of Science in Computer Science and Engineering, Minor in Mathmatics. \nExpected Graduation: December 2024.',
                       image: 'assets/portraits/yeamin.webp',
                     ),
                     // Add more team members as needed
