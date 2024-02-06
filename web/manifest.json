@@ -1,11 +1,11 @@
 {
-    "name": "uni_market",
-    "short_name": "uni_market",
+    "name": "Uni-Market",
+    "short_name": "Uni-Market",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A Marketplace Made for Students.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
