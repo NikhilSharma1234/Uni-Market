@@ -83,6 +83,7 @@ flutter:
     - assets/logo.png
     - assets/ItemImages/
     - assets/
+    - assets/portraits/
   fonts:
     - family: Ubuntu
       fonts:
