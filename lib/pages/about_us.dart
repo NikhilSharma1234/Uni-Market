@@ -214,12 +214,15 @@ class TeamMemberCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.role,
-    required this.bio,
+    this.bio,
     required this.image,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Generate the alt text dynamically using the name.
+    String imageDescription = "Profile picture of $name";
+
     return Card(
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -229,13 +232,32 @@ class TeamMemberCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-            child: Image.asset(
-              image,
-              height: 150,
-              width: 150,
-              fit: BoxFit.cover,
+          Semantics(
+            label: imageDescription, // Use the dynamically generated description
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              child: Image.asset(
+                image,
+                height: 150,
+                width: 150,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150,
+                    width: 150,
+                    color: Colors.grey[200], // Optional: Provide a placeholder color
+                    alignment: Alignment.center,
+                    child: Text(
+                      imageDescription, // Display the alt text
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54, 
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           Padding(
@@ -257,13 +279,13 @@ class TeamMemberCard extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                bio != null ? const SizedBox(height: 8) : const SizedBox(),
-                bio != null
-                    ? Text(
-                        bio!,
-                        style: const TextStyle(fontSize: 14),
-                      )
-                    : SizedBox(),
+                if (bio != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    bio!,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
               ],
             ),
           ),
