@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/pages/about_us.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
+import 'package:uni_market/pages/search.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
