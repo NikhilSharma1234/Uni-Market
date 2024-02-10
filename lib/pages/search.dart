@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar.dart';
 import 'ItemGeneration/data.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
 import 'package:uni_market/helpers/filters.dart';
-
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:csv/csv.dart';
 
@@ -313,8 +314,24 @@ class PageController {
 }
 
 class ItemModel {
+  // initializing firebase access point
+  final db = FirebaseFirestore.instance;
+
   // get the data from the text file
   getData(String fileName, int num) async {
+    final dbItems =
+        db.collection('items').where('condition', isEqualTo: 'NEW').get();
+
+    print(db.collection('items').get());
+
+    // dbItems.then(
+    //   (DocumentSnapshot doc) {
+    //     final data = doc.data() as Map<String, dynamic>;
+    //     // ...
+    //   },
+    //   onError: (e) => print("Error getting document: $e"),
+    // );
+
     List<Data> items = [];
     int numLines = num;
     var rawFileString = await rootBundle.loadString(fileName);
