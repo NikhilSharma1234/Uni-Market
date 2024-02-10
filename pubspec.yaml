@@ -47,6 +47,7 @@ dependencies:
   image_picker_web: any
   image_picker: ^1.0.7
   carousel_slider: ^4.2.1
+  url_launcher: ^6.2.4
 
 dependency_overrides:
   intl: ^0.17.0
