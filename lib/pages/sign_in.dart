@@ -68,7 +68,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 }
 
-// Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)
+// Function to recreate Firebase User with Email and Password (Pass in Register Form Controllers)
 Future<void> _signInUser(
   BuildContext context,
   TextEditingController emailController,
@@ -92,17 +92,18 @@ Future<void> _signInUser(
   }
 }
 
-// Register Form
-class SignInForm extends StatelessWidget {
-  // Initialize controllers for Each Input Container
+class SignInForm extends StatefulWidget {
+  const SignInForm({super.key});
 
+  @override
+  _SignInFormState createState() => _SignInFormState();
+}
+
+// Register Form
+class _SignInFormState extends State<SignInForm> {
+  // Initialize controllers for Each Input Container
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  SignInForm({
-    Key? key,
-  }) : super(key: key);
-
   final _formKey = GlobalKey<FormState>();
 
   @override
