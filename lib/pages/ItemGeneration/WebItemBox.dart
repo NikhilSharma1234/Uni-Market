@@ -76,8 +76,8 @@ class _WebItemBoxState extends State<WebItemBox> {
                                 child: ClipRRect(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(10)),
-                                    child: Image.asset(
-                                      item.imagePath,
+                                    child: Image.network(
+                                      'https://${item.imagePath}', // TODO may not need depending on fix in search
                                       fit: BoxFit.fitWidth,
                                       // height: screenWidth * 0.1,
                                     )))),
