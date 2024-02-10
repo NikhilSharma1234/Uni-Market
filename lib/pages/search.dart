@@ -319,35 +319,22 @@ class ItemModel {
 
   // get the data from the text file
   getData(String fileName, int num) async {
-    final dbItems =
-        db.collection('items').where('condition', isEqualTo: 'NEW').get();
-
-    print(db.collection('items').get());
-
-    // dbItems.then(
-    //   (DocumentSnapshot doc) {
-    //     final data = doc.data() as Map<String, dynamic>;
-    //     // ...
-    //   },
-    //   onError: (e) => print("Error getting document: $e"),
-    // );
-
     List<Data> items = [];
-    int numLines = num;
-    var rawFileString = await rootBundle.loadString(fileName);
-    // return rawFileString;
-    List<List<dynamic>> dataFile =
-        const CsvToListConverter().convert(rawFileString);
 
-    for (var field in dataFile) {
-      // do a certain number of lines
-      if (numLines == 0) {
-        break;
+    final dbItems =
+        await db.collection('items').where('condition', isEqualTo: 'NEW').get();
+
+    for (var item in dbItems.docs) {
+      var image = 'uh oh';
+      if (dbItems.docs.contains('images')) {
+        // TODO currently gets local url, need the hosted url from db
+        var image = item['images'][0].toString();
       }
-      items.add(Data(field[0], field[1], field[2], field[3], field[4],
-          List<String>.from(field.sublist(5))));
-      numLines -= 1;
+
+      items.add(Data(item['name'], item['price'], item['dateListed'],
+          item['sellerId'], image, item['tags']));
     }
+
     return items;
   }
 }
@@ -369,55 +356,3 @@ generateFakeItems(int num, BuildContext context) {
   }
   return items;
 }
-
-// I was working on an expansionpanel list on the side of the main page in the body but pivoted to the drawer approach, saving this in case we decide to go back to it
-
-//   List<bool> _isOpen = [true, false, false];
-// ExpansionPanelList(
-//                                   dividerColor: Colors.black,
-//                                   expandIconColor: Colors.white,
-//                                   expandedHeaderPadding:
-//                                       const EdgeInsets.all(0),
-//                                   materialGapSize: 0,
-//                                   children: [
-//                                     ExpansionPanel(
-//                                         headerBuilder: (BuildContext context,
-//                                             bool isOpen) {
-//                                           return const Text("Price");
-//                                         },
-//                                         body: Row(children: [
-//                                           Expanded(
-//                                               child: TextField(
-//                                             controller: lowerPrice,
-//                                             decoration: const InputDecoration(
-//                                               border: OutlineInputBorder(),
-//                                               labelText: "Lower",
-//                                             ),
-//                                           )),
-//                                           Expanded(
-//                                               child: TextField(
-//                                             controller: upperPrice,
-//                                             decoration: const InputDecoration(
-//                                               border: OutlineInputBorder(),
-//                                               labelText: "Upper",
-//                                             ),
-//                                           )),
-//                                         ]),
-//                                         isExpanded: _isOpen[0]),
-//                                     ExpansionPanel(
-//                                         headerBuilder: (context, isOpen) {
-//                                           return Text("Filter2");
-//                                         },
-//                                         body: Text("THERE"),
-//                                         isExpanded: _isOpen[1]),
-//                                     ExpansionPanel(
-//                                         headerBuilder: (context, isOpen) {
-//                                           return Text("Filter3");
-//                                         },
-//                                         body: Text("EVERYWHERE"),
-//                                         isExpanded: _isOpen[2]),
-//                                   ],
-//                                   expansionCallback: (int i, bool isOpen) =>
-//                                       setState(() {
-//                                         _isOpen[i] = !_isOpen[i];
-//                                       }))
