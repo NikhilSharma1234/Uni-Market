@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 // NOTE - to get assets like images to work, you need to run flutter build web then use the asset in code
 
 void main() async {
+   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
