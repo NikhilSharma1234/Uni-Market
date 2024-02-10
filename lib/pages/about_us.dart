@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsPage extends StatefulWidget {
   const AboutUsPage({super.key});
@@ -9,6 +11,15 @@ class AboutUsPage extends StatefulWidget {
 }
 
 class _AboutUsPageState extends State<AboutUsPage> {
+  _launchURL(link) async {
+    Uri _url = Uri.parse(link);
+    if (await launchUrl(_url)) {
+      await launchUrl(_url);
+    } else {
+      throw 'Could not launch $_url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -66,30 +77,30 @@ class _AboutUsPageState extends State<AboutUsPage> {
                   scrollDirection: Axis.horizontal,
                   children: const [
                     TeamMemberCard(
-                      name: 'David Feil-Seifer',
-                      role: 'Instructor, CSE, University of Nevada, Reno',
-                      bio: null,
-                      image: 'assets/portraits/david.jpg',
-                    ),
+                        name: 'Dave Feil-Seifer',
+                        role: 'Instructor, CSE, University of Nevada, Reno',
+                        bio: null,
+                        image: 'assets/portraits/david.jpg',
+                        imageAltText: 'A picture of Dave Feil-Seifer'),
                     TeamMemberCard(
-                      name: 'Devrin Lee',
-                      role: 'Instructor, CSE, University of Nevada, Reno',
-                      bio: null,
-                      image: 'assets/portraits/devrin.jpg',
-                    ),
+                        name: 'Devrin Lee',
+                        role: 'Instructor, CSE, University of Nevada, Reno',
+                        bio: null,
+                        image: 'assets/portraits/devrin.jpg',
+                        imageAltText: 'A picture of Devrin Lee'),
                     TeamMemberCard(
-                      name: 'Sara Davis',
-                      role: 'Instructor, CSE, University of Nevada, Reno',
-                      bio: null,
-                      image: 'assets/portraits/sara.jpg',
-                    ),
+                        name: 'Sara Davis',
+                        role: 'Instructor, CSE, University of Nevada, Reno',
+                        bio: null,
+                        image: 'assets/portraits/sara.jpg',
+                        imageAltText: 'A picture of Sara Davis'),
                     TeamMemberCard(
-                      name: 'Elke Folmer',
-                      role:
-                          'External Advisor & CSE Department Chair, University of Nevada, Reno',
-                      bio: null,
-                      image: 'assets/portraits/elke.jpg',
-                    ),
+                        name: 'Elke Folmer',
+                        role:
+                            'External Advisor & CSE Department Chair, University of Nevada, Reno',
+                        bio: null,
+                        image: 'assets/portraits/elke.jpg',
+                        imageAltText: 'A picture of Elke Folmer'),
                     // Add more team members as needed
                   ],
                 ),
@@ -110,32 +121,33 @@ class _AboutUsPageState extends State<AboutUsPage> {
                   scrollDirection: Axis.horizontal,
                   children: const [
                     TeamMemberCard(
-                      name: 'Nikhil Sharma',
-                      role: 'Project Manager & Dev Ops',
-                      bio:
-                          'Bachelors of Science in Computer Science and Engineering.\nExpected Graduation: May 2024.',
-                      image: 'assets/portraits/nikhil.jpeg',
-                    ),
+                        name: 'Nikhil Sharma',
+                        role: 'Project Manager & Dev Ops',
+                        bio:
+                            'Bachelors of Science in Computer Science and Engineering.\nExpected Graduation: May 2024.',
+                        image: 'assets/portraits/nikhil.jpeg',
+                        imageAltText: 'A picture of Nikhil Sharma'),
                     TeamMemberCard(
-                      name: 'Jacob Hunter',
-                      role: 'CTO',
-                      bio:
-                          'Bachelor of Science in Computer Science and Engineering.\nExpected Graduation: December 2024.',
-                      image: 'assets/portraits/jacob.webp',
-                    ),
+                        name: 'Jacob Hunter',
+                        role: 'CTO',
+                        bio:
+                            'Bachelor of Science in Computer Science and Engineering.\nExpected Graduation: December 2024.',
+                        image: 'assets/portraits/jacob.webp',
+                        imageAltText: 'A picture of Jacob Hunter'),
                     TeamMemberCard(
-                      name: 'Cameron McCoy',
-                      role: 'Full Stack Development',
-                      bio:
-                          'B.S. Computer Science & Engineering / Biology \nExpected Graduation: May 2024',
-                      image: 'assets/portraits/cameron.webp',
-                    ),
+                        name: 'Cameron McCoy',
+                        role: 'Full Stack Development',
+                        bio:
+                            'B.S. Computer Science & Engineering / Biology \nExpected Graduation: May 2024',
+                        image: 'assets/portraits/cameron.webp',
+                        imageAltText: 'A picture of Cameron McCoy'),
                     TeamMemberCard(
                       name: 'Yeamin Chowdhury',
                       role: 'Full Stack Development',
                       bio:
                           'Bachelors of Science in Computer Science and Engineering, Minor in Mathmatics. \nExpected Graduation: December 2024.',
                       image: 'assets/portraits/yeamin.webp',
+                      imageAltText: 'A picture of Yeamin Chowdhury',
                     ),
                     // Add more team members as needed
                   ],
@@ -143,56 +155,78 @@ class _AboutUsPageState extends State<AboutUsPage> {
               ),
               SizedBox(
                 width: screenWidth * 0.75,
-                child: const Column(
+                child: Column(
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'Project Related Resources',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Books',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'Problem Domain Book: The Lean Marketplace: A Practical Guide to Building a Successful Online Marketplace Business\n\nJuho Makkonen, Cristóbal Gracia. The Lean Marketplace: A Practical Guide to Building a Successful Online Marketplace Business. Sharetribe, February 28, 2018. None of the marketplaces listed above were built in a day. Each one had to go through the slow process of learning by doing. This book is designed to help give you a head start with your own marketplace idea and avoid the most common pitfalls.\n\nFlutter and Dart Cookbook: Developing Full-Stack Applications for the Cloud\n\nRichard Rose. Flutter and Dart Cookbook: Developing Full-Stack Applications for the Cloud. O\'Reilly Media; 1st edition, January 24, 2023. Building applications involves lots of moving pieces as well as integrating with external services. Learn the fundamentals of working with the Firebase suite and take your first steps with Cloud. Learn flutter and dart while building full stack applications for any industry all with one codebase.\n',
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
-                    Text(
+                    const Text(
                       'Articles',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       'The social infrastructure of online marketplaces: Trade, work and the interplay of decided and emergent orders\n\nAspers P, Darr A. The social infrastructure of online marketplaces: Trade, work and the interplay of decided and emergent orders. Br J Sociol. 2022 Sep;73(4):822-838. doi: 10.1111/1468-4446.12965. Epub 2022 June 30. PMID: 35771185; PMCID: PMC9540661. This article goes over the social relationship between the sellers and buyers within a marketplace. Analyzing multiple online marketplaces and trading platforms, it leads to examples of price settings and the distinction of a large-name trade site versus a locally fostered marketplace.\n\nManagement of Trust in the E-Marketplace: The Role of the Buyer\'s Experience in Building Trust\n\nKim, M.-S., & Ahn, J.-H. (2007). Management of Trust in the E-Marketplace: The Role of the Buyer’s Experience in Building Trust. Journal of Information Technology, 22(2), 119-132. https://doi.org/10.1057/palgrave.jit.2000095. This article talks about the communication side of a buyer and seller relationship and how the seller has to build trust with the buyer. Reinforces the concept of Uni-Market and gives additional ideas on how the platform could be better. The outcome relies on the experience of the transaction.\n\nUsing Google´s Flutter Framework for the Development of a Large-Scale Reference Application\n\nFaust, Sebastian. “Using Google´s Flutter Framework for the Development of a Large-Scale Reference Application.” (2020). This article provides an excellent guideline on how to set up a flutter project for large scale development. Going over the development process, team dynamic, the challenges and the benefits of using Google’s flutter framework. It provides the testimony of industry experts and how they were able to curate their projects with Flutter’s help.\n',
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
-                    Text(
+                    const Text(
                       'Websites',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Text(
-                      'https://docs.flutter.dev/\n\nThis link is pointed to the official Flutter documents. It is single-handedly the most helpful resource for Uni-Market. It goes over tutorials to accomplish various parts of a Flutter project as well as common fixes to common problems. It has examples of various development practices when developing in the programming language Dart.\n\nhttps://altar.io/eight-steps-follow-build-successful-marketplace/\n\nThis website link is to an article that explains how to build a successful marketplace. It goes over attributes of how to choose a viable industry, a unique value proposition, market size, and marketing strategies. Overall, a good article that guides the process for solving the problem that Uni-Market seeks to solve.',
+                    const SizedBox(height: 10),
+                    RichText(
+                      text: TextSpan(
+                        recognizer: TapGestureRecognizer()
+                        ..onTap = () { _launchURL('https://docs.flutter.dev/');},
+                        text:
+                          'https://docs.flutter.dev/',
+                        )),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'This link is pointed to the official Flutter documents. It is single-handedly the most helpful resource for Uni-Market. It goes over tutorials to accomplish various parts of a Flutter project as well as common fixes to common problems. It has examples of various development practices when developing in the programming language Dart.',
                       style: TextStyle(fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
+                    RichText(
+                      text: TextSpan(
+                        recognizer: TapGestureRecognizer()
+                        ..onTap = () {_launchURL(
+                            'https://altar.io/eight-steps-follow-build-successful-marketplace/');},
+                        text: 'https://altar.io/eight-steps-follow-build-successful-marketplace/',
+                        )),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'This website link is to an article that explains how to build a successful marketplace. It goes over attributes of how to choose a viable industry, a unique value proposition, market size, and marketing strategies. Overall, a good article that guides the process for solving the problem that Uni-Market seeks to solve.',
+                      style: TextStyle(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -209,6 +243,7 @@ class TeamMemberCard extends StatelessWidget {
   final String role;
   final String? bio;
   final String image;
+  final String imageAltText;
 
   const TeamMemberCard({
     super.key,
@@ -216,7 +251,13 @@ class TeamMemberCard extends StatelessWidget {
     required this.role,
     this.bio,
     required this.image,
+    required this.imageAltText,
   });
+
+  _fileExists(imagePath) {
+    // logic goes here
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
