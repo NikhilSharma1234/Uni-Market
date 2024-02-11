@@ -206,6 +206,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
                         ..onTap = () { _launchURL('https://docs.flutter.dev/');},
                         text:
                           'https://docs.flutter.dev/',
+                          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)
                         )),
                     const SizedBox(height: 10),
                     const Text(
@@ -220,6 +221,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
                         ..onTap = () {_launchURL(
                             'https://altar.io/eight-steps-follow-build-successful-marketplace/');},
                         text: 'https://altar.io/eight-steps-follow-build-successful-marketplace/',
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)
                         )),
                     const SizedBox(height: 10),
                     const Text(
@@ -292,7 +294,7 @@ class TeamMemberCard extends StatelessWidget {
                     child: Text(
                       imageDescription, // Display the alt text
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54, 
                       ),
