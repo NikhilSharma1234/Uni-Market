@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/pages/profile.dart';
-import 'package:uni_market/pages/search.dart';
+import 'package:uni_market/pages/home.dart';
 
 class UserNavBarMobile extends StatefulWidget implements PreferredSizeWidget {
   final int activeIndex;
@@ -23,7 +23,7 @@ class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which Nav
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const SearchPage()
+                builder: (context) => const HomePage()
               ),
             );
           },

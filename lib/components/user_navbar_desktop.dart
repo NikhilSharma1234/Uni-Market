@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/pages/profile.dart';
-import 'package:uni_market/pages/search.dart';
+import 'package:uni_market/pages/home.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
   const UserNavBarDesktop({super.key});
@@ -29,11 +29,11 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const SearchPage(),
+                builder: (context) => const HomePage(),
               ),
             );
           },
-          child: const Text('Search'),
+          child: const Text('Home'),
         ),
         TextButton(
           style: TextButton.styleFrom(

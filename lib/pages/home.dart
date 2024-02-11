@@ -10,17 +10,17 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:csv/csv.dart';
 
-class SearchPage extends StatefulWidget {
+class HomePage extends StatefulWidget {
 
-  const SearchPage({
+  const HomePage({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _HomePageState extends State<HomePage> {
   late List<Widget> items = [const Text("")];
 
   // redraws the items on the page based on search results
