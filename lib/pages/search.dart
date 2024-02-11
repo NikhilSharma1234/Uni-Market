@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/user_navbar.dart';
+import 'package:uni_market/components/user_navbar_desktop.dart';
+import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'ItemGeneration/data.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
@@ -59,7 +61,8 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     return Scaffold(
-      appBar: const UserNavBar(),
+      appBar: kIsWeb ? const UserNavBarDesktop() : null,
+        bottomNavigationBar: !kIsWeb ? const UserNavBarMobile() : null,
       // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
       body: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
         Expanded(

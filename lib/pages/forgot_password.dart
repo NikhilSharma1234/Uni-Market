@@ -21,6 +21,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: NavBar(),
       body: Center(
         child: Form(
