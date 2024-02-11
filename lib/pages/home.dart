@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: kIsWeb ? const UserNavBarDesktop() : null,
+      appBar: kIsWeb ? UserNavBarDesktop(redrawItems: redrawItems) : null,
       bottomNavigationBar: !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
         onPressed: () => 
@@ -110,9 +110,9 @@ class _HomePageState extends State<HomePage> {
         Expanded(
             flex: 14,
             child: Column(children: <Widget>[
-              SizedBox(
+              !kIsWeb ? SizedBox(
                   width: .5 * screenWidth,
-                  child: MySearchBar(setPageState: redrawItems)),
+                  child: MySearchBar(setPageState: redrawItems)) : const SizedBox(),
               Expanded(
                   child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -185,6 +185,7 @@ class _MySearchBarState extends State<MySearchBar> {
           builder: (BuildContext context, controller) {
             // attempting to get the search bar to take an enter key to submit search
             return SearchBar(
+              constraints: const BoxConstraints(maxWidth: 500, minHeight: 45),
               controller: controller,
               padding: const MaterialStatePropertyAll<EdgeInsets>(
                   EdgeInsets.symmetric(horizontal: 16.0)),
