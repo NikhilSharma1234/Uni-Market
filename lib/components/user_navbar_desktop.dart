@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uni_market/pages/home.dart';
-import 'package:uni_market/pages/posting_page.dart';
+import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/search.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
@@ -30,23 +29,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const Home(),
-              ),
-            );
-          },
-          child: const Text('Home'),
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const SearchPage(
-                  title: 'adsa',
-                ),
+                builder: (context) => const SearchPage(),
               ),
             );
           },
@@ -60,21 +43,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const PostingPage(),
-              ),
-            );
-          },
-          child: const Text('Create Post'),
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const Home(),
+                builder: (context) => const ProfilePage(),
               ),
             );
           },
@@ -82,18 +51,16 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: Container(
-            child: TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF041E42),
-                padding: const EdgeInsets.all(16.0),
-                textStyle: const TextStyle(fontSize: 20),
-              ),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-              },
-              child: const Text('Sign Out'),
+          child: TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF041E42),
+              padding: const EdgeInsets.all(16.0),
+              textStyle: const TextStyle(fontSize: 20),
             ),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+            child: const Text('Sign Out'),
           ),
         ),
       ],
