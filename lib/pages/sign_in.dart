@@ -25,6 +25,7 @@ class _SignInPageState extends State<SignInPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: Size(screenWidth * 0.25, 110),
         child: NavBar(), // Include NavBar if needed
@@ -36,9 +37,9 @@ class _SignInPageState extends State<SignInPage> {
             SizedBox(
               width:
                   screenWidth < 500 ? screenWidth * 0.95 : screenWidth * 0.45,
-              child: Column(
+              child: const Column(
                 children: <Widget>[
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(10.0),
                     child: AutoSizeText(
                       'Welcome back to the marketplace made for students.',
@@ -51,13 +52,8 @@ class _SignInPageState extends State<SignInPage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                      height: (screenHeight * 0.6),
-                    ),
-                    child: SignInForm(),
+                  SignInForm(),
                     // Use SignInForm here
-                  ),
                 ],
               ),
             ),
