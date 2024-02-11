@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+class ChatPage extends StatefulWidget {
+  const ChatPage({Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
 // This is where Jacob's item tile page will go
-class _HomeState extends State<Home> {
+class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: kIsWeb ? UserNavBarDesktop() : null,
-      bottomNavigationBar: !kIsWeb ? UserNavBarMobile() : null, // Custom app bar here
+      bottomNavigationBar: !kIsWeb ? UserNavBarMobile(activeIndex: 1) : null, // Custom app bar here
       body: Center(
         child: SizedBox(),
       ),
