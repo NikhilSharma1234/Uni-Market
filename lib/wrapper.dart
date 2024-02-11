@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/pages/search.dart';
+import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/sign_up.dart';
 
 class Wrapper extends StatefulWidget {
@@ -26,7 +26,7 @@ class _WrapperState extends State<Wrapper> {
     if (mounted && event != null && event.emailVerified) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const SearchPage(),
+          builder: (context) => const HomePage(),
         ),
       );
     } else if (event != null && !event.emailVerified) {
