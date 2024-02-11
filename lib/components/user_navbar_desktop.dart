@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
-  const UserNavBarDesktop({super.key});
+  final Function(List<Widget>, bool) redrawItems;
+
+  const UserNavBarDesktop({super.key, required this.redrawItems});
   @override
   State<UserNavBarDesktop> createState() => _UserNavBarDesktopState();
 
@@ -18,50 +19,36 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('Uni-Market'),
+      title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            MySearchBar(setPageState: widget.redrawItems),
+          ],
+        ),
+      centerTitle: true,
       automaticallyImplyLeading: false,
-      actions: <Widget>[
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const HomePage(),
-              ),
-            );
-          },
-          child: const Text('Home'),
+      leading: const Padding(
+        padding: EdgeInsets.only(
+          top: 10,
+          bottom: 10,
+          left: 15
         ),
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const ProfilePage(),
-              ),
-            );
-          },
-          child: const Text('Profile'),
-        ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF041E42),
-              padding: const EdgeInsets.all(16.0),
-              textStyle: const TextStyle(fontSize: 20),
-            ),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-            },
-            child: const Text('Sign Out'),
-          ),
+        child: Text(
+          'Uni-Market',
+          style: TextStyle(fontSize: 20)
+        )
+      ),
+      leadingWidth: 200,
+      actions: const <Widget>[
+        MenuBar(
+          children: <Widget>[
+            SubmenuButton(
+              menuChildren: <Widget>[
+                SizedBox(width: 300, height: 500,child: ProfilePage())
+              ],
+              child: IconButton(icon: Icon(Icons.person, size: 40), onPressed: null,),
+            )]
         ),
       ],
     );
