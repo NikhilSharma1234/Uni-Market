@@ -58,6 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       // sets height of appbar
       appBar: NavBar(),
       body: Row(

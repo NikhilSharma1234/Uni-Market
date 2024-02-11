@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/user_navbar.dart';
+import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/post_form.dart';
+import 'package:uni_market/components/user_navbar_mobile.dart';
 
 class PostingPage extends StatefulWidget {
   const PostingPage({Key? key}) : super(key: key);
@@ -28,7 +30,9 @@ class _PostingPageState extends State<PostingPage> {
     }
 
     return Scaffold(
-        appBar: const UserNavBar(), // Custom app bar here
+        appBar: kIsWeb ? const UserNavBarDesktop() : null,
+        bottomNavigationBar: !kIsWeb ? const UserNavBarMobile() : null,
+      resizeToAvoidBottomInset: false,
         body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,

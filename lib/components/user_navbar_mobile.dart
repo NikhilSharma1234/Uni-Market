@@ -4,24 +4,22 @@ import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:uni_market/pages/search.dart';
 
-class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
-  const UserNavBar({super.key});
+class UserNavBarMobile extends StatefulWidget implements PreferredSizeWidget {
+  const UserNavBarMobile({super.key});
   @override
-  State<UserNavBar> createState() => _UserNavBarState();
+  State<UserNavBarMobile> createState() => _UserNavBarMobileState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _UserNavBarState extends State<UserNavBar> {
+class _UserNavBarMobileState extends State<UserNavBarMobile> {
   int hoveredIndex = -1; // Track which NavItem is currently hovered
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: const Text('Uni-Market'),
-      automaticallyImplyLeading: false,
-      actions: <Widget>[
+    return NavigationBar(
+      destinations: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
             padding: const EdgeInsets.all(16.0),
