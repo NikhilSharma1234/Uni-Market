@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -32,7 +31,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: kIsWeb ? const UserNavBarDesktop() : null,
       bottomNavigationBar: !kIsWeb ? const UserNavBarMobile(activeIndex: 2) : null, // Custom app bar here
       body: Center(
         child: SizedBox(

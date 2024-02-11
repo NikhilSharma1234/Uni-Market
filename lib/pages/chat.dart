@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 
 class ChatPage extends StatefulWidget {
@@ -17,7 +16,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return const Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: kIsWeb ? UserNavBarDesktop() : null,
       bottomNavigationBar: !kIsWeb ? UserNavBarMobile(activeIndex: 1) : null, // Custom app bar here
       body: Center(
         child: SizedBox(),
