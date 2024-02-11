@@ -2,20 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/pages/posting_page.dart';
 import 'ItemGeneration/data.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'package:csv/csv.dart';
 
 class SearchPage extends StatefulWidget {
-  final String title;
 
   const SearchPage({
     Key? key,
-    required this.title,
   }) : super(key: key);
 
   @override
@@ -61,8 +59,22 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: kIsWeb ? const UserNavBarDesktop() : null,
-        bottomNavigationBar: !kIsWeb ? const UserNavBarMobile() : null,
+      bottomNavigationBar: !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => 
+          showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => 
+                const Dialog(
+                  insetPadding: EdgeInsets.all(0),
+                  
+                  child: PostingPage(),
+                )
+        ),
+        child: const Icon(Icons.add),
+      ),
       // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
       body: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
         Expanded(
@@ -226,15 +238,16 @@ class ItemModel {
     var rawFileString = await rootBundle.loadString(fileName);
     // return rawFileString;
     List<List<dynamic>> dataFile =
-        const CsvToListConverter().convert(rawFileString);
+        const CsvToListConverter(eol: "\n",fieldDelimiter: ",").convert(rawFileString);
 
     for (var field in dataFile) {
       // do a certain number of lines
       if (numLines == 0) {
         break;
       }
+      print(field);
       items.add(Data(field[0], field[1], field[2], field[3], field[4],
-          List<String>.from(field.sublist(5))));
+      List<String>.from(field.sublist(5))));
       numLines -= 1;
     }
     return items;

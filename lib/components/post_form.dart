@@ -35,8 +35,16 @@ class _PostFormState extends State<PostForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const Text(
+            'Create a post!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
           // Title box
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           FormBuilderTextField(
             name: 'title',
             style: const TextStyle(fontSize: 13),
@@ -47,7 +55,7 @@ class _PostFormState extends State<PostForm> {
             maxLength: 30, // Set a maximum character limit
           ),
           // Description
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           FormBuilderTextField(
             name: 'description',
             controller: _descriptionController,
@@ -57,7 +65,7 @@ class _PostFormState extends State<PostForm> {
             maxLength: 150, // Set a maximum character limit
           ),
           // Price Box
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           FormBuilderTextField(
             name: 'price',
             controller: _priceController,
@@ -94,6 +102,12 @@ class _PostFormState extends State<PostForm> {
           ),
           const SizedBox(height: 38),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0))),
             onPressed: () async {
               if (kIsWeb) {
                 List<XFile> clientImageFiles = await multiImagePicker(context);
@@ -136,7 +150,7 @@ class _PostFormState extends State<PostForm> {
               ],
             ),
           ),
-          const SizedBox(height: 29),
+          const SizedBox(height: 8),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -155,6 +169,17 @@ class _PostFormState extends State<PostForm> {
               }
             },
             child: const Text('Submit'),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0))),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
         ],
       ),
