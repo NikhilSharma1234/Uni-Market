@@ -1,17 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
-import 'package:uni_market/components/user_navbar_mobile.dart';
-import 'package:uni_market/pages/posting_page.dart';
 import 'ItemGeneration/data.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/services.dart' show rootBundle;
-
-import 'package:csv/csv.dart';
+import 'package:uni_market/helpers/filters.dart';
+import 'package:flutter/foundation.dart';
+import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/pages/posting_page.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
-
   const HomePage({
     Key? key,
   }) : super(key: key);
@@ -40,8 +38,6 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
   }
 
-  List<bool> _isOpen = [true, false, false];
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -58,68 +54,124 @@ class _HomePageState extends State<HomePage> {
           const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
     }
 
+    // filter stuff
+    Filters filter = Filters(0, 999999999, [false, false, false]);
+    final lowerPrice = TextEditingController();
+    final upperPrice = TextEditingController();
+
+    void clearFilters() {
+      setState(() {
+        filter = Filters(0, 999999999, [false, false, false]);
+        lowerPrice.value = TextEditingValue.empty;
+        upperPrice.value = TextEditingValue.empty;
+      });
+    }
+
+    // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
+    void applyFilters() {}
+
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: kIsWeb ? UserNavBarDesktop(redrawItems: redrawItems) : null,
-      bottomNavigationBar: !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => 
-          showDialog<String>(
-                context: context,
-                builder: (BuildContext context) => 
-                const Dialog(
-                  insetPadding: EdgeInsets.all(0),
-                  
-                  child: PostingPage(),
-                )
+        resizeToAvoidBottomInset: false,
+        appBar: kIsWeb ? UserNavBarDesktop(redrawItems: redrawItems) : null,
+        bottomNavigationBar:
+            !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => showDialog<String>(
+              context: context,
+              builder: (BuildContext context) => const Dialog(
+                    insetPadding: EdgeInsets.all(0),
+                    child: PostingPage(),
+                  )),
+          child: const Icon(Icons.add),
         ),
-        child: const Icon(Icons.add),
-      ),
-      // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
-      body: Row(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
-        Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.center,
-                child: ListView(children: [
-                  ExpansionPanelList(
+        drawer: Theme(
+            data: Theme.of(context).copyWith(cardColor: Colors.blueGrey),
+            child: Drawer(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: ListView(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
                       children: [
-                        ExpansionPanel(
-                            headerBuilder: (BuildContext context, bool isOpen) {
-                              return Text("Filter1");
-                            },
-                            body: Text("HERE"),
-                            isExpanded: _isOpen[0]),
-                        ExpansionPanel(
-                            headerBuilder: (context, isOpen) {
-                              return Text("Filter2");
-                            },
-                            body: Text("THERE"),
-                            isExpanded: _isOpen[1]),
-                        ExpansionPanel(
-                            headerBuilder: (context, isOpen) {
-                              return Text("Filter3");
-                            },
-                            body: Text("EVERYWHERE"),
-                            isExpanded: _isOpen[2]),
-                      ],
-                      expansionCallback: (int i, bool isOpen) => setState(() {
-                            _isOpen[i] = !_isOpen[i];
-                          }))
-                ]))),
-        Expanded(
-            flex: 14,
-            child: Column(children: <Widget>[
-              !kIsWeb ? SizedBox(
-                  width: .5 * screenWidth,
-                  child: MySearchBar(setPageState: redrawItems)) : const SizedBox(),
-              Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 50),
-                      child: body))
-            ])),
-      ]),
-    );
+                        Padding(
+                          padding: const EdgeInsets.only(top: 55),
+                          child: Container(
+                              color: Theme.of(context).primaryColor,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Text("Price Range")),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                            child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          controller: lowerPrice,
+                                          onChanged: ((value) {
+                                            filter.lowerPrice =
+                                                int.parse(lowerPrice.text);
+                                          }),
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            labelText: "Lower",
+                                          ),
+                                        )),
+                                        Expanded(
+                                            child: TextField(
+                                          keyboardType: TextInputType.number,
+                                          controller: upperPrice,
+                                          onChanged: ((value) {
+                                            filter.upperPrice =
+                                                int.parse(upperPrice.text);
+                                          }),
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            labelText: "Upper",
+                                          ),
+                                        ))
+                                      ],
+                                    ),
+                                    const Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Text("Tags")),
+                                    CheckboxListTile(
+                                        title: const Text("Kit"),
+                                        value: filter.tags[0],
+                                        onChanged: (value) => setState(
+                                            () => filter.tags[0] = value)),
+                                    CheckboxListTile(
+                                        title: const Text("Desk"),
+                                        value: filter.tags[1],
+                                        onChanged: (value) => setState(
+                                            () => filter.tags[1] = value)),
+                                    CheckboxListTile(
+                                        title: const Text("Computer"),
+                                        value: filter.tags[2],
+                                        onChanged: (value) => setState(
+                                            () => filter.tags[2] = value)),
+                                    Padding(
+                                        padding: const EdgeInsets.all(5),
+                                        child: TextButton(
+                                            style: const ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(Colors.green),
+                                            ),
+                                            onPressed: () =>
+                                                applyFilters(), // use this to call a function to update filters
+                                            child: const Text('Apply Filters')))
+                                  ])),
+                        ),
+                      ]),
+                ))),
+        // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
+        body: body);
   }
 }
 
@@ -127,10 +179,13 @@ class MySearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
   final Function(List<Widget> newItems, bool append) setPageState;
 
+  // final Filters filters;
+
   // requiring the function
   const MySearchBar({
     super.key,
     required this.setPageState,
+    // required this.filters
   });
 
   @override
@@ -153,7 +208,7 @@ class _MySearchBarState extends State<MySearchBar> {
           title: Text(item),
           onTap: () {
             setState(() {
-              // redraw the page when the search has been done
+              // TODO - update the search function to include the now passed in filters using widget.filters
               ctrl.search(item, 30, context).then((value) {
                 widget.setPageState(value, false);
               });
@@ -163,6 +218,10 @@ class _MySearchBarState extends State<MySearchBar> {
         );
       });
     });
+  }
+
+  String getText() {
+    return controller.text;
   }
 
   @override
@@ -185,7 +244,6 @@ class _MySearchBarState extends State<MySearchBar> {
           builder: (BuildContext context, controller) {
             // attempting to get the search bar to take an enter key to submit search
             return SearchBar(
-              constraints: const BoxConstraints(maxWidth: 500, minHeight: 45),
               controller: controller,
               padding: const MaterialStatePropertyAll<EdgeInsets>(
                   EdgeInsets.symmetric(horizontal: 16.0)),
@@ -232,25 +290,34 @@ class PageController {
 }
 
 class ItemModel {
+  // initializing firebase access point
+  final db = FirebaseFirestore.instance;
+  final dbstorage = FirebaseStorage.instance.ref();
+
   // get the data from the text file
   getData(String fileName, int num) async {
     List<Data> items = [];
-    int numLines = num;
-    var rawFileString = await rootBundle.loadString(fileName);
-    // return rawFileString;
-    List<List<dynamic>> dataFile =
-        const CsvToListConverter(eol: "\n",fieldDelimiter: ",").convert(rawFileString);
 
-    for (var field in dataFile) {
-      // do a certain number of lines
-      if (numLines == 0) {
-        break;
+    final dbItems = await db
+        .collection('items')
+        .where('description', isEqualTo: 'here is my crack')
+        .get();
+
+    for (var item in dbItems.docs) {
+      var image = 'uh oh';
+      try {
+        image = await dbstorage
+            .child(item.data()['images'][0].toString())
+            .getDownloadURL();
+      } catch (e) {
+        print(e);
+        image = 'missing image';
       }
-      print(field);
-      items.add(Data(field[0], field[1], field[2], field[3], field[4],
-      List<String>.from(field.sublist(5))));
-      numLines -= 1;
+
+      items.add(Data(item['name'], item['price'], item['dateListed'],
+          item['sellerId'], image, item['tags']));
     }
+
     return items;
   }
 }
