@@ -19,37 +19,32 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: true,
       title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            MySearchBar(setPageState: widget.redrawItems),
-          ],
-        ),
-      centerTitle: true,
-      automaticallyImplyLeading: false,
-      leading: const Padding(
-        padding: EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-          left: 15
-        ),
-        child: Text(
-          'Uni-Market',
-          style: TextStyle(fontSize: 20)
-        )
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const Padding(
+              padding: EdgeInsets.only(top: 10, bottom: 10),
+              child: Text('Uni-Market', style: TextStyle(fontSize: 20))),
+          Expanded(
+              child:
+                  Center(child: MySearchBar(setPageState: widget.redrawItems))),
+        ],
       ),
-      leadingWidth: 200,
+      centerTitle: true,
       actions: const <Widget>[
-        MenuBar(
-          children: <Widget>[
-            SubmenuButton(
-              menuChildren: <Widget>[
-                SizedBox(width: 300, height: 500,child: ProfilePage())
-              ],
-              child: IconButton(icon: Icon(Icons.person, size: 40), onPressed: null,),
-            )]
-        ),
+        MenuBar(children: <Widget>[
+          SubmenuButton(
+            menuChildren: <Widget>[
+              SizedBox(width: 300, height: 500, child: ProfilePage())
+            ],
+            child: IconButton(
+              icon: Icon(Icons.person, size: 40),
+              onPressed: null,
+            ),
+          )
+        ]),
       ],
     );
   }

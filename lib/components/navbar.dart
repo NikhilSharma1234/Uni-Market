@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/pages/about_us.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
-import 'package:uni_market/pages/search.dart';
 
 // if you make this extend and return an AppBar widget, you can use it as the appBar: in other widgets
 class NavBar extends AppBar {
@@ -18,7 +17,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
     var brightness = MediaQuery.of(context).platformBrightness;
     bool darkModeOn = brightness == Brightness.dark;
     return AppBar(
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
@@ -52,22 +51,6 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
             );
           },
           child: const Text('Sign Up'),
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            foregroundColor:
-                darkModeOn ? Colors.white : const Color(0xFF041E42),
-            padding: const EdgeInsets.all(16.0),
-            textStyle: const TextStyle(fontSize: 20),
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const SearchPage(title: 'Search'),
-              ),
-            );
-          },
-          child: const Text('Search'),
         ),
         const SizedBox(height: 20),
         ClipRRect(
