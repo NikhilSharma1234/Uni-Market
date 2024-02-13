@@ -298,10 +298,8 @@ class ItemModel {
   getData(String fileName, int num) async {
     List<Data> items = [];
 
-    final dbItems = await db
-        .collection('items')
-        .where('description', isEqualTo: 'here is my crack')
-        .get();
+    final dbItems =
+        await db.collection('items').where('condition', isEqualTo: 'NEW').get();
 
     for (var item in dbItems.docs) {
       var image = 'uh oh';
