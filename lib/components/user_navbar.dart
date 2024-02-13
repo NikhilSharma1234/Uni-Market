@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/pages/home.dart';
-import 'package:uni_market/pages/posting_form.dart';
-import 'package:uni_market/pages/search.dart';
+import 'package:uni_market/pages/posting_page.dart';
 
 class UserNavBar extends StatefulWidget implements PreferredSizeWidget {
   const UserNavBar({super.key});
@@ -20,7 +19,7 @@ class _UserNavBarState extends State<UserNavBar> {
   Widget build(BuildContext context) {
     return AppBar(
       title: const Text('Uni-Market'),
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
@@ -30,7 +29,7 @@ class _UserNavBarState extends State<UserNavBar> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const Home(),
+                builder: (context) => const HomePage(),
               ),
             );
           },
@@ -44,9 +43,7 @@ class _UserNavBarState extends State<UserNavBar> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const SearchPage(
-                  title: 'adsa',
-                ),
+                builder: (context) => const HomePage(),
               ),
             );
           },
@@ -60,7 +57,7 @@ class _UserNavBarState extends State<UserNavBar> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const PostingForm(),
+                builder: (context) => const PostingPage(),
               ),
             );
           },
@@ -74,7 +71,7 @@ class _UserNavBarState extends State<UserNavBar> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const Home(),
+                builder: (context) => const HomePage(),
               ),
             );
           },
