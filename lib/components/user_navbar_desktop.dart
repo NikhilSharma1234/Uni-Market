@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
+import 'package:uni_market/pages/chat.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
   final Function(List<Widget>, bool) redrawItems;
@@ -33,8 +34,22 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
         ],
       ),
       centerTitle: true,
-      actions: const <Widget>[
-        MenuBar(children: <Widget>[
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.all(16.0),
+            textStyle: const TextStyle(fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const ChatPage(),
+              ),
+            );
+          },
+          child: const Text('Chat'),
+        ),
+        const MenuBar(children: <Widget>[
           SubmenuButton(
             menuChildren: <Widget>[
               SizedBox(width: 300, height: 500, child: ProfilePage())
