@@ -26,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = [const Text("")];
+  String searchVal = "";
 
   // redraws the items on the page based on search results
   redrawItems(List<Widget> newItems, bool append) {
@@ -34,11 +35,39 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // callback to keep up to date search text stored here.
+  updateSearchText(String text) {
+    setState(() {
+      searchVal = text;
+    });
+  }
+
+  // filter stuff
+  Filters filter = Filters.none();
+  final lowerPrice = TextEditingController();
+  final upperPrice = TextEditingController();
+
+  void clearFilters() {
+    setState(() {
+      filter = Filters.none();
+      lowerPrice.value = TextEditingValue.empty;
+      upperPrice.value = TextEditingValue.empty;
+    });
+  }
+
+  // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
+  void applyFilters() {
+    PageController ctrl = PageController();
+    ctrl.search(searchVal, 30, context, filter).then((value) {
+      redrawItems(value, false);
+    });
+  }
+
   // called just after initstate, used to set the initial items displayed
   @override
   void didChangeDependencies() async {
     PageController ctrl = PageController();
-    ctrl.search("", 30, context).then((value) {
+    ctrl.search("", 30, context, filter).then((value) {
       redrawItems(value, false);
     });
     super.didChangeDependencies();
@@ -60,25 +89,16 @@ class _HomePageState extends State<HomePage> {
           const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
     }
 
-    // filter stuff
-    Filters filter = Filters(0, 999999999, [false, false, false]);
-    final lowerPrice = TextEditingController();
-    final upperPrice = TextEditingController();
-
-    void clearFilters() {
-      setState(() {
-        filter = Filters(0, 999999999, [false, false, false]);
-        lowerPrice.value = TextEditingValue.empty;
-        upperPrice.value = TextEditingValue.empty;
-      });
-    }
-
-    // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
-    void applyFilters() {}
+    var radioValue;
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: kIsWeb ? UserNavBarDesktop(redrawItems: redrawItems) : null,
+        appBar: kIsWeb
+            ? UserNavBarDesktop(
+                redrawItems: redrawItems,
+                updateSearchText: updateSearchText,
+                filter: filter)
+            : null,
         bottomNavigationBar:
             !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
         floatingActionButton: FloatingActionButton(
@@ -143,24 +163,73 @@ class _HomePageState extends State<HomePage> {
                                         ))
                                       ],
                                     ),
-                                    const Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: Text("Tags")),
-                                    CheckboxListTile(
-                                        title: const Text("Kit"),
-                                        value: filter.tags[0],
-                                        onChanged: (value) => setState(
-                                            () => filter.tags[0] = value)),
-                                    CheckboxListTile(
-                                        title: const Text("Desk"),
-                                        value: filter.tags[1],
-                                        onChanged: (value) => setState(
-                                            () => filter.tags[1] = value)),
-                                    CheckboxListTile(
-                                        title: const Text("Computer"),
-                                        value: filter.tags[2],
-                                        onChanged: (value) => setState(
-                                            () => filter.tags[2] = value)),
+                                    Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: DropdownMenu(
+                                          onSelected: (value) =>
+                                              filter.sort = value as Sort,
+                                          initialSelection: filter.sort,
+                                          dropdownMenuEntries: const [
+                                            DropdownMenuEntry(
+                                                value: Sort.highToLow,
+                                                label: 'High to Low'),
+                                            DropdownMenuEntry(
+                                                value: Sort.lowToHigh,
+                                                label: 'Low to High'),
+                                            DropdownMenuEntry(
+                                                value: Sort.bestMatch,
+                                                label: 'Best Match')
+                                          ]),
+                                    ),
+                                    ListTile(
+                                        title: const Text("New"),
+                                        leading: Radio<Condition>(
+                                            value: Condition.newItem,
+                                            groupValue: filter.condition,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                filter.condition = value!;
+                                              });
+                                            })),
+                                    ListTile(
+                                        title: const Text("Used"),
+                                        leading: Radio<Condition>(
+                                            value: Condition.usedItem,
+                                            groupValue: filter.condition,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                filter.condition = value!;
+                                              });
+                                            })),
+                                    ListTile(
+                                        title: const Text("Worn"),
+                                        leading: Radio<Condition>(
+                                            value: Condition.wornItem,
+                                            groupValue: filter.condition,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                filter.condition = value!;
+                                              });
+                                            })),
+
+                                    // const Padding(
+                                    //     padding: EdgeInsets.all(5),
+                                    //     child: Text("Tags")),
+                                    // CheckboxListTile(
+                                    //     title: const Text("Kit"),
+                                    //     value: filter.tags[0],
+                                    //     onChanged: (value) => setState(
+                                    //         () => filter.tags[0] = value)),
+                                    // CheckboxListTile(
+                                    //     title: const Text("Desk"),
+                                    //     value: filter.tags[1],
+                                    //     onChanged: (value) => setState(
+                                    //         () => filter.tags[1] = value)),
+                                    // CheckboxListTile(
+                                    //     title: const Text("Computer"),
+                                    //     value: filter.tags[2],
+                                    //     onChanged: (value) => setState(
+                                    //         () => filter.tags[2] = value)),
                                     Padding(
                                         padding: const EdgeInsets.all(5),
                                         child: TextButton(
@@ -169,14 +238,15 @@ class _HomePageState extends State<HomePage> {
                                                   MaterialStatePropertyAll<
                                                       Color>(Colors.green),
                                             ),
-                                            onPressed: () =>
-                                                applyFilters(), // use this to call a function to update filters
+                                            onPressed: () {
+                                              applyFilters();
+                                              Navigator.pop(context);
+                                            },
                                             child: const Text('Apply Filters')))
                                   ])),
                         ),
                       ]),
                 ))),
-        // alternatively, this could all be chucked directly into the navbar or put on the side if it looks better
         body: body);
   }
 }
@@ -184,15 +254,17 @@ class _HomePageState extends State<HomePage> {
 class MySearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
   final Function(List<Widget> newItems, bool append) setPageState;
+  final Function(String) updateSearchText;
+  final Filters filter;
 
   // final Filters filters;
 
   // requiring the function
-  const MySearchBar({
-    super.key,
-    required this.setPageState,
-    // required this.filters
-  });
+  const MySearchBar(
+      {super.key,
+      required this.setPageState,
+      required this.updateSearchText,
+      required this.filter});
 
   @override
   State<MySearchBar> createState() => _MySearchBarState();
@@ -215,7 +287,7 @@ class _MySearchBarState extends State<MySearchBar> {
           onTap: () {
             setState(() {
               // TODO - update the search function to include the now passed in filters using widget.filters
-              ctrl.search(item, 30, context).then((value) {
+              ctrl.search(item, 30, context, widget.filter).then((value) {
                 widget.setPageState(value, false);
               });
               controller.closeView(item);
@@ -224,10 +296,6 @@ class _MySearchBarState extends State<MySearchBar> {
         );
       });
     });
-  }
-
-  String getText() {
-    return controller.text;
   }
 
   @override
@@ -239,13 +307,14 @@ class _MySearchBarState extends State<MySearchBar> {
           // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
           viewOnSubmitted: (value) {
             // redraw the page when the search has been done
-            ctrl.search(value, 30, context).then((value) {
+            ctrl.search(value, 30, context, widget.filter).then((value) {
               widget.setPageState(value, false);
             });
             controller.closeView(value);
           },
           viewOnChanged: (value) {
             updateSuggestions(value);
+            widget.updateSearchText(value);
           },
           builder: (BuildContext context, controller) {
             // attempting to get the search bar to take an enter key to submit search
@@ -268,7 +337,8 @@ class _MySearchBarState extends State<MySearchBar> {
 
 class PageController {
   AbstractItemFactory factory = AbstractItemFactory();
-  search(String searchTerm, int number, BuildContext context) async {
+  search(String searchTerm, int number, BuildContext context,
+      Filters filter) async {
     List<Widget> widgets = [];
     final config = Configuration(
       typeSenseAPIKey,
@@ -285,9 +355,34 @@ class PageController {
 
     final client = Client(config);
 
+    String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
+
+    String sort = '';
+    if (filter.sort == Sort.highToLow) {
+      sort = 'price:asc';
+    } else if (filter.sort == Sort.lowToHigh) {
+      sort = 'price:desc';
+    }
+
+    switch (filter.condition) {
+      case Condition.newItem:
+        filterString += ' && condition:NEW';
+        break;
+      case Condition.usedItem:
+        filterString += ' && condition:USED';
+        break;
+      case Condition.wornItem:
+        filterString += ' && condition:WORN';
+        break;
+      case Condition.none:
+        break;
+    }
+
     final searchParameters = {
       'q': searchTerm,
       'query_by': 'name, description',
+      'sort_by': sort,
+      'filter_by': filterString,
     };
     final Map<String, dynamic> data = await client
         .collection('typesenseItems')
