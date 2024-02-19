@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'data.dart';
+import 'item.dart';
 
 abstract class ItemBox extends StatefulWidget {
   // DataSnapshot snapshot; for when database is actually usable
-  final Data itemData;
+  final Item itemData;
   // final Style style;
   final BuildContext context;
 
