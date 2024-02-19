@@ -1,3 +1,5 @@
+import 'package:universal_io/io.dart';
+
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'ItemGeneration/data.dart';
@@ -8,6 +10,10 @@ import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:typesense/typesense.dart';
+
+// I KNOW THIS IS BAD PRACTICE I DO NOT CARE RN I JUST WANT TO GET THIS WORKING (search only)
+const typeSenseAPIKey = "oR9PTRdUpGBUI3CbbKLLS16JtYavUU44";
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -265,6 +271,29 @@ class PageController {
   ItemModel model = ItemModel();
 
   search(String searchTerm, int number, BuildContext context) async {
+    final config = Configuration(
+      typeSenseAPIKey,
+      nodes: {
+        Node(
+          Protocol.https,
+          "vzlsy6kriwp0at9bp-1.a1.typesense.net",
+          port: 443, // stuff provided by the cloud hosting
+        ),
+      },
+      // numRetries: 3, // A total of 4 tries (1 original try + 3 retries)
+      connectionTimeout: const Duration(seconds: 2),
+    );
+
+    final client = Client(config);
+
+    final searchParameters = {
+      'q': 'test',
+      'query_by': 'name, description',
+    };
+    print(await client
+        .collection('typesenseItems')
+        .documents
+        .search(searchParameters));
     return await generateItems(searchTerm, number, context);
   }
 
