@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/chat.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
   final Function(List<Widget>, bool) redrawItems;
+  final Function(String) updateSearchText;
+  final Filters filter;
 
-  const UserNavBarDesktop({super.key, required this.redrawItems});
+  const UserNavBarDesktop(
+      {super.key,
+      required this.redrawItems,
+      required this.updateSearchText,
+      required this.filter});
   @override
   State<UserNavBarDesktop> createState() => _UserNavBarDesktopState();
 
@@ -29,8 +36,11 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
               padding: EdgeInsets.only(top: 10, bottom: 10),
               child: Text('Uni-Market', style: TextStyle(fontSize: 20))),
           Expanded(
-              child:
-                  Center(child: MySearchBar(setPageState: widget.redrawItems))),
+              child: Center(
+                  child: MySearchBar(
+                      setPageState: widget.redrawItems,
+                      updateSearchText: widget.updateSearchText,
+                      filter: widget.filter))),
         ],
       ),
       centerTitle: true,
