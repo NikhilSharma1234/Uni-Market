@@ -380,14 +380,12 @@ class PageController {
 
     final searchParameters = {
       'q': searchTerm,
-      'query_by': 'name, description',
+      'query_by': 'embedding',
       'sort_by': sort,
       'filter_by': filterString,
     };
-    final Map<String, dynamic> data = await client
-        .collection('typesenseItems')
-        .documents
-        .search(searchParameters);
+    final Map<String, dynamic> data =
+        await client.collection('items').documents.search(searchParameters);
     if (context.mounted) {
       widgets = await generateItems(data, context);
     } else {
