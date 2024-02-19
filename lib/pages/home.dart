@@ -1,8 +1,7 @@
-import 'package:universal_io/io.dart';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
-import 'ItemGeneration/data.dart';
+import 'ItemGeneration/item.dart';
 import 'ItemGeneration/AbstractItemFactory.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +10,7 @@ import 'package:uni_market/pages/posting_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:typesense/typesense.dart';
+import 'dart:convert';
 
 // I KNOW THIS IS BAD PRACTICE I DO NOT CARE RN I JUST WANT TO GET THIS WORKING (search only)
 const typeSenseAPIKey = "oR9PTRdUpGBUI3CbbKLLS16JtYavUU44";
@@ -268,9 +268,8 @@ class _MySearchBarState extends State<MySearchBar> {
 
 class PageController {
   AbstractItemFactory factory = AbstractItemFactory();
-  ItemModel model = ItemModel();
-
   search(String searchTerm, int number, BuildContext context) async {
+    List<Widget> widgets = [];
     final config = Configuration(
       typeSenseAPIKey,
       nodes: {
@@ -287,82 +286,33 @@ class PageController {
     final client = Client(config);
 
     final searchParameters = {
-      'q': 'test',
+      'q': searchTerm,
       'query_by': 'name, description',
     };
-    print(await client
+    final Map<String, dynamic> data = await client
         .collection('typesenseItems')
         .documents
-        .search(searchParameters));
-    return await generateItems(searchTerm, number, context);
+        .search(searchParameters);
+    if (context.mounted) {
+      widgets = await generateItems(data, context);
+    } else {
+      print("no clue as to whats going on, buildcontext wasnt mounded");
+    }
+
+    return widgets;
   }
 
-  generateItems(String searchTerm, int num, BuildContext context) async {
+  generateItems(Map<String, dynamic> data, BuildContext context) async {
     List<Widget> widgets = [];
-    int i = 0;
-    for (Data item in await model.getData('assets/items.csv', num)) {
-      if (!item.tags.contains(searchTerm.toLowerCase()) &&
-          !item.name.toLowerCase().contains(searchTerm.toLowerCase()) &&
-          searchTerm != "") {
-        continue;
-      }
-      if (i >= num) {
-        break;
-      }
+    for (var item in data['hits']) {
+      item['document']['images'][0] = await FirebaseStorage.instance
+          .ref(item['document']['images'][0])
+          .getDownloadURL();
       if (context.mounted) {
-        widgets.add(factory.buildItemBox(item, context));
-        i++;
+        widgets.add(factory.buildItemBox(
+            Item.fromJSON(item['document']), context)); // this is the issue
       }
     }
     return widgets;
   }
-}
-
-class ItemModel {
-  // initializing firebase access point
-  final db = FirebaseFirestore.instance;
-  final dbstorage = FirebaseStorage.instance.ref();
-
-  // get the data from the text file
-  getData(String fileName, int num) async {
-    List<Data> items = [];
-
-    final dbItems =
-        await db.collection('items').where('condition', isEqualTo: 'NEW').get();
-
-    for (var item in dbItems.docs) {
-      var image = 'uh oh';
-      try {
-        image = await dbstorage
-            .child(item.data()['images'][0].toString())
-            .getDownloadURL();
-      } catch (e) {
-        print(e);
-        image = 'missing image';
-      }
-
-      items.add(Data(item['name'], item['price'], item['dateListed'],
-          item['sellerId'], image, item['tags']));
-    }
-
-    return items;
-  }
-}
-
-generateFakeItems(int num, BuildContext context) {
-  List<Widget> items = [];
-  for (int i = 0; i < num; i++) {
-    // temporary bit for testing
-    items.add(Container(
-        margin: const EdgeInsets.all(15.0),
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-        child: Center(
-          child: Text(
-            "Text",
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-        )));
-  }
-  return items;
 }

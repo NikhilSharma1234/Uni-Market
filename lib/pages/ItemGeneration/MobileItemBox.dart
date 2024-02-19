@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ItemBox.dart';
-import 'data.dart';
+import 'item.dart';
 import 'Styles/Style.dart';
 import 'Styles/BookStyle.dart';
 import 'Styles/DefaultStyle.dart';
@@ -8,7 +8,7 @@ import 'Styles/KitStyle.dart';
 
 class MobileItemBox extends ItemBox {
   @override
-  final Data itemData;
+  final Item itemData;
   @override
   final BuildContext context;
 
