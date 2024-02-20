@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/pages/item_page.dart';
 import 'ItemBox.dart';
 import 'item.dart';
 import 'Styles/Style.dart';
@@ -53,9 +54,14 @@ class _WebItemBoxState extends State<WebItemBox> {
 
     return InkWell(
         // for future use to link each item to a unique page based on its id
-        // onTap: () {
-        //   Navigator.pushReplacementNamed(context, "$id");
-        // },
+        onTap: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    ItemPage(data: item),
+              ),
+            );
+        },
         child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Stack(children: <Widget>[
@@ -76,8 +82,9 @@ class _WebItemBoxState extends State<WebItemBox> {
                                 child: ClipRRect(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(10)),
-                                    child: Image.network(
-                                      item.imagePath, // TODO may not need depending on fix in search
+                                    child: item.imagePath.isEmpty ? Image.network('https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227724992-stock-illustration-image-available-icon-flat-vector.jpg', fit: BoxFit.fitWidth,)
+                                    : Image.network(
+                                      item.imagePath[0], // TODO may not need depending on fix in search
                                       fit: BoxFit.fitWidth,
                                       // height: screenWidth * 0.1,
                                     )))),
