@@ -63,7 +63,7 @@ class _MobileItemBoxState extends State<MobileItemBox> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Center(child: Image.asset(item.imagePath)),
+                      Center(child: item.imagePath.isEmpty ? Image.asset('https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227724992-stock-illustration-image-available-icon-flat-vector.jpg') : Image.asset(item.imagePath[0])),
                       Center(
                           child: Text(item.name,
                               style: const TextStyle(fontSize: 20))),
