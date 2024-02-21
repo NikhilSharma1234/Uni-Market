@@ -51,6 +51,10 @@ dependencies:
   typesense: ^0.4.0
   dots_indicator: ^2.1.1
   intl: ^0.15.7
+  flutter_advanced_avatar: ^1.5.0
+  provider: ^6.1.1
+
+
 
 dependency_overrides:
   intl: ^0.17.0
