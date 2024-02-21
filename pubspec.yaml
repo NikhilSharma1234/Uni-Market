@@ -49,6 +49,8 @@ dependencies:
   carousel_slider: ^4.2.1
   url_launcher: ^6.2.4
   typesense: ^0.4.0
+  dots_indicator: ^2.1.1
+  intl: ^0.15.7
 
 dependency_overrides:
   intl: ^0.17.0
