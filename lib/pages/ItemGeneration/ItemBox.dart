@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/item_page.dart';
-import 'data.dart';
+import 'item.dart';
 import 'Styles/Style.dart';
 import 'Styles/BookStyle.dart';
 import 'Styles/DefaultStyle.dart';
 import 'Styles/KitStyle.dart';
 
 class ItemBox extends StatefulWidget {
-  final Data itemData;
+  final Item itemData;
   final BuildContext context;
 
   const ItemBox({super.key, required this.itemData, required this.context});
@@ -78,9 +78,8 @@ class _ItemBoxState extends State<ItemBox> {
                             child: ClipRRect(
                               borderRadius: const BorderRadius.all(
                                 Radius.circular(10)),
-                              child: item.imagePath.isEmpty ? Image.network('https://st4.depositphotos.com/14953852/22772/v/450/depositphotos_227724992-stock-illustration-image-available-icon-flat-vector.jpg', fit: BoxFit.fitWidth)
-                                : Image.network(
-                                  item.imagePath[0], // TODO may not need depending on fix in search
+                              child: Image.network(
+                                  item.imagePath[0],
                                   fit: BoxFit.fitWidth,
                                   // height: screenWidth * 0.1,
                               )
