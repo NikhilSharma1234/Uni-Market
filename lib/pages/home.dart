@@ -140,8 +140,12 @@ class _HomePageState extends State<HomePage> {
                                           keyboardType: TextInputType.number,
                                           controller: lowerPrice,
                                           onChanged: ((value) {
-                                            filter.lowerPrice =
-                                                int.parse(lowerPrice.text);
+                                            if (value != "") {
+                                              filter.lowerPrice =
+                                                  int.parse(lowerPrice.text);
+                                            } else {
+                                              filter.lowerPrice = 0;
+                                            }
                                           }),
                                           decoration: const InputDecoration(
                                             border: OutlineInputBorder(),
@@ -153,8 +157,12 @@ class _HomePageState extends State<HomePage> {
                                           keyboardType: TextInputType.number,
                                           controller: upperPrice,
                                           onChanged: ((value) {
-                                            filter.upperPrice =
-                                                int.parse(upperPrice.text);
+                                            if (value != "") {
+                                              filter.upperPrice =
+                                                  int.parse(upperPrice.text);
+                                            } else {
+                                              filter.upperPrice = 100000;
+                                            }
                                           }),
                                           decoration: const InputDecoration(
                                             border: OutlineInputBorder(),
@@ -359,9 +367,9 @@ class PageController {
 
     String sort = '';
     if (filter.sort == Sort.highToLow) {
-      sort = 'price:asc';
-    } else if (filter.sort == Sort.lowToHigh) {
       sort = 'price:desc';
+    } else if (filter.sort == Sort.lowToHigh) {
+      sort = 'price:asc';
     }
 
     switch (filter.condition) {
@@ -398,9 +406,16 @@ class PageController {
   generateItems(Map<String, dynamic> data, BuildContext context) async {
     List<Widget> widgets = [];
     for (var item in data['hits']) {
-      item['document']['images'][0] = await FirebaseStorage.instance
-          .ref(item['document']['images'][0])
-          .getDownloadURL();
+      if (item['document']['images'].length == 0) {
+        item['document']['images'].add(await FirebaseStorage.instance
+            .ref("images/missing_image.jpg")
+            .getDownloadURL());
+      } else {
+        item['document']['images'][0] = await FirebaseStorage.instance
+            .ref(item['document']['images'][0])
+            .getDownloadURL();
+      }
+
       if (context.mounted) {
         widgets.add(factory.buildItemBox(
             Item.fromJSON(item['document']), context)); // this is the issue
