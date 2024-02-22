@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemPageInfo.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/pages/ItemGeneration/data.dart';
 import 'dart:ui';
 
@@ -53,7 +54,85 @@ class _ItemPageState extends State<ItemPage> {
         future: loadImages(), // a previously-obtained Future<String> or null
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           Widget child;
-          if (snapshot.hasData) {
+          if (snapshot.hasData && isMobile(context)) {
+            child =
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    SizedBox(
+                      width: screenWidth,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Column(
+                            children: [
+                              CarouselSlider(
+                                options: CarouselOptions(
+                                  enableInfiniteScroll: false,
+                                  viewportFraction: 1,
+                                  onPageChanged: (index, reason) {
+                                  setState(() {
+                                    currentIndex = index;
+                                  });
+                                },
+                                ),
+                                items: itemData.imagePath.map((i) {
+                                  return Builder(
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        width: MediaQuery.of(context).size.width,
+                                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(i),
+                                            fit: BoxFit.cover
+                                          ),
+                                        ),
+                                        child: Stack(
+                                          children: <Widget>[
+                                            ClipRect(
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                                              child: Container(
+                                                color: Colors.black.withOpacity(0.1),
+                                              ),
+                                            ),
+                                          ),
+                                          Center(
+                                            child: Positioned(
+                                            child: Image.network(i, fit: BoxFit.fitHeight),
+                                            )
+                                          )
+                                          ]
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 10,
+                            child: DotsIndicator(
+                              dotsCount: itemData.imagePath.length,
+                              position: currentIndex.toDouble()
+                            ),
+                          )   
+                        ]
+                      ),
+                    ),
+                    SizedBox(
+                        width: screenWidth,
+                        child: Expanded(
+                          child: ItemPageInfo(itemData, sellerInformation)
+                        )
+                    ),
+                  ],
+                ),
+              );
+          } else if (snapshot.hasData && !isMobile(context)) {
             child =
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
