@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:uni_market/components/custom_switch.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
+import 'package:uni_market/helpers/profile_pic_shuffler.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late GlobalKey<_ProfilePageState> profilePageKey =
       GlobalKey<_ProfilePageState>();
   late bool _switchValue;
-  DateTime? timeOfDbRequest;
+  String? profilerPic = const ProfilePicShuffler().reveal();
 
   @override
   void initState() {
@@ -57,152 +59,167 @@ class _ProfilePageState extends State<ProfilePage> {
                   List<String>.from(userProfileData["schoolsInMarketplace"]);
               schoolsInMarketplace.remove(userProfileData["institution"]);
 
-              return SizedBox(
-                width: screenWidth * 0.85,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: screenHeight * 0.0195,
-                    ),
-                    //
-                    // USER PROFILE PIC VIEW
-                    AdvancedAvatar(
-                      size: screenHeight * .11,
-                      image: AssetImage('../assets/portraits/cameron.webp'),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.015,
-                    ),
-                    //
-                    // USER NAME VIEW
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      child: Text(
-                        "Name: ${userProfileData["name"]}",
-                        textAlign: TextAlign.center,
+              return SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SizedBox(
+                  width: screenWidth * 0.85,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: screenHeight * 0.0195,
                       ),
-                    ),
-                    //
-                    // USER EMAIL VIEW
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      child: Text(
-                        "Email: ${userProfileData["email"]}",
-                        textAlign: TextAlign.center,
+                      //
+                      // USER PROFILE PIC VIEW
+                      AdvancedAvatar(
+                        size: screenHeight * .11,
+                        image: AssetImage('../assets/portraits/cameron.webp'),
                       ),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.019,
-                    ),
-                    //
-                    // Dark Mode Toggle View
-                    SizedBox(
-                      height: screenHeight * 0.029,
-                      width: screenWidth * 0.95,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Dark Mode:"),
-                          SizedBox(
-                            width: screenWidth * 0.005,
+                      SizedBox(
+                        height: screenHeight * 0.015,
+                      ),
+                      //
+                      // USER NAME VIEW
+                      SizedBox(
+                        height: screenHeight * 0.025,
+                        child: Text(
+                          "Name: ${userProfileData["name"]}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      //
+                      // USER EMAIL VIEW
+                      SizedBox(
+                        height: screenHeight * 0.025,
+                        child: Text(
+                          "Email: ${userProfileData["email"]}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(
+                        height: screenHeight * 0.019,
+                      ),
+                      //
+                      // Dark Mode Toggle View
+                      SizedBox(
+                        height: screenHeight * 0.029,
+                        width: screenWidth * 0.95,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Dark Mode:"),
+                            SizedBox(
+                              width: screenWidth * 0.005,
+                            ),
+                            CustomSwitch(
+                              value: _switchValue,
+                              onChanged: (bool val) {
+                                setState(() {
+                                  _switchValue = val;
+                                });
+                                Provider.of<ThemeProvider>(context,
+                                        listen: false)
+                                    .setThemeMode(
+                                        val ? ThemeMode.dark : ThemeMode.light);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: screenHeight * 0.03,
+                      ),
+                      //
+                      // USER INSTITUTION BOX
+                      SizedBox(
+                        height: screenHeight * 0.025,
+                        width: screenWidth * 0.65,
+                        child: Text(
+                          "Institution: ${userProfileData["institution"]}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      //
+                      // SCHOOLS IN MARKETPLACE BOX
+                      SizedBox(
+                        height: screenHeight * 0.025,
+                        width: screenWidth * 0.65,
+                        child: Text(
+                          "Other Schools in Marketplace: $schoolsInMarketplace",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(
+                        height: screenHeight * 0.04,
+                      ),
+                      //
+                      // UPDATE PROFILE
+                      OutlinedButton(
+                          onPressed: () {}, child: Text("APPLY CHANGES")),
+                      //
+                      SizedBox(
+                        height: screenWidth * 0.055,
+                        width: screenWidth * 0.65,
+                      ),
+                      // ITEMS BOUGHT BUTTON
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade400,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.blue.shade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
-                          CustomSwitch(
-                            value: _switchValue,
-                            onChanged: (bool val) {
-                              setState(() {
-                                _switchValue = val;
-                              });
-                              Provider.of<ThemeProvider>(context, listen: false)
-                                  .setThemeMode(
-                                      val ? ThemeMode.dark : ThemeMode.light);
-                            },
+                        ),
+                        onPressed: () {},
+                        child: const Text("Items Bought"),
+                      ),
+                      SizedBox(
+                        height: screenHeight * 0.005,
+                      ),
+                      //
+                      // ITEMS SOLD BUTTON
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade400,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.blue.shade900,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.03,
-                    ),
-                    //
-                    // USER INSTITUTION VIEW
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      width: screenWidth * 0.65,
-                      child: Text(
-                        "Institution: ${userProfileData["institution"]}",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    //
-                    // SCHOOLS IN MARKETPLACE VIEW
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      width: screenWidth * 0.65,
-                      child: Text(
-                        "Other Schools in Marketplace: $schoolsInMarketplace",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
-                    //
-                    // ITEMS BOUGHT BUTTON
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400,
-                        foregroundColor: Colors.white,
-                        shadowColor: Colors.blue.shade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6.0),
                         ),
+                        onPressed: () {},
+                        child: const Text("Items Sold"),
                       ),
-                      onPressed: () {},
-                      child: const Text("Items Bought"),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.005,
-                    ),
-                    // ITEMS SOLD BUTTON
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade400,
-                        foregroundColor: Colors.white,
-                        shadowColor: Colors.blue.shade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6.0),
+                      SizedBox(
+                        height: screenHeight * 0.005,
+                      ),
+                      //
+                      // SIGN OUT BUTTON
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
                         ),
+                        onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
+                        },
+                        child: const Text('LOG OUT'),
                       ),
-                      onPressed: () {},
-                      child: const Text("Items Sold"),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.005,
-                    ),
-                    // SIGN OUT BUTTON
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        shadowColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
+                      SizedBox(
+                        height: screenHeight * 0.065,
                       ),
-                      onPressed: () async {
-                        await FirebaseAuth.instance.signOut();
-                      },
-                      child: const Text('LOG OUT'),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.05,
-                    ),
-                    // Future Delete Account Button
-                    TextButton(
-                      onPressed: () {},
-                      child: Text("Delete Account"),
-                    ),
-                  ],
+                      //
+                      // Delete Account Button, NO LOGIC
+                      TextButton(
+                        onPressed: () {},
+                        child: Text("Delete Account"),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
@@ -220,7 +237,9 @@ Future<Map<String, dynamic>> getUserProfileData() async {
     "email": null,
     "institution": null,
     "schoolsInMarketplace": null,
-    "marketplaceId": null
+    "marketplaceId": null,
+    "profile_pic_path": null,
+    "profile_pic_url": null
   };
 
   var currentUser = FirebaseAuth.instance.currentUser;
@@ -233,57 +252,20 @@ Future<Map<String, dynamic>> getUserProfileData() async {
     await FirebaseFirestore.instance
         .collection("users")
         .doc(userProfile["email"])
-        .get()
-        .then((DocumentSnapshot documemtSnapshot) {
-      userProfile["institution"] = documemtSnapshot.get("schoolId");
-      userProfile["marketplaceId"] = documemtSnapshot.get("marketplaceId");
-    });
-
-    // read schools in users marketplace Id from db
-    await FirebaseFirestore.instance
-        .collection("marketplace")
-        .doc(userProfile["marketplaceId"])
         .get()
         .then((DocumentSnapshot documentSnapshot) {
-      userProfile["schoolsInMarketplace"] = documentSnapshot.get("schoolIds");
+      userProfile["institution"] = documentSnapshot.get("schoolId");
+      userProfile["marketplaceId"] = documentSnapshot.get("marketplaceId");
+      userProfile["profile_pic_path"] = documentSnapshot.get("profile_pic");
     });
-  }
 
-  return userProfile;
-}
+    // Get Image Download URL for Profile Page Display
+    String? profilePicUrl = await FirebaseStorage.instance
+        .ref()
+        .child("profile_pics/astronaut.png")
+        .getDownloadURL();
 
-// TEST FUNCTION (not in use) to add limiting to db reads
-Future<Map<String, dynamic>> getUserProfileDataLimited(
-    DateTime? lastApiCallTime) async {
-  // Conditional Check to prevent Backend Read Spamming ($$$$)
-  print(lastApiCallTime);
-  if (lastApiCallTime == null ||
-      DateTime.now().difference(lastApiCallTime) > Duration(seconds: 15)) {
-    print("testing timer");
-  }
-  final userProfile = <String, dynamic>{
-    "name": null,
-    "email": null,
-    "institution": null,
-    "schoolsInMarketplace": null,
-    "marketplaceId": null
-  };
-
-  var currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser != null) {
-    userProfile["email"] = currentUser.email;
-    userProfile["name"] = currentUser.displayName;
-
-    // read User institution / marketplace set from db
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(userProfile["email"])
-        .get()
-        .then((DocumentSnapshot documemtSnapshot) {
-      userProfile["institution"] = documemtSnapshot.get("schoolId");
-      userProfile["marketplaceId"] = documemtSnapshot.get("marketplaceId");
-    });
+    print(profilePicUrl);
 
     // read schools in users marketplace Id from db
     await FirebaseFirestore.instance

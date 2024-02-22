@@ -4,6 +4,7 @@ import 'dialog.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uni_market/helpers/profile_pic_shuffler.dart';
 
 Step register(index, tapped) {
   return Step(
@@ -104,6 +105,13 @@ class _RegistirationState extends State<Registiration> {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: userEmail, password: password);
 
+      // Set starting profile picture
+      String? chosenProfilePic = const ProfilePicShuffler().reveal();
+
+      DocumentReference profilePicRef = FirebaseFirestore.instance
+          .collection("profile_pics")
+          .doc(chosenProfilePic);
+
       final user = <String, dynamic>{
         "createdAt": Timestamp.now(),
         "updatedAt": Timestamp.now(),
@@ -114,7 +122,8 @@ class _RegistirationState extends State<Registiration> {
         "marketplaceId": null,
         "darkMode": null,
         "emailVerified": null,
-        "verifiedUniStudent": false
+        "verifiedUniStudent": false,
+        "profile_pic": profilePicRef,
       };
 
       // Add user to users database
@@ -285,7 +294,8 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
                           ? Icons.visibility
                           : Icons.visibility_off)),
                   widget.isSignIn
-                      ? const SizedBox.shrink() // Empty (Don't show this when in sign in)
+                      ? const SizedBox
+                          .shrink() // Empty (Don't show this when in sign in)
                       : IconButton(
                           onPressed: () => showDialog<String>(
                               context: context,
@@ -296,6 +306,8 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
                                   'Ok')),
                           icon: const Icon(Icons.info_outlined)),
                 ])),
-        validator: widget.isSignIn ? null : validatePassword); // No validation while in sign in
+        validator: widget.isSignIn
+            ? null
+            : validatePassword); // No validation while in sign in
   }
 }
