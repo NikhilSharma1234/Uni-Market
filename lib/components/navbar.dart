@@ -17,7 +17,7 @@ class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
     var brightness = MediaQuery.of(context).platformBrightness;
     bool darkModeOn = brightness == Brightness.dark;
     return AppBar(
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
