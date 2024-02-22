@@ -1,16 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
-import 'ItemGeneration/item.dart';
-import 'ItemGeneration/AbstractItemFactory.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
+import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:typesense/typesense.dart';
-import 'dart:convert';
 
 // I KNOW THIS IS BAD PRACTICE I DO NOT CARE RN I JUST WANT TO GET THIS WORKING (search only)
 const typeSenseAPIKey = "oR9PTRdUpGBUI3CbbKLLS16JtYavUU44";
@@ -294,7 +291,6 @@ class _MySearchBarState extends State<MySearchBar> {
           title: Text(item),
           onTap: () {
             setState(() {
-              // TODO - update the search function to include the now passed in filters using widget.filters
               ctrl.search(item, 30, context, widget.filter).then((value) {
                 widget.setPageState(value, false);
               });

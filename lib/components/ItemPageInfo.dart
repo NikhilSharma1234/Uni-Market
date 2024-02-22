@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:uni_market/pages/ItemGeneration/item.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 
 SingleChildScrollView ItemPageInfo(Item itemData, var sellerInformation) {
   return SingleChildScrollView(

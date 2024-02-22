@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/item_page.dart';
-import 'item.dart';
-import 'Styles/Style.dart';
-import 'Styles/BookStyle.dart';
-import 'Styles/DefaultStyle.dart';
-import 'Styles/KitStyle.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
+import 'package:uni_market/helpers/Styles/Style.dart';
+import 'package:uni_market/helpers/Styles/BookStyle.dart';
+import 'package:uni_market/helpers/Styles/DefaultStyle.dart';
+import 'package:uni_market/helpers/Styles/KitStyle.dart';
 
 class ItemBox extends StatefulWidget {
   final Item itemData;
