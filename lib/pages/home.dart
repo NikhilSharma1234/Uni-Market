@@ -403,6 +403,19 @@ class PageController {
     return widgets;
   }
 
+  Future<String> getURL(String imageURL,) async {
+    String image;
+    try {
+    image = await FirebaseStorage.instance
+            .ref(imageURL)
+            .getDownloadURL();
+    } catch (e) {
+      image = "Missing Image";
+    }
+    return image;
+}
+
+
   generateItems(Map<String, dynamic> data, BuildContext context) async {
     List<Widget> widgets = [];
     for (var item in data['hits']) {
@@ -411,9 +424,10 @@ class PageController {
             .ref("images/missing_image.jpg")
             .getDownloadURL());
       } else {
-        item['document']['images'][0] = await FirebaseStorage.instance
-            .ref(item['document']['images'][0])
-            .getDownloadURL();
+          for (int i = 0; i < item['document']['images'].length; i++) {
+            item['document']['images'][i] = 
+              await getURL(item['document']['images'][i]);
+          }
       }
 
       if (context.mounted) {

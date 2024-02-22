@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:uni_market/pages/ItemGeneration/data.dart';
+import 'package:uni_market/pages/ItemGeneration/item.dart';
 
-SingleChildScrollView ItemPageInfo(Data itemData, var sellerInformation) {
+SingleChildScrollView ItemPageInfo(Item itemData, var sellerInformation) {
   return SingleChildScrollView(
     child: Padding(
       padding: const EdgeInsets.all(8.0),
