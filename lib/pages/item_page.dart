@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemPageInfo.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
-import 'package:uni_market/pages/ItemGeneration/item.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'dart:ui';
 
 class ItemPage extends StatefulWidget {
