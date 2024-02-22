@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemPageInfo.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
-import 'package:uni_market/pages/ItemGeneration/data.dart';
+import 'package:uni_market/pages/ItemGeneration/item.dart';
 import 'dart:ui';
 
 class ItemPage extends StatefulWidget {
-  final Data data;
+  final Item data;
 
   const ItemPage({Key? key, required this.data}) : super(key: key);
 
@@ -20,7 +20,7 @@ class ItemPage extends StatefulWidget {
 
 class _ItemPageState extends State<ItemPage> {
   int currentIndex = 0;
-  late Data itemData;
+  late Item itemData;
   late List<String> productImages;
   late var sellerInformation;
 
@@ -35,7 +35,7 @@ class _ItemPageState extends State<ItemPage> {
       productImages = itemData.imagePath;
       await FirebaseFirestore.instance
               .collection('users')
-              .doc(itemData.owner)
+              .doc(itemData.sellerId)
               .get()
               .then((value) => sellerInformation = value.data()
             );

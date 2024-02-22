@@ -2,27 +2,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item {
   String name;
+  String description;
+  String schoolId;
   double price;
   Timestamp dateListed;
+  List<String> imagePath;
   String sellerId;
-  String imagePath;
   List<dynamic> tags;
-  Item(this.name, this.price, this.dateListed, this.sellerId, this.imagePath,
+  Item(this.name, this.description, this.schoolId, this.price, this.dateListed, this.imagePath, this.sellerId,
       this.tags);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
       : name = "missing",
+        description = "missing",
+        schoolId = "missing",
         price = 0.0,
         dateListed = Timestamp(0, 0),
         sellerId = "missing",
-        imagePath = "missing",
+        imagePath = [],
         tags = [] {
     name = map['name'];
+    description = map['description'];
+    schoolId = map['schoolId'];
     price = map['price'];
     dateListed = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
     sellerId = map['sellerId'];
-    imagePath = map['images'][0];
+    for (String path in map['images']) {
+      imagePath.add(path);
+    }
     tags = map['tags'];
   }
 
