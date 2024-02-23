@@ -106,11 +106,8 @@ class _RegistirationState extends State<Registiration> {
           .signInWithEmailAndPassword(email: userEmail, password: password);
 
       // Set starting profile picture
-      String? chosenProfilePic = const ProfilePicShuffler().reveal();
-
-      DocumentReference profilePicRef = FirebaseFirestore.instance
-          .collection("profile_pics")
-          .doc(chosenProfilePic);
+      String? chosenProfilePicPath =
+          "profile_pics/${const ProfilePicShuffler().reveal()}";
 
       final user = <String, dynamic>{
         "createdAt": Timestamp.now(),
@@ -123,7 +120,8 @@ class _RegistirationState extends State<Registiration> {
         "darkMode": null,
         "emailVerified": null,
         "verifiedUniStudent": false,
-        "profile_pic": profilePicRef,
+        "assignable_profile_pic": null,
+        "starting_profile_pic": chosenProfilePicPath,
       };
 
       // Add user to users database
