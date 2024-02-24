@@ -31,7 +31,7 @@ class Item {
     description = map['description'];
     condition = map['condition'];
     schoolId = map['schoolId'];
-    price = map['price'];
+    price = map['price'].toDouble();
     dateListed = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
     sellerId = map['sellerId'];
     for (String path in map['images']) {
