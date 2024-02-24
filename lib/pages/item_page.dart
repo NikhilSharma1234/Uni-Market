@@ -62,66 +62,62 @@ class _ItemPageState extends State<ItemPage> {
                   children: <Widget>[
                     SizedBox(
                       width: screenWidth,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          Column(
-                            children: [
-                              CarouselSlider(
-                                options: CarouselOptions(
-                                  enableInfiniteScroll: false,
-                                  viewportFraction: 1,
-                                  onPageChanged: (index, reason) {
+                      child:
+                        Column(
+                          children: [
+                            CarouselSlider(
+                              options: CarouselOptions(
+                                height: MediaQuery.of(context).size.height,
+                                enableInfiniteScroll: false,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
                                   setState(() {
                                     currentIndex = index;
                                   });
                                 },
-                                ),
-                                items: itemData.imagePath.map((i) {
-                                  return Builder(
-                                    builder: (BuildContext context) {
-                                      return Container(
-                                        width: MediaQuery.of(context).size.width,
-                                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(i),
-                                            fit: BoxFit.cover
-                                          ),
+                              ),
+                              items: itemData.imagePath.map((i) {
+                                return Builder(
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: MediaQuery.of(context).size.height,
+                                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(i),
+                                          fit: BoxFit.cover
                                         ),
-                                        child: Stack(
-                                          children: <Widget>[
-                                            ClipRect(
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                                              child: Container(
-                                                color: Colors.black.withOpacity(0.1),
-                                              ),
+                                      ),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          ClipRect(
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                                            child: Container(
+                                              color: Colors.black.withOpacity(0.1),
                                             ),
                                           ),
-                                          Center(
-                                            child: Positioned(
-                                            child: Image.network(i, fit: BoxFit.fitHeight),
-                                            )
-                                          )
-                                          ]
                                         ),
-                                      );
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                          Positioned(
-                            bottom: 10,
-                            child: DotsIndicator(
-                              dotsCount: itemData.imagePath.length,
-                              position: currentIndex.toDouble()
+                                        Positioned.fill(
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child:Image.network(i, fit: BoxFit.fitHeight),
+                                          )
+                                        )
+                                        ]
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
                             ),
-                          )   
-                        ]
-                      ),
+                            DotsIndicator(
+                            dotsCount: itemData.imagePath.length,
+                            position: currentIndex.toDouble()
+                            ),
+                          ],
+                        ),
                     ),
                     SizedBox(
                         width: screenWidth,
@@ -135,40 +131,41 @@ class _ItemPageState extends State<ItemPage> {
           } else if (snapshot.hasData && !isMobile(context)) {
             child =
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
+                  SizedBox(
+                    width: screenWidth * 0.7,
+                    child: Column(
                       children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Expanded(
-                              child: CarouselSlider(
-                                options: CarouselOptions(
-                                  enableInfiniteScroll: false,
-                                  viewportFraction: 1,
-                                  onPageChanged: (index, reason) {
-                                  setState(() {
-                                    currentIndex = index;
-                                  });
-                                },
-                                ),
-                                items: itemData.imagePath.map((i) {
-                                  return Builder(
-                                    builder: (BuildContext context) {
-                                      return Container(
-                                        width: MediaQuery.of(context).size.width,
-                                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(i),
-                                            fit: BoxFit.cover
-                                          ),
-                                        ),
-                                        child: Stack(
-                                          children: <Widget>[
-                                            ClipRect(
+                        Expanded(
+                          child: CarouselSlider(
+                            options: CarouselOptions(
+                              height: MediaQuery.of(context).size.height,
+                              enableInfiniteScroll: false,
+                              viewportFraction: 1,
+                              onPageChanged: (index, reason) {
+                                setState(() {
+                                  currentIndex = index;
+                                });
+                              },
+                            ),
+                            items: itemData.imagePath.map((i) {
+                              return Builder(
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height,
+                                    margin: const EdgeInsets.symmetric(horizontal: 1.0),
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(i),
+                                        fit: BoxFit.fill
+                                      ),
+                                    ),
+                                    child: Stack(
+                                      children: <Widget>[
+                                        Center(
+                                          child: ClipRect(
                                             child: BackdropFilter(
                                               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                                               child: Container(
@@ -176,28 +173,25 @@ class _ItemPageState extends State<ItemPage> {
                                               ),
                                             ),
                                           ),
-                                          Center(
-                                            child: Positioned(
-                                            child: Image.network(i, fit: BoxFit.fitHeight),
-                                            )
-                                          )
-                                          ]
                                         ),
-                                      );
-                                    },
+                                        Positioned.fill(
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child:Image.network(i, fit: BoxFit.fitHeight),
+                                          )
+                                        )
+                                      ]
+                                    ),
                                   );
-                                }).toList(),
-                              ),
-                            )
-                          ]
-                        ),
-                        Positioned(
-                          bottom: 10,
-                          child: DotsIndicator(
-                            dotsCount: itemData.imagePath.length,
-                            position: currentIndex.toDouble()
+                                },
+                              );
+                            }).toList(),
                           ),
-                        )   
+                        ),
+                        DotsIndicator(
+                          dotsCount: itemData.imagePath.length,
+                          position: currentIndex.toDouble()
+                        ),
                       ]
                     ),
                   ),
@@ -211,40 +205,40 @@ class _ItemPageState extends State<ItemPage> {
               );
           } else if (snapshot.hasError) {
             child = 
-            Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 60,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text('Error: ${snapshot.error}'),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('Error: ${snapshot.error}'),
-                ),
-              ],
-            ),
-          );
+              );
           } else {
             child = 
-            const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                width: 60,
-                height: 60,
-                child: CircularProgressIndicator(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('Awaiting result...'),
-              ),
-              ],
-            ),
-          );
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text('Awaiting result...'),
+                  ),
+                  ],
+                ),
+              );
           }
           return child;
         }
