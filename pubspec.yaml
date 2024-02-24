@@ -50,6 +50,7 @@ dependencies:
   url_launcher: ^6.2.4
   flutter_advanced_avatar: ^1.5.0
   provider: ^6.1.1
+  profanity_filter: ^2.0.0
 
 
 
