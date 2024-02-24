@@ -270,14 +270,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  flutter_advanced_avatar:
-    dependency: "direct main"
-    description:
-      name: flutter_advanced_avatar
-      sha256: "29f5d1586075a2ee5ce462fe25b9aa7179a157697260f542a05c5293a5bda8cc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   flutter_form_builder:
     dependency: "direct main"
     description:
@@ -508,7 +500,7 @@ packages:
       sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.7"
+    version: "6.1.1"
   sky_engine:
     dependency: transitive
     description: flutter
