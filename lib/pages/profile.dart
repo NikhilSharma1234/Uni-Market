@@ -11,6 +11,7 @@ import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'package:uni_market/helpers/profile_pic_shuffler.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -67,8 +68,10 @@ class _ProfilePageState extends State<ProfilePage> {
               var profilePic;
 
               if (userProfileData["assignable_profile_pic_path"] == null) {
+                // Starting Pic Exists, New User / User Has not set an assignable profile
                 profilePic = userProfileData["starting_profile_pic_url"];
               } else {
+                // Assignable Pic Exists, User has changed profile pics
                 profilePic = userProfileData["assignable_profile_pic_url"];
               }
 
@@ -350,10 +353,14 @@ Future<Map<String, dynamic>> getUserProfileData() async {
         .then((DocumentSnapshot documentSnapshot) {
       userProfile["institution"] = documentSnapshot.get("schoolId");
       userProfile["marketplaceId"] = documentSnapshot.get("marketplaceId");
-      userProfile["assignable_profile_pic_path"] =
-          documentSnapshot.get("assignable_profile_pic");
-      userProfile["starting_profile_pic_path"] =
-          documentSnapshot.get("starting_profile_pic");
+      try {
+        userProfile["assignable_profile_pic_path"] =
+            documentSnapshot.get("assignable_profile_pic");
+        userProfile["starting_profile_pic_path"] =
+            documentSnapshot.get("starting_profile_pic");
+      } catch (e) {
+        _assignStartingProfilePicSignUp();
+      }
     });
     // Get Image Download for Assignable Profile Pic if used
     if (userProfile["assignable_profile_pic_path"] != null) {
@@ -394,6 +401,22 @@ Future<XFile?> singleImagePicker(BuildContext context) async {
     }
   }
   return null;
+}
+
+Future<void> _assignStartingProfilePicSignUp() async {
+  var currentUser = FirebaseAuth.instance.currentUser;
+  if (currentUser != null) {
+    String? userEmail = currentUser.email;
+    String? chosenProfilePicPath =
+        "profile_pics/${const ProfilePicShuffler().reveal()}";
+
+    CollectionReference users = FirebaseFirestore.instance.collection("users");
+
+    await users.doc(userEmail).update({
+      "assignable_profile_pic": null,
+      "starting_profile_pic": chosenProfilePicPath
+    });
+  }
 }
 
 Future<bool?> _updateProfilePicture(XFile? profilePic) async {
