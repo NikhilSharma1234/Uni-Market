@@ -56,18 +56,17 @@ class _ProfilePageState extends State<ProfilePage> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
-              // Successful DB data snapshot, store in map / filter duplicate strings
+              // Successful DB data snapshot
               Map<String, dynamic> userProfileData = snapshot.data!;
+
               List<String> schoolsInMarketplace =
                   List<String>.from(userProfileData["schoolsInMarketplace"]);
               schoolsInMarketplace.remove(userProfileData["institution"]);
 
-              // Get available profile pic (stock or assigned)
-              // Stock = Download Url String
-              // Assigned = Not implemented, why this uses var for profile pic
+              // Get available profile pic (starting or assignable)
               var profilePic;
 
-              if (userProfileData["assignable_profile_pic"] == null) {
+              if (userProfileData["assignable_profile_pic_path"] == null) {
                 profilePic = userProfileData["starting_profile_pic_url"];
               } else {
                 profilePic = userProfileData["assignable_profile_pic_url"];
@@ -79,11 +78,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: screenWidth * 0.85,
                   child: Column(
                     children: [
+                      // Spacer box sized through trial and error to fit mobile / desktop
                       SizedBox(
                         height: screenHeight * 0.0195,
                       ),
                       //
-                      // USER PROFILE PIC CLICKABLE AVATAR
+                      // MODIFIABLE USER PROFILE PIC
                       InkWell(
                         borderRadius:
                             BorderRadius.circular(screenHeight * 0.025),
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: screenHeight * 0.019,
                       ),
                       //
-                      // Dark Mode Toggle Box (Text and Stateful Switch)
+                      // DARK MODE TOGGLE BOX (Text and Stateful Switch)
                       SizedBox(
                         height: screenHeight * 0.029,
                         width: screenWidth * 0.95,
@@ -189,100 +189,117 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       SizedBox(
-                        height: screenHeight * 0.04,
+                        height: screenHeight * 0.019,
                       ),
                       //
                       // UPDATE PROFILE
-                      OutlinedButton(
-                        onPressed: () {
-                          if (_profileSettingsChanged == true) {
-                            _updateProfilePicture(newProfilePic)
-                                .then((success) {
-                              if (success != null) {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text(
-                                            "Profile Settings Changed!"),
-                                        content: const Text(
-                                            "Profile Settings Updated"),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Continue"),
-                                          )
-                                        ],
-                                      );
-                                    });
-                              }
-                            });
-                          } else {
-                            // "Don't invoke print in production code" - This linter can stfu
-                            print("No changes to apply!!");
-                          }
-                        },
-                        style: _profileSettingsChanged
-                            ? ElevatedButton.styleFrom(
-                                backgroundColor: Colors.greenAccent[400])
-                            : null,
-                        child: const Text("APPLY CHANGES"),
+                      SizedBox(
+                        height: screenHeight * 0.034,
+                        width: screenWidth * 0.38,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            if (_profileSettingsChanged == true) {
+                              _updateProfilePicture(newProfilePic)
+                                  .then((success) {
+                                if (success != null) {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                              "Profile Settings Changed!"),
+                                          content: const Text(
+                                              "Profile Settings Updated"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("Continue"),
+                                            )
+                                          ],
+                                        );
+                                      });
+                                }
+                              });
+                            } else {
+                              // "Don't invoke print in production code" - This linter can put a sock in it
+                              print("No changes to apply!!");
+                            }
+                          },
+                          style: _profileSettingsChanged
+                              ? ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.greenAccent[400])
+                              : null,
+                          child: const Text("APPLY CHANGES"),
+                        ),
                       ),
                       //
+                      // Spacer box sized through trial and error to fit mobile / desktop
                       SizedBox(
-                        height: screenWidth * 0.055,
+                        height: screenHeight * 0.0125,
                         width: screenWidth * 0.65,
                       ),
                       // ITEMS BOUGHT BUTTON, UNDEFINED ON PRESSED LOGIC
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade400,
-                          foregroundColor: Colors.white,
-                          shadowColor: Colors.blue.shade900,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
+                      SizedBox(
+                        height: screenHeight * 0.034,
+                        width: screenWidth * 0.38,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade400,
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.blue.shade900,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
                           ),
+                          onPressed: () {},
+                          child: const Text("Items Bought"),
                         ),
-                        onPressed: () {},
-                        child: const Text("Items Bought"),
                       ),
                       SizedBox(
                         height: screenHeight * 0.005,
                       ),
                       //
                       // ITEMS SOLD BUTTON, UNDEFINED ON PRESSED LOGIC
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade400,
-                          foregroundColor: Colors.white,
-                          shadowColor: Colors.blue.shade900,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
+                      SizedBox(
+                        height: screenHeight * 0.034,
+                        width: screenWidth * 0.38,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade400,
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.blue.shade900,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
                           ),
+                          onPressed: () {},
+                          child: const Text("Items Sold"),
                         ),
-                        onPressed: () {},
-                        child: const Text("Items Sold"),
                       ),
                       SizedBox(
                         height: screenHeight * 0.005,
                       ),
                       //
                       // SIGN OUT BUTTON
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shadowColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
+                      SizedBox(
+                        height: screenHeight * 0.034,
+                        width: screenWidth * 0.38,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
                           ),
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                          },
+                          child: const Text('LOG OUT'),
                         ),
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut();
-                        },
-                        child: const Text('LOG OUT'),
                       ),
                       SizedBox(
                         height: screenHeight * 0.065,
@@ -315,7 +332,7 @@ Future<Map<String, dynamic>> getUserProfileData() async {
     "marketplaceId": null,
     "profile_pic_path": null,
     "profile_pic_url": null,
-    "assignable_profile_pic": null,
+    "assignable_profile_pic_path": null,
     "assignable_profile_pic_url": null,
   };
 
@@ -333,16 +350,16 @@ Future<Map<String, dynamic>> getUserProfileData() async {
         .then((DocumentSnapshot documentSnapshot) {
       userProfile["institution"] = documentSnapshot.get("schoolId");
       userProfile["marketplaceId"] = documentSnapshot.get("marketplaceId");
-      userProfile["assignable_profile_pic"] =
+      userProfile["assignable_profile_pic_path"] =
           documentSnapshot.get("assignable_profile_pic");
       userProfile["starting_profile_pic_path"] =
           documentSnapshot.get("starting_profile_pic");
     });
     // Get Image Download for Assignable Profile Pic if used
-    if (userProfile["assignable_profile_pic"] != null) {
+    if (userProfile["assignable_profile_pic_path"] != null) {
       userProfile["assignable_profile_pic_url"] = await FirebaseStorage.instance
           .ref()
-          .child(userProfile["assignable_profile_pic"])
+          .child(userProfile["assignable_profile_pic_path"])
           .getDownloadURL();
     }
 
@@ -365,6 +382,7 @@ Future<Map<String, dynamic>> getUserProfileData() async {
   return userProfile;
 }
 
+// Helper function for selecting new profile picture
 Future<XFile?> singleImagePicker(BuildContext context) async {
   XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
@@ -381,19 +399,14 @@ Future<XFile?> singleImagePicker(BuildContext context) async {
 Future<bool?> _updateProfilePicture(XFile? profilePic) async {
   if (profilePic != null) {
     Future<String?> imageDataUrl = convertImageToDataUrl(profilePic);
-
     try {
       String? dataUrl = await imageDataUrl;
       if (dataUrl != null) {
         List<String> imageNames = [];
-        // Extract image data from data URL
         Uint8List imageBytes = base64Decode(dataUrl.split(',').last);
-
-        // Generate unique image reference in Firebase image collection
         String fileName = DateTime.now().millisecondsSinceEpoch.toString();
         final imageRef =
             FirebaseStorage.instance.ref().child("profile_pics/$fileName.jpg");
-
         try {
           await imageRef.putData(imageBytes);
           imageNames.add("profile_pics/$fileName.jpg");
@@ -419,9 +432,9 @@ Future<bool?> _updateProfilePicture(XFile? profilePic) async {
         }
         Completer<List<String>> completer = Completer<List<String>>();
         completer.complete(imageNames);
-
         return true;
       } else {
+        // Data URL is null
         return false;
       }
     } catch (e) {
@@ -440,46 +453,4 @@ Future<String?> convertImageToDataUrl(XFile? imageFile) async {
     return dataUrl;
   }
   return null;
-}
-
-// Function for uploading selected post images to firebase
-Future uploadImage(
-    Future<String?> imageDataUrl, Completer<List<String>> completer) async {
-  List<String> imageNames = [];
-  // Create a firebase storage reference from app
-  final storageRef = FirebaseStorage.instance.ref();
-
-  await Future.forEach(imageDataUrl as Iterable<String>,
-      (String dataUrl) async {
-    // Extract image data from data URL
-    Uint8List imageBytes = base64Decode(dataUrl.split(',').last);
-
-    // Generate unique image reference in firebase image collection
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final imageRef = storageRef.child("images/$fileName.jpg");
-    imageNames.add("images/$fileName.jpg");
-
-    try {
-      await imageRef.putData(imageBytes);
-    } on FirebaseException catch (e) {
-      // Undeveloped catch case for firebase write error
-      if (kDebugMode) {
-        print(e);
-      }
-      return false;
-    }
-  });
-
-  completer.complete(imageNames);
-}
-
-Future<String?> getProfilePicDownloadUrl(String profilePicPath) async {
-  try {
-    final storageRef = FirebaseStorage.instance.ref().child(profilePicPath);
-    String downloadUrl = await storageRef.getDownloadURL();
-    return downloadUrl;
-  } catch (e) {
-    print("Failed to get profile pic download url: $e");
-    return null;
-  }
 }
