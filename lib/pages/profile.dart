@@ -256,8 +256,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           onPressed: () {},
                           child: const Text("Items Bought"),
                         ),
-                        onPressed: () {},
-                        child: const Text("Items Sold"),
                       ),
                       SizedBox(
                         height: screenHeight * 0.005,
@@ -279,10 +277,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           onPressed: () {},
                           child: const Text("Items Sold"),
                         ),
-                        onPressed: () async {
-                          await FirebaseAuth.instance.signOut();
-                        },
-                        child: const Text('LOG OUT'),
                       ),
                       SizedBox(
                         height: screenHeight * 0.005,
