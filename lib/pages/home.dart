@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
@@ -291,6 +292,7 @@ class _MySearchBarState extends State<MySearchBar> {
           title: Text(item),
           onTap: () {
             setState(() {
+              // TODO - update the search function to include the now passed in filters using widget.filters
               ctrl.search(item, 30, context, widget.filter).then((value) {
                 widget.setPageState(value, false);
               });
@@ -399,18 +401,17 @@ class PageController {
     return widgets;
   }
 
-  Future<String> getURL(String imageURL,) async {
+  Future<String> getURL(
+    String imageURL,
+  ) async {
     String image;
     try {
-    image = await FirebaseStorage.instance
-            .ref(imageURL)
-            .getDownloadURL();
+      image = await FirebaseStorage.instance.ref(imageURL).getDownloadURL();
     } catch (e) {
       image = "Missing Image";
     }
     return image;
-}
-
+  }
 
   generateItems(Map<String, dynamic> data, BuildContext context) async {
     List<Widget> widgets = [];
@@ -420,10 +421,10 @@ class PageController {
             .ref("images/missing_image.jpg")
             .getDownloadURL());
       } else {
-          for (int i = 0; i < item['document']['images'].length; i++) {
-            item['document']['images'][i] = 
+        for (int i = 0; i < item['document']['images'].length; i++) {
+          item['document']['images'][i] =
               await getURL(item['document']['images'][i]);
-          }
+        }
       }
 
       if (context.mounted) {
