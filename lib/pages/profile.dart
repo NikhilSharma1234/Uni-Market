@@ -12,6 +12,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:uni_market/helpers/profile_pic_shuffler.dart';
+import 'package:uni_market/pages/item_page.dart';
+import 'package:uni_market/pages/item_view.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -243,75 +245,88 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: screenHeight * 0.0125,
                         width: screenWidth * 0.65,
                       ),
-                      // ITEMS BOUGHT BUTTON, UNDEFINED ON PRESSED LOGIC
-                      SizedBox(
-                        height: screenHeight * 0.034,
-                        width: screenWidth * 0.38,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade400,
-                            foregroundColor: Colors.white,
-                            shadowColor: Colors.blue.shade900,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: screenHeight * 0.01,
                             ),
-                          ),
-                          onPressed: () {},
-                          child: const Text("Items Bought"),
-                        ),
-                      ),
-                      SizedBox(
-                        height: screenHeight * 0.005,
-                      ),
-                      //
-                      // ITEMS SOLD BUTTON, UNDEFINED ON PRESSED LOGIC
-                      SizedBox(
-                        height: screenHeight * 0.034,
-                        width: screenWidth * 0.38,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade400,
-                            foregroundColor: Colors.white,
-                            shadowColor: Colors.blue.shade900,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ItemView(
+                                        sellerID: FirebaseAuth
+                                            .instance.currentUser?.email),
+                                  ),
+                                );
+                              },
+                              child: const Text("Items you've listed"),
                             ),
-                          ),
-                          onPressed: () {},
-                          child: const Text("Items Sold"),
-                        ),
-                      ),
-                      SizedBox(
-                        height: screenHeight * 0.005,
-                      ),
-                      //
-                      // SIGN OUT BUTTON
-                      SizedBox(
-                        height: screenHeight * 0.034,
-                        width: screenWidth * 0.38,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            shadowColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                            SizedBox(
+                              height: screenHeight * 0.01,
                             ),
-                          ),
-                          onPressed: () async {
-                            await FirebaseAuth.instance.signOut();
-                          },
-                          child: const Text('LOG OUT'),
-                        ),
-                      ),
-                      SizedBox(
-                        height: screenHeight * 0.065,
-                      ),
-                      //
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Text("Items Bought"),
+                            ),
+                            SizedBox(
+                              height: screenHeight * 0.01,
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Text("Items Sold"),
+                            ),
+                            SizedBox(
+                              height: screenHeight * 0.01,
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () async {
+                                await FirebaseAuth.instance.signOut();
+                              },
+                              child: const Text('LOG OUT'),
+                            ),
+                          ]),
                       // Delete Account Button, NO LOGIC
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("Delete Account"),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text("Delete Account"),
+                        ),
                       ),
                     ],
                   ),
