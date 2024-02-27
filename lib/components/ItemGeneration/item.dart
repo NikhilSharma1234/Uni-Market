@@ -9,8 +9,8 @@ class Item {
   List<String> imagePath;
   String sellerId;
   List<dynamic> tags;
-  Item(this.name, this.description, this.schoolId, this.price, this.dateListed, this.imagePath, this.sellerId,
-      this.tags);
+  Item(this.name, this.description, this.schoolId, this.price, this.dateListed,
+      this.imagePath, this.sellerId, this.tags);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
@@ -27,6 +27,28 @@ class Item {
     schoolId = map['schoolId'];
     price = map['price'];
     dateListed = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
+    sellerId = map['sellerId'];
+    for (String path in map['images']) {
+      imagePath.add(path);
+    }
+    tags = map['tags'];
+  }
+
+  Item.fromFirebase(Map map)
+      // all of these need to be initialized
+      : name = "missing",
+        description = "missing",
+        schoolId = "missing",
+        price = 0.0,
+        dateListed = Timestamp(0, 0),
+        sellerId = "missing",
+        imagePath = [],
+        tags = [] {
+    name = map['name'];
+    description = map['description'];
+    schoolId = map['schoolId'];
+    price = map['price'];
+    dateListed = map['dateListed'];
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
