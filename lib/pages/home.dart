@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
@@ -77,6 +76,9 @@ class _HomePageState extends State<HomePage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     Widget body = GridView.count(
+      controller: ScrollController(),
+      physics:
+          const BouncingScrollPhysics(), // truing to make scrolling smooth not working
       crossAxisCount: (screenWidth / 320).round(),
       childAspectRatio: 2 / 2,
       children: items,
@@ -87,173 +89,174 @@ class _HomePageState extends State<HomePage> {
           const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
     }
 
-    var radioValue;
-
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: kIsWeb
-            ? UserNavBarDesktop(
-                redrawItems: redrawItems,
-                updateSearchText: updateSearchText,
-                filter: filter)
-            : null,
-        bottomNavigationBar:
-            !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => showDialog<String>(
-              context: context,
-              builder: (BuildContext context) => const Dialog(
-                    insetPadding: EdgeInsets.all(0),
-                    child: PostingPage(),
-                  )),
-          child: const Icon(Icons.add),
-        ),
-        drawer: Theme(
-            data: Theme.of(context).copyWith(cardColor: Colors.blueGrey),
-            child: Drawer(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: ListView(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 55),
-                          child: Container(
-                              color: Theme.of(context).primaryColor,
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: Text("Price Range")),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: TextField(
-                                          keyboardType: TextInputType.number,
-                                          controller: lowerPrice,
-                                          onChanged: ((value) {
-                                            if (value != "") {
-                                              filter.lowerPrice =
-                                                  int.parse(lowerPrice.text);
-                                            } else {
-                                              filter.lowerPrice = 0;
-                                            }
-                                          }),
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            labelText: "Lower",
-                                          ),
-                                        )),
-                                        Expanded(
-                                            child: TextField(
-                                          keyboardType: TextInputType.number,
-                                          controller: upperPrice,
-                                          onChanged: ((value) {
-                                            if (value != "") {
-                                              filter.upperPrice =
-                                                  int.parse(upperPrice.text);
-                                            } else {
-                                              filter.upperPrice = 100000;
-                                            }
-                                          }),
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            labelText: "Upper",
-                                          ),
-                                        ))
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(5),
-                                      child: DropdownMenu(
-                                          onSelected: (value) =>
-                                              filter.sort = value as Sort,
-                                          initialSelection: filter.sort,
-                                          dropdownMenuEntries: const [
-                                            DropdownMenuEntry(
-                                                value: Sort.highToLow,
-                                                label: 'High to Low'),
-                                            DropdownMenuEntry(
-                                                value: Sort.lowToHigh,
-                                                label: 'Low to High'),
-                                            DropdownMenuEntry(
-                                                value: Sort.bestMatch,
-                                                label: 'Best Match')
-                                          ]),
-                                    ),
-                                    ListTile(
-                                        title: const Text("New"),
-                                        leading: Radio<Condition>(
-                                            value: Condition.newItem,
-                                            groupValue: filter.condition,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                filter.condition = value!;
-                                              });
-                                            })),
-                                    ListTile(
-                                        title: const Text("Used"),
-                                        leading: Radio<Condition>(
-                                            value: Condition.usedItem,
-                                            groupValue: filter.condition,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                filter.condition = value!;
-                                              });
-                                            })),
-                                    ListTile(
-                                        title: const Text("Worn"),
-                                        leading: Radio<Condition>(
-                                            value: Condition.wornItem,
-                                            groupValue: filter.condition,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                filter.condition = value!;
-                                              });
-                                            })),
+      resizeToAvoidBottomInset: false,
+      appBar: kIsWeb
+          ? UserNavBarDesktop(
+              redrawItems: redrawItems,
+              updateSearchText: updateSearchText,
+              filter: filter)
+          : null,
+      bottomNavigationBar:
+          !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => const Dialog(
+                  insetPadding: EdgeInsets.all(0),
+                  child: PostingPage(),
+                )),
+        child: const Icon(Icons.add),
+      ),
+      drawer: Drawer(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child:
+                ListView(shrinkWrap: true, padding: EdgeInsets.zero, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 55),
+                child: Container(
+                    color: Theme.of(context).colorScheme.background,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Text("Price Range")),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: TextField(
+                                keyboardType: TextInputType.number,
+                                controller: lowerPrice,
+                                onChanged: ((value) {
+                                  if (value != "") {
+                                    filter.lowerPrice =
+                                        int.parse(lowerPrice.text);
+                                  } else {
+                                    filter.lowerPrice = 0;
+                                  }
+                                }),
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: "Lower",
+                                ),
+                              )),
+                              Expanded(
+                                  child: TextField(
+                                keyboardType: TextInputType.number,
+                                controller: upperPrice,
+                                onChanged: ((value) {
+                                  if (value != "") {
+                                    filter.upperPrice =
+                                        int.parse(upperPrice.text);
+                                  } else {
+                                    filter.upperPrice = 100000;
+                                  }
+                                }),
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: "Upper",
+                                ),
+                              ))
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: DropdownMenu(
+                                onSelected: (value) =>
+                                    filter.sort = value as Sort,
+                                initialSelection: filter.sort,
+                                dropdownMenuEntries: const [
+                                  DropdownMenuEntry(
+                                      value: Sort.highToLow,
+                                      label: 'High to Low'),
+                                  DropdownMenuEntry(
+                                      value: Sort.lowToHigh,
+                                      label: 'Low to High'),
+                                  DropdownMenuEntry(
+                                      value: Sort.newestToOldest,
+                                      label: 'Newest to Oldest'),
+                                  DropdownMenuEntry(
+                                      value: Sort.oldestToNewest,
+                                      label: 'Oldest to Newest'),
+                                  DropdownMenuEntry(
+                                      value: Sort.bestMatch,
+                                      label: 'Best Match')
+                                ]),
+                          ),
+                          ListTile(
+                              title: const Text("New"),
+                              leading: Radio<Condition>(
+                                  value: Condition.newItem,
+                                  groupValue: filter.condition,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      filter.condition = value!;
+                                    });
+                                  })),
+                          ListTile(
+                              title: const Text("Used"),
+                              leading: Radio<Condition>(
+                                  value: Condition.usedItem,
+                                  groupValue: filter.condition,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      filter.condition = value!;
+                                    });
+                                  })),
+                          ListTile(
+                              title: const Text("Worn"),
+                              leading: Radio<Condition>(
+                                  value: Condition.wornItem,
+                                  groupValue: filter.condition,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      filter.condition = value!;
+                                    });
+                                  })),
 
-                                    // const Padding(
-                                    //     padding: EdgeInsets.all(5),
-                                    //     child: Text("Tags")),
-                                    // CheckboxListTile(
-                                    //     title: const Text("Kit"),
-                                    //     value: filter.tags[0],
-                                    //     onChanged: (value) => setState(
-                                    //         () => filter.tags[0] = value)),
-                                    // CheckboxListTile(
-                                    //     title: const Text("Desk"),
-                                    //     value: filter.tags[1],
-                                    //     onChanged: (value) => setState(
-                                    //         () => filter.tags[1] = value)),
-                                    // CheckboxListTile(
-                                    //     title: const Text("Computer"),
-                                    //     value: filter.tags[2],
-                                    //     onChanged: (value) => setState(
-                                    //         () => filter.tags[2] = value)),
-                                    Padding(
-                                        padding: const EdgeInsets.all(5),
-                                        child: TextButton(
-                                            style: const ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll<
-                                                      Color>(Colors.green),
-                                            ),
-                                            onPressed: () {
-                                              applyFilters();
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('Apply Filters')))
-                                  ])),
-                        ),
-                      ]),
-                ))),
-        body: body);
+                          // const Padding(
+                          //     padding: EdgeInsets.all(5),
+                          //     child: Text("Tags")),
+                          // CheckboxListTile(
+                          //     title: const Text("Kit"),
+                          //     value: filter.tags[0],
+                          //     onChanged: (value) => setState(
+                          //         () => filter.tags[0] = value)),
+                          // CheckboxListTile(
+                          //     title: const Text("Desk"),
+                          //     value: filter.tags[1],
+                          //     onChanged: (value) => setState(
+                          //         () => filter.tags[1] = value)),
+                          // CheckboxListTile(
+                          //     title: const Text("Computer"),
+                          //     value: filter.tags[2],
+                          //     onChanged: (value) => setState(
+                          //         () => filter.tags[2] = value)),
+                          Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: TextButton(
+                                  style: const ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStatePropertyAll<Color>(
+                                            Colors.green),
+                                  ),
+                                  onPressed: () {
+                                    applyFilters();
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Apply Filters')))
+                        ])),
+              ),
+            ]),
+          )),
+      body: body,
+    );
   }
 }
 
@@ -364,10 +367,22 @@ class PageController {
     String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
 
     String sort = '';
-    if (filter.sort == Sort.highToLow) {
-      sort = 'price:desc';
-    } else if (filter.sort == Sort.lowToHigh) {
-      sort = 'price:asc';
+
+    switch (filter.sort) {
+      case Sort.newestToOldest:
+        sort = 'dateListed:desc';
+        break;
+      case Sort.oldestToNewest:
+        sort = 'dateListed:asc';
+        break;
+      case Sort.highToLow:
+        sort = 'price:desc';
+        break;
+      case Sort.lowToHigh:
+        sort = 'price:asc';
+        break;
+      default:
+        break;
     }
 
     switch (filter.condition) {
