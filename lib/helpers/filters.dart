@@ -4,6 +4,8 @@ enum Sort {
   lowToHigh,
   highToLow,
   bestMatch,
+  newestToOldest,
+  oldestToNewest,
 }
 
 enum Condition { newItem, usedItem, wornItem, none }
