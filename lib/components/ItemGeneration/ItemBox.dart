@@ -62,8 +62,20 @@ class _ItemBoxState extends State<ItemBox> {
             child: Stack(children: <Widget>[
               Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: style.colorScheme.onPrimary),
-                      color: style.colorScheme.background,
+                      // border: Border.all(color: style.colorScheme.onPrimary),
+                      color: style.colorScheme.background.withOpacity(0.25),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Colors.grey.shade700.withOpacity(0.25)
+                                  : Colors.black.withOpacity(0.25),
+                          spreadRadius: 3,
+                          blurRadius: 4,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
                       borderRadius:
                           const BorderRadius.all(Radius.circular(20))),
                   child: Padding(
@@ -99,24 +111,22 @@ class _ItemBoxState extends State<ItemBox> {
   Widget _buildPriceIndicatior(double width, double height, String itemPrice) {
     return Align(
         alignment: Alignment.topLeft,
-        child: Padding(
-            padding: const EdgeInsets.only(left: 1, top: 1),
-            child: SizedBox(
-                width: width,
-                height: height,
-                child: DecoratedBox(
-                    decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(10)),
-                        color: Colors.grey.shade800),
-                    child: FittedBox(
-                        fit: BoxFit.contain,
-                        child: Padding(
-                            padding: const EdgeInsets.only(left: 1),
-                            child: Text(
-                              itemPrice,
-                              textAlign: TextAlign.center,
-                            )))))));
+        child: SizedBox(
+            width: width,
+            height: height,
+            child: DecoratedBox(
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        bottomRight: Radius.circular(10)),
+                    color: Theme.of(context).colorScheme.background),
+                child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Padding(
+                        padding: const EdgeInsets.only(left: 5, right: 5),
+                        child: Text(
+                          itemPrice,
+                          textAlign: TextAlign.center,
+                        ))))));
   }
 }
