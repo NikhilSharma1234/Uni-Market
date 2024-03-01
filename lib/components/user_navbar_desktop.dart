@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/pages/profile.dart';
-import 'package:uni_market/pages/home.dart';
+import 'package:uni_market/components/search_bar.dart';
 import 'package:uni_market/pages/chat.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
