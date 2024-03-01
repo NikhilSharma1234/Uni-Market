@@ -48,18 +48,17 @@ class _ItemBoxState extends State<ItemBox> {
 
     double fontSize = screenHeight * 0.015;
 
-    return InkWell(
-        // for future use to link each item to a unique page based on its id
-        onTap: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    ItemPage(data: item),
-              ),
-            );
-        },
-        child: Padding(
-            padding: const EdgeInsets.all(5.0),
+    return Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: InkWell(
+            // for future use to link each item to a unique page based on its id
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ItemPage(data: item),
+                ),
+              );
+            },
             child: Stack(children: <Widget>[
               Container(
                   decoration: BoxDecoration(
@@ -85,27 +84,19 @@ class _ItemBoxState extends State<ItemBox> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Flexible(
-                          flex: 8,
-                          child: Center(
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(10)),
-                              child: Image.network(
-                                  item.imagePath[0],
-                                  fit: BoxFit.fitWidth,
-                                  // height: screenWidth * 0.1,
-                              )
-                            )
-                          )
-                        ),
+                            flex: 8,
+                            child: Center(
+                                child: ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    child: Image.network(
+                                      item.imagePath[0],
+                                      fit: BoxFit.fitWidth,
+                                      // height: screenWidth * 0.1,
+                                    )))),
                         Center(
-                          child: Text(
-                            item.name,
-                            style: const TextStyle(
-                              fontSize: 24
-                            )
-                          )
-                        )
+                            child: Text(item.name,
+                                style: const TextStyle(fontSize: 24)))
                       ],
                     ),
                   )),

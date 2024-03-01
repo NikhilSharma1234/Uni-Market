@@ -54,6 +54,7 @@ dependencies:
   flutter_advanced_avatar: ^1.5.0
   provider: ^6.1.1
   profanity_filter: ^2.0.0
+  web_smooth_scroll: ^1.1.0
 
 
 
