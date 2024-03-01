@@ -8,7 +8,7 @@ import 'package:typesense/typesense.dart';
 // I KNOW THIS IS BAD PRACTICE I DO NOT CARE RN I JUST WANT TO GET THIS WORKING (search only)
 const typeSenseAPIKey = "oR9PTRdUpGBUI3CbbKLLS16JtYavUU44";
 
-class MySearchBar extends StatefulWidget {
+class ItemSearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
   final Function(List<Widget> newItems, bool append) setPageState;
   final Function(String) updateSearchText;
@@ -17,23 +17,23 @@ class MySearchBar extends StatefulWidget {
   // final Filters filters;
 
   // requiring the function
-  const MySearchBar(
+  const ItemSearchBar(
       {super.key,
       required this.setPageState,
       required this.updateSearchText,
       required this.filter});
 
   @override
-  State<MySearchBar> createState() => _MySearchBarState();
+  State<ItemSearchBar> createState() => _ItemSearchBarState();
 }
 
-class _MySearchBarState extends State<MySearchBar> {
+class _ItemSearchBarState extends State<ItemSearchBar> {
   bool isDark = true;
   late String searchVal;
   final SearchController controller = SearchController();
   List<ListTile> suggestions = [];
 
-  PageController ctrl = PageController();
+  SearchPageController ctrl = SearchPageController();
 
   void updateSuggestions(String typedText) {
     setState(() {
@@ -92,7 +92,7 @@ class _MySearchBarState extends State<MySearchBar> {
   }
 }
 
-class PageController {
+class SearchPageController {
   AbstractItemFactory factory = AbstractItemFactory();
   search(String searchTerm, int number, BuildContext context,
       Filters filter) async {
