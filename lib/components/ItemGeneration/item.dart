@@ -3,19 +3,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Item {
   String name;
   String description;
+  String condition;
   String schoolId;
   double price;
   Timestamp dateListed;
   List<String> imagePath;
   String sellerId;
   List<dynamic> tags;
-  Item(this.name, this.description, this.schoolId, this.price, this.dateListed,
-      this.imagePath, this.sellerId, this.tags);
+  Item(this.name, this.description, this.condition, this.schoolId, this.price,
+      this.dateListed, this.imagePath, this.sellerId, this.tags);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
       : name = "missing",
         description = "missing",
+        condition = "missing",
         schoolId = "missing",
         price = 0.0,
         dateListed = Timestamp(0, 0),
@@ -24,6 +26,7 @@ class Item {
         tags = [] {
     name = map['name'];
     description = map['description'];
+    condition = map['condition'];
     schoolId = map['schoolId'];
     price = map['price'];
     dateListed = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
@@ -38,6 +41,7 @@ class Item {
       // all of these need to be initialized
       : name = "missing",
         description = "missing",
+        condition = "missing",
         schoolId = "missing",
         price = 0.0,
         dateListed = Timestamp(0, 0),
@@ -46,6 +50,7 @@ class Item {
         tags = [] {
     name = map['name'];
     description = map['description'];
+    condition = map['condition'];
     schoolId = map['schoolId'];
     price = map['price'];
     dateListed = map['dateListed'];

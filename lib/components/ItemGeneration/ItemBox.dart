@@ -26,6 +26,11 @@ class _ItemBoxState extends State<ItemBox> {
       "default": DefaultStyle(context: context),
       "kit": KitStyle(context: context)
     };
+    Map<String, Color> conditionBackground = {
+      "NEW": Colors.green,
+      "USED": Colors.orange,
+      "WORN": Colors.red
+    };
 
     // getting the correct style type - maybe combine colors down the line?
     bool found = false;
@@ -46,7 +51,7 @@ class _ItemBoxState extends State<ItemBox> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    double fontSize = screenHeight * 0.015;
+    Color conditionColor = conditionBackground[item.condition]!;
 
     return Padding(
         padding: const EdgeInsets.all(5.0),
@@ -81,22 +86,56 @@ class _ItemBoxState extends State<ItemBox> {
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Flexible(
-                            flex: 8,
-                            child: Center(
-                                child: ClipRRect(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10)),
-                                    child: Image.network(
-                                      item.imagePath[0],
-                                      fit: BoxFit.fitWidth,
-                                      // height: screenWidth * 0.1,
-                                    )))),
                         Center(
-                            child: Text(item.name,
-                                style: const TextStyle(fontSize: 24)))
+                            child: ClipRRect(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(15)),
+                                child: AspectRatio(
+                                  aspectRatio: 30 / 26,
+                                  child: Image.network(
+                                    item.imagePath[0],
+                                    fit: BoxFit.fitWidth,
+                                    // height: screenWidth * 0.1,
+                                  ),
+                                ))),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 5, right: 5),
+                                  child: Text(item.name,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          overflow: TextOverflow.ellipsis)),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(10)),
+                                          color:
+                                              conditionColor.withOpacity(0.75)),
+                                      child: Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 3),
+                                        child: Text(
+                                            '${item.condition[0]}${item.condition.substring(1).toLowerCase()}',
+                                            style:
+                                                const TextStyle(fontSize: 20)),
+                                      ),
+                                    )),
+                              )
+                            ]),
                       ],
                     ),
                   )),

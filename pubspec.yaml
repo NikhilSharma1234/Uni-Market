@@ -85,7 +85,6 @@ flutter:
     - assets/logo_dark.png
     - assets/logo_light.png
     - assets/logo.png
-    - assets/ItemImages/
     - assets/
     - assets/portraits/
   fonts:
