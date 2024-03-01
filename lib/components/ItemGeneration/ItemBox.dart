@@ -48,17 +48,17 @@ class _ItemBoxState extends State<ItemBox> {
 
     double fontSize = screenHeight * 0.015;
 
-    return InkWell(
-        // for future use to link each item to a unique page based on its id
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ItemPage(data: item),
-            ),
-          );
-        },
-        child: Padding(
-            padding: const EdgeInsets.all(5.0),
+    return Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: InkWell(
+            // for future use to link each item to a unique page based on its id
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ItemPage(data: item),
+                ),
+              );
+            },
             child: Stack(children: <Widget>[
               Container(
                   decoration: BoxDecoration(
