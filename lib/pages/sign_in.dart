@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:uni_market/components/register.dart';
+import 'package:uni_market/components/input_containers.dart';
 import 'package:uni_market/pages/forgot_password.dart';
 // import 'package:uni_market/pages/forgot_password.dart';
 
@@ -101,6 +101,14 @@ class _SignInFormState extends State<SignInForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    _focusNode = FocusNode();
+    super.initState();
+    _focusNode.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +130,8 @@ class _SignInFormState extends State<SignInForm> {
             key: _formKey,
             child: Column(children: [
               const SizedBox(height: 50),
-              EmailContainer(emailController: emailController),
+              EmailContainer(
+                  emailController: emailController, focusNode: _focusNode),
               const SizedBox(height: 10),
               PasswordContainer(
                 passwordController: passwordController,
