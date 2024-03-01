@@ -1,24 +1,144 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'ChatController.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  final String chatSessionId;
+
+  const ChatPage({Key? key, required this.chatSessionId}) : super(key: key);
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  _ChatPageState createState() => _ChatPageState();
 }
 
-// This is where Jacob's item tile page will go
 class _ChatPageState extends State<ChatPage> {
+  final ChatController _chatController = ChatController();
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      resizeToAvoidBottomInset: false,
-      bottomNavigationBar: !kIsWeb ? UserNavBarMobile(activeIndex: 1) : null, // Custom app bar here
-      body: Center(
-        child: SizedBox(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Chat"),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _chatController.getMessageStream(widget.chatSessionId),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    var message = snapshot.data!.docs[index];
+                    bool isSentByMe = message['senderId'] ==
+                        _chatController.chatModel.currentUser?.uid;
+                    return _buildMessageBubble(context, message, isSentByMe);
+                  },
+                );
+              },
+            ),
+          ),
+          _buildMessageComposer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageBubble(BuildContext context, QueryDocumentSnapshot message, bool isSentByMe) {
+  // Determine if we are in dark mode or light mode
+  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+  // Define bubble colors for light mode
+  Color senderBubbleColorLight = Colors.blueGrey.shade700;
+  Color receiverBubbleColorLight = Colors.blueGrey.shade700;
+
+  // Define bubble colors for dark mode
+  Color senderBubbleColorDark = Colors.white;
+  Color receiverBubbleColorDark = Colors.grey.shade200;
+
+  // Set bubble color and text color based on the theme and sender
+  Color bubbleColor;
+  Color textColor;
+  
+  if (isDarkMode) {
+    bubbleColor = isSentByMe ? senderBubbleColorDark : receiverBubbleColorDark;
+    textColor = Colors.black;
+  } else {
+    bubbleColor = isSentByMe ? senderBubbleColorLight : receiverBubbleColorLight;
+    textColor = Colors.white;
+  }
+
+  return Row(
+    mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+    children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: bubbleColor, // Use the determined bubble color
+          borderRadius: isSentByMe
+            ? const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              )
+            : const BorderRadius.only(
+                topRight: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message['content'],
+              style: TextStyle(color: textColor),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                message['timestamp'].toDate().toString(),
+                style: TextStyle(
+                  color: textColor.withOpacity(0.7),
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+
+
+  Widget _buildMessageComposer() {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _chatController.messageController,
+              decoration: const InputDecoration(
+                labelText: "Type a message...",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: () => _chatController.sendMessage(widget.chatSessionId),
+          ),
+        ],
       ),
     );
   }

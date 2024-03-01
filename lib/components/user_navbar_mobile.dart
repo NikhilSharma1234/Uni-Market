@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/chat.dart';
+import 'package:uni_market/pages/chat_selection_page.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
 
@@ -37,7 +38,7 @@ class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which Nav
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const ChatPage()
+                builder: (context) => ChatSelectionPage()
               ),
             );
           },

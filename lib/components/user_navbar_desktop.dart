@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
+import 'package:uni_market/pages/chat_selection_page.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/components/search_bar.dart';
 import 'package:uni_market/pages/chat.dart';
+import 'package:uni_market/pages/inbox_view.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
   final Function(List<Widget>, bool) redrawItems;
@@ -53,7 +55,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const ChatPage(),
+                builder: (context) => InboxView(),
               ),
             );
           },
