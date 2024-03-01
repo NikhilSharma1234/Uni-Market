@@ -17,6 +17,14 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   int index = 0;
   bool returningUser = false;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    _focusNode = FocusNode();
+    super.initState();
+    _focusNode.requestFocus();
+  }
 
   tapped(int step) {
     setState(() => index = step);
@@ -94,7 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       onStepTapped: (step) => tapped(step),
                       physics: const ScrollPhysics(),
                       steps: <Step>[
-                        register(index, () => tapped(1)),
+                        register(index, () => tapped(1), _focusNode),
                         verify(index, () => tapped(2)),
                         aboutYou(index),
                       ],
