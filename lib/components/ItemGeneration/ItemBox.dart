@@ -102,8 +102,8 @@ class _ItemBoxState extends State<ItemBox> {
                   )),
               LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                return _buildPriceIndicatior(constraints.maxWidth * 0.18,
-                    constraints.maxHeight * 0.08, '\$${item.price}');
+                return _buildPriceIndicatior(constraints.maxWidth * 0.25,
+                    constraints.maxHeight * 0.1, '\$${item.price}');
               }),
             ])));
   }
