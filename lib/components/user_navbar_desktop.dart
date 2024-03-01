@@ -37,7 +37,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
               child: Text('Uni-Market', style: TextStyle(fontSize: 20))),
           Expanded(
               child: Center(
-                  child: MySearchBar(
+                  child: ItemSearchBar(
                       setPageState: widget.redrawItems,
                       updateSearchText: widget.updateSearchText,
                       filter: widget.filter))),

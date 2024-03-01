@@ -4,8 +4,8 @@ import 'Style.dart';
 class DefaultStyle implements Style {
   Color borderColor = Colors.blue;
   @override
-  Color backgroundColor = Colors.black; // temp, will be overwritten
-  Color darkBackgroundColor = Colors.blueGrey.shade700;
+  Color backgroundColor = Colors.black;
+  Color darkBackgroundColor = Colors.blueGrey.shade200;
   Color lightBackgroundColor = Colors.blueGrey;
   @override
   Color textColor = Colors.blue;
