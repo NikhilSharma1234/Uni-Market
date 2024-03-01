@@ -1,11 +1,9 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
-import 'package:uni_market/components/search_bar.dart' as sb;
+import 'package:uni_market/components/search_bar.dart'; // SearchPageController is a flutter class so this is just to make sure it uses the correct one
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:web_smooth_scroll/web_smooth_scroll.dart';
 
@@ -62,7 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
   void applyFilters() {
-    sb.PageController ctrl = sb.PageController();
+    SearchPageController ctrl = SearchPageController();
     ctrl.search(searchVal, 30, context, filter).then((value) {
       redrawItems(value, false);
     });
@@ -71,7 +69,7 @@ class _HomePageState extends State<HomePage> {
   // called just after initstate, used to set the initial items displayed
   @override
   void didChangeDependencies() async {
-    sb.PageController ctrl = sb.PageController();
+    SearchPageController ctrl = SearchPageController();
     ctrl.search("", 30, context, filter).then((value) {
       redrawItems(value, false);
     });
