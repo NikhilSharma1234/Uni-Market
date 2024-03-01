@@ -1,12 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
-import 'package:uni_market/components/ItemGeneration/ItemBox.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
-import 'package:uni_market/components/navbar.dart';
-import 'package:uni_market/components/user_navbar_desktop.dart';
 
 class ItemView extends StatefulWidget {
   final String? sellerID;
@@ -21,6 +17,7 @@ class ItemView extends StatefulWidget {
 }
 
 class _ItemViewState extends State<ItemView> {
+  // TODO: Make this page more generalized for whatever needs of items displays.
   late List<Widget> items = [const Text("")];
   var db = FirebaseFirestore.instance;
   AbstractItemFactory factory = AbstractItemFactory();

@@ -53,7 +53,7 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   SignInForm(),
-                    // Use SignInForm here
+                  // Use SignInForm here
                 ],
               ),
             ),
@@ -104,6 +104,19 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
+    void submit() {
+      if (_formKey.currentState!.validate()) {
+        // If the form is valid, display a snackbar. In the real world,
+        // you'd often call a server or save the information in a database.
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logging in to your account')),
+        );
+        // Attempt to register user input into Firebase
+        _signInUser(context, emailController, passwordController);
+      }
+    }
+
     return Form(
         child: Form(
             key: _formKey,
@@ -112,22 +125,14 @@ class _SignInFormState extends State<SignInForm> {
               EmailContainer(emailController: emailController),
               const SizedBox(height: 10),
               PasswordContainer(
-                  passwordController: passwordController, isSignIn: true),
+                passwordController: passwordController,
+                isSignIn: true,
+                submitted: submit,
+              ),
               const SizedBox(height: 25),
               ElevatedButton(
                 onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database.
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Logging in to your account')),
-                    );
-                    // Attempt to register user input into Firebase
-                    _signInUser(context, emailController, passwordController);
-                  }
+                  submit();
                 },
                 child: const Text('Login'),
               ),
