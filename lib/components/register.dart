@@ -241,8 +241,14 @@ class _NameContainerState extends State<NameContainer> {
 class PasswordContainer extends StatefulWidget {
   final TextEditingController passwordController;
   final bool isSignIn;
+  // function to handle enter press
+  final Function()? submitted;
+
   const PasswordContainer(
-      {Key? key, required this.passwordController, required this.isSignIn})
+      {Key? key,
+      required this.passwordController,
+      required this.isSignIn,
+      this.submitted})
       : super(key: key);
 
   @override
@@ -274,6 +280,11 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
         controller: widget.passwordController,
         textInputAction: TextInputAction.done,
         obscureText: !_passwordVisible,
+        onFieldSubmitted: (value) {
+          if (widget.submitted != null) {
+            widget.submitted!();
+          }
+        },
         decoration: InputDecoration(
             prefixIconConstraints:
                 const BoxConstraints(minWidth: 23, maxHeight: 20),
