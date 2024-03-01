@@ -6,7 +6,7 @@ class DefaultStyle implements Style {
   @override
   Color backgroundColor = Colors.black;
   Color darkBackgroundColor = Colors.blueGrey.shade200;
-  Color lightBackgroundColor = Colors.blueGrey;
+  Color lightBackgroundColor = Colors.blueGrey.shade300;
   @override
   Color textColor = Colors.blue;
   @override
