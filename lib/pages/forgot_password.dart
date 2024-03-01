@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:uni_market/components/register.dart';
+import 'package:uni_market/components/input_containers.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -35,23 +35,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                  const Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: AutoSizeText(
-                    'Trouble Logging In? Enter your email to reset your password.',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w500,
+                    const Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: AutoSizeText(
+                        'Trouble Logging In? Enter your email to reset your password.',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        minFontSize: 16,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    minFontSize: 16,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-
-                SizedBox(height: 20),
-                EmailContainer(emailController: emailController),
-        
+                    SizedBox(height: 20),
+                    EmailContainer(emailController: emailController),
                     SizedBox(height: 20),
                     ValueListenableBuilder<bool>(
                       valueListenable: submitEnabled,
