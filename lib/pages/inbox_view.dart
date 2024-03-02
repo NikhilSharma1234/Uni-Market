@@ -22,7 +22,7 @@ class InboxView extends StatelessWidget {
         appBar: AppBar(
           title: Text('Inbox'),
         ),
-        body: Center(
+        body: const Center(
           child: Text(
             'Not signed in',
             style: TextStyle(fontSize: 24.0),
@@ -34,13 +34,13 @@ class InboxView extends StatelessWidget {
     // Use the userEmail in your StreamBuilder to fetch chat summaries.
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inbox'),
+        title: const Text('Inbox'),
       ),
       body: StreamBuilder<List<ChatSessionSummary>>(
-        stream: _controller.chatSummariesStream(userEmail!),
+        stream: _controller.chatSummariesStream(userEmail),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           if (snapshot.hasError) {
@@ -48,7 +48,7 @@ class InboxView extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Text('No chats found.');
+            return const Text('No chats found.');
           }
 
           List<ChatSessionSummary> summaries = snapshot.data!;
@@ -56,19 +56,24 @@ class InboxView extends StatelessWidget {
           return ListView.builder(
             itemCount: summaries.length,
             itemBuilder: (context, index) {
-              var summary = summaries[index];
-              // Concatenating buyer name with product name
-              String titleText = '${summary.buyerName} | ${summary.productName}';
+  var summary = summaries[index];
+  String titleText = '${summary.buyerName} | ${summary.productName}';
+  return Column(
+    children: [
+      ListTile(
+        title: Text(titleText),
+        subtitle: Text(
+          '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
+          overflow: TextOverflow.ellipsis,
+        ),
+        onTap: () => _controller.onChatSelected(context, summary.sessionId),
+      ),
+      const Divider(), // Adds a divider line below each ListTile
+    ],
+  );
+},
 
-              return ListTile(
-                title: Text(titleText), // Use the concatenated string as title
-                subtitle: Text(
-                  '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
-                  overflow: TextOverflow.ellipsis,
-                ),
-                onTap: () => _controller.onChatSelected(context, summary.sessionId),
-              );
-            },
+
           );
         },
       ),
