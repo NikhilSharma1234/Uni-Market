@@ -126,7 +126,7 @@ class _ItemPageState extends State<ItemPage> {
                     SizedBox(
                         width: screenWidth,
                         child: Expanded(
-                          child: ItemPageInfo(itemData, sellerInformation)
+                          child: ItemPageInfo(itemData, sellerInformation, context)
                         )
                     ),
                   ],
@@ -204,7 +204,7 @@ class _ItemPageState extends State<ItemPage> {
                   SizedBox(
                       width: screenWidth * 0.3,
                       child: Expanded(
-                        child: ItemPageInfo(itemData, sellerInformation)
+                        child: ItemPageInfo(itemData, sellerInformation, context)
                       )
                   ),
                 ],
