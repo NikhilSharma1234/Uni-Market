@@ -42,7 +42,6 @@ dependencies:
   firebase_core: ^2.20.0
   firebase_storage: any
   flutter_form_builder: ^6.1.1
-  csv: ^5.1.1
   cloud_firestore: ^4.14.0
   image_picker_web: any
   image_picker: ^1.0.7
@@ -55,8 +54,7 @@ dependencies:
   provider: ^6.1.1
   profanity_filter: ^2.0.0
   web_smooth_scroll: ^1.1.0
-
-
+  flutter_dotenv: ^5.1.0
 
 dependency_overrides:
   intl: ^0.17.0
@@ -72,10 +70,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
-
-
- 
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -83,7 +77,7 @@ dev_dependencies:
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
-  # the material Icons class.
+  # the material Icons class.P
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

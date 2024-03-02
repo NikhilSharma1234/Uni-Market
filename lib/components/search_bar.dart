@@ -4,9 +4,7 @@ import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:typesense/typesense.dart';
-
-// I KNOW THIS IS BAD PRACTICE I DO NOT CARE RN I JUST WANT TO GET THIS WORKING (search only)
-const typeSenseAPIKey = "oR9PTRdUpGBUI3CbbKLLS16JtYavUU44";
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ItemSearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
@@ -96,9 +94,10 @@ class SearchPageController {
   AbstractItemFactory factory = AbstractItemFactory();
   search(String searchTerm, int number, BuildContext context,
       Filters filter) async {
+    await dotenv.load(fileName: ".env"); // loading .env file
     List<Widget> widgets = [];
     final config = Configuration(
-      typeSenseAPIKey,
+      dotenv.get('TYPESENSEAPIKEY'),
       nodes: {
         Node(
           Protocol.https,
