@@ -118,7 +118,7 @@ class _ChatSelectionPageState extends State<ChatSelectionPage> {
   DocumentReference chatSessionRef = await _firestore.collection('chat_sessions').add({
     'productName': productName, // Include the product name in the chat session document
     'buyerName': buyerName,
-    'participantIdsKey': participantIdsKey,
+    'participantIds': participantIds,
     'productId': productId, // Include the productId in the chat session document
     'participantDetails': {
       senderEmail: {'email': senderEmail},
@@ -127,7 +127,6 @@ class _ChatSelectionPageState extends State<ChatSelectionPage> {
     'createdAt': Timestamp.now(),
     'lastMessage': '',
     'lastMessageAt': Timestamp.now(),
-    'unreadCount': {senderEmail: 0, receiverEmail: 0},
   });
 
   print("New chat session created with ID: ${chatSessionRef.id} for product ID: $productId");
