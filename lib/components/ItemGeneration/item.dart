@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item {
   String name;
+  String id;
   String description;
   String condition;
   String schoolId;
@@ -10,12 +11,13 @@ class Item {
   List<String> imagePath;
   String sellerId;
   List<dynamic> tags;
-  Item(this.name, this.description, this.condition, this.schoolId, this.price,
-      this.dateListed, this.imagePath, this.sellerId, this.tags);
+  Item(this.name, this.id, this.description, this.condition, this.schoolId,
+      this.price, this.dateListed, this.imagePath, this.sellerId, this.tags);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
       : name = "missing",
+        id = "missing",
         description = "missing",
         condition = "missing",
         schoolId = "missing",
@@ -25,6 +27,7 @@ class Item {
         imagePath = [],
         tags = [] {
     name = map['name'];
+    id = map['id'];
     description = map['description'];
     condition = map['condition'];
     schoolId = map['schoolId'];
@@ -40,6 +43,7 @@ class Item {
   Item.fromFirebase(Map map)
       // all of these need to be initialized
       : name = "missing",
+        id = "missing",
         description = "missing",
         condition = "missing",
         schoolId = "missing",
@@ -49,6 +53,7 @@ class Item {
         imagePath = [],
         tags = [] {
     name = map['name'];
+    id = map['id'];
     description = map['description'];
     condition = map['condition'];
     schoolId = map['schoolId'];
