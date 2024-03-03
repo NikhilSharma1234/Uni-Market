@@ -6,7 +6,6 @@ class ChatController {
   final ChatModel _chatModel = ChatModel();
   final TextEditingController messageController = TextEditingController();
 
-
   Stream<QuerySnapshot> getMessageStream(String chatSessionId) {
     return _chatModel.getMessagesStream(chatSessionId);
   }
@@ -16,12 +15,11 @@ class ChatController {
     messageController.clear();
   }
 
-  Future<Map<String, dynamic>?> fetchChatSessionDetails(String chatSessionId) async {
-  return await _chatModel.getSessionDetails(chatSessionId);
-}
-  
+  Future<Map<String, dynamic>?> fetchChatSessionDetails(
+      String chatSessionId) async {
+    return await _chatModel.getSessionDetails(chatSessionId);
+  }
+
   // If you need to expose _chatModel, provide a public getter
   ChatModel get chatModel => _chatModel;
-
-  
 }

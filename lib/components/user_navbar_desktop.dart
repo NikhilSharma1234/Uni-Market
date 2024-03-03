@@ -52,7 +52,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
             textStyle: const TextStyle(fontSize: 20),
           ),
           onPressed: () {
-            Navigator.of(context).pushReplacement(
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => InboxView(),
               ),

@@ -35,7 +35,7 @@ class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which Nav
         ),
         IconButton(
           onPressed: () {
-            Navigator.of(context).pushReplacement(
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => InboxView()
               ),

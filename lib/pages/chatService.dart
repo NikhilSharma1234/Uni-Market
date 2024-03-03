@@ -84,8 +84,7 @@ class ChatService {
       return existingChatSessionQuery.docs.first.id;
     }
 
-    DocumentReference chatSessionRef =
-        await _firestore.collection('chat_sessions').add({
+    DocumentReference chatSessionRef = await _firestore.collection('chat_sessions').add({
       'productName': productName,
       'buyerName': buyerName,
       'participantIds': participantIds,
@@ -94,15 +93,6 @@ class ChatService {
       'lastMessage': '',
       'lastMessageAt': Timestamp.now(),
     });
-
-    // Update the 'chats' field in both the sender's and receiver's user documents with the new session ID
-    await _firestore.collection('users').doc(senderEmail).update({
-      'chats': FieldValue.arrayUnion([chatSessionRef.id]),
-    }).catchError((e) => print("Error updating sender's chat list: $e"));
-
-    await _firestore.collection('users').doc(receiverEmail).update({
-      'chats': FieldValue.arrayUnion([chatSessionRef.id]),
-    }).catchError((e) => print("Error updating receiver's chat list: $e"));
 
     return chatSessionRef.id;
   }

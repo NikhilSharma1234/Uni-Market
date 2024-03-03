@@ -1,9 +1,9 @@
-// views/inbox_view.dart
+//inbox_view.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'inbox_controller.dart'; // Ensure this file exports ChatSessionSummary
+import 'inbox_controller.dart'; 
 
 class InboxView extends StatelessWidget {
   final InboxController _controller = InboxController();
@@ -20,7 +20,7 @@ class InboxView extends StatelessWidget {
     if (userEmail == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Inbox'),
+          title: const Text('Inbox'),
         ),
         body: const Center(
           child: Text(
@@ -31,7 +31,6 @@ class InboxView extends StatelessWidget {
       );
     }
 
-    // Use the userEmail in your StreamBuilder to fetch chat summaries.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inbox'),
@@ -56,24 +55,24 @@ class InboxView extends StatelessWidget {
           return ListView.builder(
             itemCount: summaries.length,
             itemBuilder: (context, index) {
-  var summary = summaries[index];
-  String titleText = '${summary.buyerName} | ${summary.productName}';
-  return Column(
-    children: [
-      ListTile(
-        title: Text(titleText),
-        subtitle: Text(
-          '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
-          overflow: TextOverflow.ellipsis,
-        ),
-        onTap: () => _controller.onChatSelected(context, summary.sessionId),
-      ),
-      const Divider(), // Adds a divider line below each ListTile
-    ],
-  );
-},
-
-
+              var summary = summaries[index];
+              String titleText =
+                  '${summary.buyerName} | ${summary.productName}';
+              return Column(
+                children: [
+                  ListTile(
+                    title: Text(titleText),
+                    subtitle: Text(
+                      '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () =>
+                        _controller.onChatSelected(context, summary.sessionId),
+                  ),
+                  const Divider(), // Adds a divider line below each ListTile
+                ],
+              );
+            },
           );
         },
       ),
