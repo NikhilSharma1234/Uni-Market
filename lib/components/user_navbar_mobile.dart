@@ -3,6 +3,7 @@ import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/pages/chat_selection_page.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
+import 'package:uni_market/pages/inbox_view.dart';
 
 class UserNavBarMobile extends StatefulWidget implements PreferredSizeWidget {
   final int activeIndex;
@@ -38,7 +39,7 @@ class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which Nav
           onPressed: () {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => ChatSelectionPage()
+                builder: (context) => InboxView()
               ),
             );
           },
