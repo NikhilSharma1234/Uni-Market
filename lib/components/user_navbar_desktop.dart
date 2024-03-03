@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
-import 'package:uni_market/pages/chat_selection_page.dart';
 import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/components/search_bar.dart';
-import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/pages/inbox_view.dart';
 
 class UserNavBarDesktop extends StatefulWidget implements PreferredSizeWidget {
@@ -46,6 +44,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
         ],
       ),
       centerTitle: true,
+      leadingWidth: 200,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
@@ -61,17 +60,15 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           },
           child: const Text('Chat'),
         ),
-        const MenuBar(children: <Widget>[
-          SubmenuButton(
-            menuChildren: <Widget>[
-              SizedBox(width: 300, height: 500, child: ProfilePage())
-            ],
-            child: IconButton(
-              icon: Icon(Icons.person, size: 40),
-              onPressed: null,
-            ),
-          )
-        ]),
+        const MenuBar(
+          children: <Widget>[
+            SubmenuButton(
+              menuChildren: <Widget>[
+                SizedBox(width: 300, height: 500,child: ProfilePage())
+              ],
+              child: IconButton(icon: Icon(Icons.person, size: 40), onPressed: null,),
+            )]
+        ),
       ],
     );
   }
