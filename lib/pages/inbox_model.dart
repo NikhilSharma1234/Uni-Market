@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'inbox_controller.dart'; // This should contain the definition for ChatSessionSummary.
+import 'inbox_controller.dart'; 
 
 class InboxModel {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
