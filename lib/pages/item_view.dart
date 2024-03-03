@@ -99,6 +99,9 @@ class _ItemViewState extends State<ItemView> {
       }
       int rowSize = (screenWidth / 320).round();
       int numRows = (items.length / rowSize).round();
+      if (numRows == 0) {
+        numRows = 1;
+      }
 
       List<Widget> rows = [];
       int currentItem = 0;
