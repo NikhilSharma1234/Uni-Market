@@ -66,6 +66,12 @@ class ChatService {
     }
 
     String senderEmail = currentUser!.email!;
+
+    if (senderEmail == receiverEmail) {
+      print("Error: Seller and buyer emails are the same");
+      return null;
+    }
+    
     String? buyerName = await getBuyerName(senderEmail);
     String? productName = await getProductName(productId);
 
