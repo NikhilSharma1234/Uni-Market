@@ -35,7 +35,7 @@ SingleChildScrollView ItemPageInfo(
                   String? sessionId =
                       await chatService.createChatSession(itemData.id);
                   if (sessionId != null) {
-                    print("Chat session created with ID: $sessionId");
+                    print("Chat session ID: $sessionId");
                     // Navigate to the ChatPage with sessionId
                     Navigator.push(
                       context,
