@@ -13,39 +13,61 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
+  late Future<Map<String, dynamic>?> _sessionDetailsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionDetailsFuture =
+        _chatController.fetchChatSessionDetails(widget.chatSessionId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Chat"),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _chatController.getMessageStream(widget.chatSessionId),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _sessionDetailsFuture,
+      builder: (context, snapshot) {
+        String title = "Chat"; // Default title
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final data = snapshot.data!;
+          title = "${data['buyerName']} - ${data['productName']}";
+        }
 
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var message = snapshot.data!.docs[index];
-                    bool isSentByMe = message['senderId'] ==
-                        _chatController.chatModel.currentUser?.uid;
-                    return _buildMessageBubble(context, message, isSentByMe);
-                  },
-                );
-              },
-            ),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(title),
           ),
-          _buildMessageComposer(),
-        ],
-      ),
+          body: Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream:
+                      _chatController.getMessageStream(widget.chatSessionId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    return ListView.builder(
+                      reverse: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        var message = snapshot.data!.docs[index];
+                        bool isSentByMe = message['senderId'] ==
+                            _chatController.chatModel.currentUser?.uid;
+                        return _buildMessageBubble(
+                            context, message, isSentByMe);
+                      },
+                    );
+                  },
+                ),
+              ),
+              _buildMessageComposer(),
+            ],
+          ),
+        );
+      },
     );
   }
 
