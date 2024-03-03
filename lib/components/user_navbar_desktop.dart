@@ -44,7 +44,6 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
         ],
       ),
       centerTitle: true,
-      leadingWidth: 200,
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(

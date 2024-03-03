@@ -54,52 +54,59 @@ class ChatService {
   }
 
   Future<String?> createChatSession(String productId) async {
-    if (currentUser == null || currentUser!.email == null) {
-      print("Error: Current user is null or has no email");
-      return null;
-    }
-
-    String? receiverEmail = await getUserEmail(productId);
-    if (receiverEmail == null) {
-      print("Error: Could not find seller's email for product ID: $productId");
-      return null;
-    }
-
-    String senderEmail = currentUser!.email!;
-
-    if (senderEmail == receiverEmail) {
-      print("Error: Seller and buyer emails are the same");
-      return null;
-    }
-    
-    String? buyerName = await getBuyerName(senderEmail);
-    String? productName = await getProductName(productId);
-
-    List<String> participantIds = [senderEmail, receiverEmail];
-    participantIds.sort();
-    String participantIdsKey = participantIds.join(':');
-
-    final QuerySnapshot existingChatSessionQuery = await _firestore
-        .collection('chat_sessions')
-        .where('participantIdsKey', isEqualTo: participantIdsKey)
-        .where('productId', isEqualTo: productId)
-        .limit(1)
-        .get();
-
-    if (existingChatSessionQuery.docs.isNotEmpty) {
-      return existingChatSessionQuery.docs.first.id;
-    }
-
-    DocumentReference chatSessionRef = await _firestore.collection('chat_sessions').add({
-      'productName': productName,
-      'buyerName': buyerName,
-      'participantIds': participantIds,
-      'productId': productId,
-      'createdAt': Timestamp.now(),
-      'lastMessage': '',
-      'lastMessageAt': Timestamp.now(),
-    });
-
-    return chatSessionRef.id;
+  if (currentUser == null || currentUser!.email == null) {
+    print("Error: Current user is null or has no email");
+    return null;
   }
+
+  String? receiverEmail = await getUserEmail(productId);
+  if (receiverEmail == null) {
+    print("Error: Could not find seller's email for product ID: $productId");
+    return null;
+  }
+
+  String senderEmail = currentUser!.email!;
+
+  // Prevent creating a chat session with oneself
+  if (senderEmail == receiverEmail) {
+    print("Error: Seller and buyer emails are the same");
+    return null;
+  }
+  
+  String? buyerName = await getBuyerName(senderEmail);
+  String? productName = await getProductName(productId);
+
+  // Generate composite key
+  List<String> participantIds = [senderEmail, receiverEmail];
+  participantIds.sort();
+  String participantIdsKey = participantIds.join(':');
+
+  // Check for existing session
+  final QuerySnapshot existingChatSessionQuery = await _firestore
+      .collection('chat_sessions')
+      .where('participantIdsKey', isEqualTo: participantIdsKey)
+      .where('productId', isEqualTo: productId)
+      .limit(1)
+      .get();
+
+  if (existingChatSessionQuery.docs.isNotEmpty) {
+    return existingChatSessionQuery.docs.first.id;
+  }
+
+  // Create a new chat session if none exists
+  DocumentReference chatSessionRef = await _firestore.collection('chat_sessions').add({
+    'participantIdsKey': participantIdsKey, // Store the composite key
+    'productName': productName,
+    'buyerName': buyerName,
+    'participantIds': participantIds,
+    'productId': productId,
+    'createdAt': Timestamp.now(),
+    'lastMessage': '',
+    'lastMessageAt': Timestamp.now(),
+  });
+
+  return chatSessionRef.id;
+}
+
+
 }
