@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'ChatController.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -157,27 +159,42 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildMessageComposer() {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _chatController.messageController,
-              decoration: const InputDecoration(
-                labelText: "Type a message...",
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
+ Widget _buildMessageComposer() {
+  return Container(
+    padding: const EdgeInsets.all(8.0),
+    child: Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _chatController.messageController,
+            decoration: const InputDecoration(
+              labelText: "Type a message...",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0)),
               ),
             ),
+            keyboardType: TextInputType.multiline,
+            maxLines: 5, // Allows the input box to expand up to 5 lines
+            minLines: 1, // Starts with a single line
+            textInputAction: TextInputAction.send,
+            onEditingComplete: () {
+              _chatController.sendMessage(widget.chatSessionId);
+              // Reset focus to the text field after sending message to allow continuous typing
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            inputFormatters: [
+              // Prevent new line characters on web
+              if (kIsWeb) FilteringTextInputFormatter.deny(RegExp('[\n]')),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () => _chatController.sendMessage(widget.chatSessionId),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+        IconButton(
+          icon: const Icon(Icons.send),
+          onPressed: () => _chatController.sendMessage(widget.chatSessionId),
+        ),
+      ],
+    ),
+  );
+}
+
 }
