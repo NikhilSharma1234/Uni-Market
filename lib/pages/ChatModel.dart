@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class ChatModel {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -41,7 +42,9 @@ class ChatModel {
             .now(), // Optionally update a timestamp for sorting or display
       });
     } catch (e) {
-      print("Error in sendMessage: $e");
+      if (kDebugMode) {
+        print("Error in sendMessage: $e");
+      }
     }
   }
 
@@ -54,7 +57,9 @@ class ChatModel {
       }
       return null;
     } catch (e) {
-      print("Error in getSessionDetails: $e");
+      if (kDebugMode) {
+        print("Error in getSessionDetails: $e");
+      }
       return null;
     }
   }

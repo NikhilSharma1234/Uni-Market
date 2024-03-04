@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -208,10 +210,12 @@ class _AboutYouContentState extends State<AboutYouContent> {
     await FirebaseFirestore.instance
         .collection('schools')
         .get()
-        .then((value) => value.docs.forEach((doc) {
-              final name = doc.data()['name'];
+        .then((value) {
+          for (var doc in value.docs) {
+              var name = doc.data()['name'];
               list[name] = doc.id.toString();
-            }));
+          }
+        });
     return list;
   }
 
@@ -242,7 +246,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
 
           // Additional actions after successful upload
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Upload successful!')),
+            const SnackBar(content: Text('Upload successful!')),
           );
           isSubmitting.value = false;
           Navigator.of(context).pushReplacement(
@@ -253,7 +257,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
         } else {
           // Handle the case where file upload failed
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('File upload failed. Please try again.')),
+            const SnackBar(content: Text('File upload failed. Please try again.')),
           );
           isSubmitting.value = false;
         }

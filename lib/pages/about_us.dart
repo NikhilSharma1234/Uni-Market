@@ -12,11 +12,11 @@ class AboutUsPage extends StatefulWidget {
 
 class _AboutUsPageState extends State<AboutUsPage> {
   _launchURL(link) async {
-    Uri _url = Uri.parse(link);
-    if (await launchUrl(_url)) {
-      await launchUrl(_url);
+    Uri url = Uri.parse(link);
+    if (await launchUrl(url)) {
+      await launchUrl(url);
     } else {
-      throw 'Could not launch $_url';
+      throw 'Could not launch $url';
     }
   }
 
@@ -256,11 +256,6 @@ class TeamMemberCard extends StatelessWidget {
     required this.image,
     required this.imageAltText,
   });
-
-  _fileExists(imagePath) {
-    // logic goes here
-    return true;
-  }
 
   @override
   Widget build(BuildContext context) {

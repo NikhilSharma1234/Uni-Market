@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/pages/ChatService.dart';
 import 'package:uni_market/pages/chat.dart';
 
-SingleChildScrollView ItemPageInfo(
+SingleChildScrollView itemPageInfo(
     Item itemData, String sellerName, String sellerProfilePic, BuildContext context) {
   return SingleChildScrollView(
     child: Padding(
@@ -35,7 +36,9 @@ SingleChildScrollView ItemPageInfo(
                   String? sessionId =
                       await chatService.createChatSession(itemData.id);
                   if (sessionId != null) {
-                    print("Chat session ID: $sessionId");
+                    if (kDebugMode) {
+                      print("Chat session ID: $sessionId");
+                    }
                     // Navigate to the ChatPage with sessionId
                     Navigator.push(
                       context,
@@ -46,7 +49,9 @@ SingleChildScrollView ItemPageInfo(
                       ),
                     );
                   } else {
-                    print("Failed to create chat session.");
+                    if (kDebugMode) {
+                      print("Failed to create chat session.");
+                    }
                     // Optionally, show an error message to the user
                   }
                 },

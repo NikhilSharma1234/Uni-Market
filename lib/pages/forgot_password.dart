@@ -48,17 +48,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     EmailContainer(emailController: emailController),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ValueListenableBuilder<bool>(
                       valueListenable: submitEnabled,
                       builder: (context, isSubmitting, child) {
                         return isSubmitting
-                            ? CircularProgressIndicator() // Show loading indicator when submitting
+                            ? const CircularProgressIndicator() // Show loading indicator when submitting
                             : ElevatedButton(
                                 onPressed: () => _submitEmail(context),
-                                child: Text('Submit'),
+                                child: const Text('Submit'),
                               );
                       },
                     ),
@@ -81,7 +81,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       _showSnackBar(context,
           'If your email: $email is registered with us, you will receive a password reset link.');
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       // Display a generic error message
       _showSnackBar(context, 'There was a problem handling your request.');
     } finally {

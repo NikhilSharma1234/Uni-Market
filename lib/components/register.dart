@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
@@ -144,7 +145,9 @@ class _RegistirationState extends State<Registiration> {
       });
     } catch (e) {
       // Handling Create User Errors (Currently Not Viable for Production using print)
-      print("Error creating user: $e");
+      if (kDebugMode) {
+        print("Error creating user: $e");
+      }
       // If the form is valid, display a snackbar. In the real world,
       // you'd often call a server or save the information in a database.
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'item.dart';
-import 'ItemBox.dart';
+import 'item_box.dart';
 
 class ItemBoxFactory {
   late ItemBox item;
