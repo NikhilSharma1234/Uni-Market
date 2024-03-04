@@ -10,7 +10,7 @@ class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.chatSessionId}) : super(key: key);
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {

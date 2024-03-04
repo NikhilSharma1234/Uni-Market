@@ -150,6 +150,7 @@ class _RegistirationState extends State<Registiration> {
       }
       // If the form is valid, display a snackbar. In the real world,
       // you'd often call a server or save the information in a database.
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error Creating User')),
       );
