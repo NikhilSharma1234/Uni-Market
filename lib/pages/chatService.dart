@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -11,12 +12,16 @@ class ChatService {
           await _firestore.collection('items').doc(productId).get();
 
       if (!productSnapshot.exists) {
-        print("Error: No product found with the provided ID: $productId");
+        if (kDebugMode) {
+          print("Error: No product found with the provided ID: $productId");
+        }
         return null;
       }
       return productSnapshot['sellerId'];
     } catch (e) {
-      print("Error fetching seller email: $e");
+      if (kDebugMode) {
+        print("Error fetching seller email: $e");
+      }
       return null;
     }
   }
@@ -27,12 +32,16 @@ class ChatService {
           await _firestore.collection('items').doc(productId).get();
 
       if (!productSnapshot.exists) {
-        print("Error: No product found with the provided ID: $productId");
+        if (kDebugMode) {
+          print("Error: No product found with the provided ID: $productId");
+        }
         return null;
       }
       return productSnapshot['name'];
     } catch (e) {
-      print("Error fetching product name: $e");
+      if (kDebugMode) {
+        print("Error fetching product name: $e");
+      }
       return null;
     }
   }
@@ -43,25 +52,33 @@ class ChatService {
           await _firestore.collection('users').doc(email).get();
 
       if (!userSnapshot.exists) {
-        print("Error: No user found with the provided email: $email");
+        if (kDebugMode) {
+          print("Error: No user found with the provided email: $email");
+        }
         return null;
       }
       return userSnapshot['name'];
     } catch (e) {
-      print("Error fetching user name: $e");
+      if (kDebugMode) {
+        print("Error fetching user name: $e");
+      }
       return null;
     }
   }
 
   Future<String?> createChatSession(String productId) async {
   if (currentUser == null || currentUser!.email == null) {
-    print("Error: Current user is null or has no email");
+    if (kDebugMode) {
+      print("Error: Current user is null or has no email");
+    }
     return null;
   }
 
   String? receiverEmail = await getUserEmail(productId);
   if (receiverEmail == null) {
-    print("Error: Could not find seller's email for product ID: $productId");
+    if (kDebugMode) {
+      print("Error: Could not find seller's email for product ID: $productId");
+    }
     return null;
   }
 
@@ -69,7 +86,9 @@ class ChatService {
 
   // Prevent creating a chat session with oneself
   if (senderEmail == receiverEmail) {
-    print("Error: Seller and buyer emails are the same");
+    if (kDebugMode) {
+      print("Error: Seller and buyer emails are the same");
+    }
     return null;
   }
   

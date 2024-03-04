@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
@@ -157,7 +158,9 @@ class SearchPageController {
     if (context.mounted) {
       widgets = await generateItems(data, context);
     } else {
-      print("no clue as to whats going on, buildcontext wasnt mounded");
+      if (kDebugMode) {
+        print("no clue as to whats going on, buildcontext wasnt mounded");
+      }
     }
 
     return widgets;

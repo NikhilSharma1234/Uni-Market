@@ -1,7 +1,7 @@
 export 'firebase_upload_service.dart';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import '/services/UploadService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -18,7 +18,9 @@ class FirebaseUploadService extends UploadService {
       var downloadUrl = await (await uploadTask).ref.getDownloadURL();
       return downloadUrl.toString();
     } catch (e) {
-      print('Error uploading file: $e');
+      if (kDebugMode) {
+        print('Error uploading file: $e');
+      }
       return null;
     }
   }
@@ -38,7 +40,9 @@ class FirebaseUploadService extends UploadService {
       }
       return "Could not upload file, please try again.";
     } catch (e) {
-      print('Error uploading file: $e');
+      if (kDebugMode) {
+        print('Error uploading file: $e');
+      }
       return null;
     }
   }
@@ -49,7 +53,9 @@ class FirebaseUploadService extends UploadService {
       // await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
       //   'school': schoolName,
       // }, SetOptions(merge: true));
-      print(schoolName);
+      if (kDebugMode) {
+        print(schoolName);
+      }
       // Optionally, handle successful upload
     } else {
       // Optionally, handle the case where there is no user logged in

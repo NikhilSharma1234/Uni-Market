@@ -4,7 +4,7 @@ import 'dart:convert';
 class SelectedImagesThumbnail extends StatelessWidget {
   final List<String> imageDataUrls;
 
-  SelectedImagesThumbnail({required this.imageDataUrls});
+  const SelectedImagesThumbnail({super.key, required this.imageDataUrls});
 
   @override
   Widget build(BuildContext context) {

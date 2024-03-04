@@ -37,9 +37,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Provider.of<ThemeProvider>(context)
           .currentTheme
@@ -456,7 +453,9 @@ Future<bool?> _updateProfilePicture(XFile? profilePic) async {
                 .update({"assignable_profile_pic": imageNames[0]});
           }
         } catch (e) {
-          print("Error: $e");
+          if (kDebugMode) {
+            print("Error: $e");
+          }
         }
         Completer<List<String>> completer = Completer<List<String>>();
         completer.complete(imageNames);
@@ -466,7 +465,9 @@ Future<bool?> _updateProfilePicture(XFile? profilePic) async {
         return false;
       }
     } catch (e) {
-      print("Error updating profile picture: $e");
+      if (kDebugMode) {
+        print("Error updating profile picture: $e");
+      }
       return false;
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +23,6 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -81,9 +81,13 @@ Future<void> _signInUser(
   } on FirebaseAuthException catch (e) {
     // Handling Create User Errors (Currently Not Viable for Production using print)
     if (e.code == 'user-not-found') {
-      print('No user found for given email');
+      if (kDebugMode) {
+        print('No user found for given email');
+      }
     } else if (e.code == 'wrong-password') {
-      print('Wrong password provided for that user.');
+      if (kDebugMode) {
+        print('Wrong password provided for that user.');
+      }
     }
   }
 }
@@ -151,7 +155,7 @@ class _SignInFormState extends State<SignInForm> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => ForgotPasswordPage(),
+                      builder: (context) => const ForgotPasswordPage(),
                     ),
                   );
                 },
