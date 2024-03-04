@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ChatController.dart';
+import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';

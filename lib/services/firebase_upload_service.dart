@@ -2,7 +2,7 @@ export 'firebase_upload_service.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import '/services/UploadService.dart';
+import 'package:uni_market/services/upload_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseUploadService extends UploadService {

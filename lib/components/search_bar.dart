@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
-import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
+import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:typesense/typesense.dart';
