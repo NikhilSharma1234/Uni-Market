@@ -1,8 +1,10 @@
 //inbox_view.dart
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'inbox_controller.dart'; 
 
 class InboxView extends StatelessWidget {
@@ -34,7 +36,10 @@ class InboxView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inbox'),
+        automaticallyImplyLeading: kIsWeb ? true : false,
       ),
+      bottomNavigationBar:
+          !kIsWeb ? const UserNavBarMobile(activeIndex: 1) : null,
       body: StreamBuilder<List<ChatSessionSummary>>(
         stream: _controller.chatSummariesStream(userEmail),
         builder: (context, snapshot) {

@@ -136,9 +136,7 @@ class _ItemPageState extends State<ItemPage> {
                     ),
                     SizedBox(
                         width: screenWidth,
-                        child: Expanded(
-                          child: itemPageInfo(itemData, sellerName, sellerProfilePic, context)
-                        )
+                        child: itemPageInfo(itemData, sellerName, sellerProfilePic, context)
                     ),
                   ],
                 ),
@@ -152,56 +150,54 @@ class _ItemPageState extends State<ItemPage> {
                     width: screenWidth * 0.7,
                     child: Column(
                       children: <Widget>[
-                        Expanded(
-                          child: CarouselSlider(
-                            options: CarouselOptions(
-                              height: MediaQuery.of(context).size.height,
-                              enableInfiniteScroll: false,
-                              viewportFraction: 1,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  currentIndex = index;
-                                });
-                              },
-                            ),
-                            items: itemData.imagePath.map((i) {
-                              return Builder(
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height,
-                                    margin: const EdgeInsets.symmetric(horizontal: 1.0),
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(i),
-                                        fit: BoxFit.fill
-                                      ),
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            height: MediaQuery.of(context).size.height * 0.85,
+                            enableInfiniteScroll: false,
+                            viewportFraction: 1,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                currentIndex = index;
+                              });
+                            },
+                          ),
+                          items: itemData.imagePath.map((i) {
+                            return Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: MediaQuery.of(context).size.height,
+                                  margin: const EdgeInsets.symmetric(horizontal: 1.0),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage(i),
+                                      fit: BoxFit.fill
                                     ),
-                                    child: Stack(
-                                      children: <Widget>[
-                                        Center(
-                                          child: ClipRect(
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                                              child: Container(
-                                                color: Colors.black.withOpacity(0.1),
-                                              ),
+                                  ),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Center(
+                                        child: ClipRect(
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                                            child: Container(
+                                              color: Colors.black.withOpacity(0.1),
                                             ),
                                           ),
                                         ),
-                                        Positioned.fill(
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child:Image.network(i, fit: BoxFit.fitHeight),
-                                          )
+                                      ),
+                                      Positioned.fill(
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child:Image.network(i, fit: BoxFit.fitHeight),
                                         )
-                                      ]
-                                    ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                          ),
+                                      )
+                                    ]
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
                         ),
                         DotsIndicator(
                           dotsCount: itemData.imagePath.length,
@@ -212,9 +208,7 @@ class _ItemPageState extends State<ItemPage> {
                   ),
                   SizedBox(
                       width: screenWidth * 0.3,
-                      child: Expanded(
-                        child: itemPageInfo(itemData, sellerName, sellerProfilePic, context)
-                      )
+                      child: itemPageInfo(itemData, sellerName, sellerProfilePic, context)
                   ),
                 ],
               );

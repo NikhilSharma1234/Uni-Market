@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/app_themes.dart';
 
 class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
+  BuildContext context;
+
+  ThemeProvider({required this.context});
   ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
@@ -23,8 +26,7 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
     } else {
       // Use system theme
       final Brightness platformBrightness =
-          // ignore: deprecated_member_use
-          WidgetsBinding.instance.window.platformBrightness;
+          MediaQuery.of(context).platformBrightness;
       return platformBrightness == Brightness.dark;
     }
   }
