@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemPageInfo.dart';
@@ -22,7 +23,8 @@ class _ItemPageState extends State<ItemPage> {
   int currentIndex = 0;
   late Item itemData;
   late List<String> productImages;
-  late var sellerInformation;
+  late String sellerName;
+  late String sellerProfilePic;
 
   @override
   void initState() {
@@ -37,8 +39,21 @@ class _ItemPageState extends State<ItemPage> {
               .collection('users')
               .doc(itemData.sellerId)
               .get()
-              .then((value) => sellerInformation = value.data()
-            );
+              .then((value) async {
+                sellerName = value.data()!['name'].toString();
+                if (value.data()?['assignable_profile_pic'] == null) {
+                  sellerProfilePic = await FirebaseStorage.instance
+                    .ref(value.data()?['starting_profile_pic'])
+                    .getDownloadURL();
+                }
+                else {
+                  sellerProfilePic = await FirebaseStorage.instance
+                    .ref(value.data()?['assignable_profile_pic'])
+                    .getDownloadURL();
+                }
+                
+
+    });
     return 'asdads';
     });
   }
@@ -122,7 +137,7 @@ class _ItemPageState extends State<ItemPage> {
                     SizedBox(
                         width: screenWidth,
                         child: Expanded(
-                          child: ItemPageInfo(itemData, sellerInformation, context)
+                          child: ItemPageInfo(itemData, sellerName, sellerProfilePic, context)
                         )
                     ),
                   ],
@@ -198,7 +213,7 @@ class _ItemPageState extends State<ItemPage> {
                   SizedBox(
                       width: screenWidth * 0.3,
                       child: Expanded(
-                        child: ItemPageInfo(itemData, sellerInformation, context)
+                        child: ItemPageInfo(itemData, sellerName, sellerProfilePic, context)
                       )
                   ),
                 ],

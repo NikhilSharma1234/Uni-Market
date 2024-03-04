@@ -5,7 +5,7 @@ import 'package:uni_market/pages/ChatService.dart';
 import 'package:uni_market/pages/chat.dart';
 
 SingleChildScrollView ItemPageInfo(
-    Item itemData, var sellerInformation, BuildContext context) {
+    Item itemData, String sellerName, String sellerProfilePic, BuildContext context) {
   return SingleChildScrollView(
     child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -90,15 +90,9 @@ SingleChildScrollView ItemPageInfo(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(24),
-                        ),
-                        child: const Icon(Icons.person, size: 96)),
+                    child: Image.network(sellerProfilePic, width: 96)
                   ),
-                  Text('Name: ${sellerInformation['name'].toString()}'),
+                  Text('Name: $sellerName'),
                   const Text('Items Sold: 2'),
                   const Text('Items Bought: 2'),
                 ],
