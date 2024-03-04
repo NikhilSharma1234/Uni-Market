@@ -12,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(), // Change Notifier
+    create: (context) => ThemeProvider(context: context), // Change Notifier
     child: const MyApp(),
   ));
 }
