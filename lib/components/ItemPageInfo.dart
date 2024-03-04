@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/pages/ChatService.dart';
@@ -95,7 +96,10 @@ SingleChildScrollView itemPageInfo(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: Image.network(sellerProfilePic, width: 96)
+                    child: AdvancedAvatar(
+                      size: 96,
+                      image: NetworkImage(sellerProfilePic),
+                    ),
                   ),
                   Text('Name: $sellerName'),
                   const Text('Items Sold: 2'),
