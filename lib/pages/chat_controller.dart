@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ChatModel.dart';
+import 'package:uni_market/pages/chat_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatController {

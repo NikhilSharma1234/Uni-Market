@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/ItemGeneration/AbstractItemFactory.dart';
+import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:web_smooth_scroll/web_smooth_scroll.dart';
 import 'package:flutter/foundation.dart';

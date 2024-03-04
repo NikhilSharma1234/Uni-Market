@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ItemBoxFactory.dart';
+import 'package:uni_market/components/ItemGeneration/item_box_factory.dart';
 import 'item.dart';
 
 class AbstractItemFactory {
