@@ -36,19 +36,36 @@ class _ItemBoxState extends State<ItemBox> {
     bool found = false;
     for (var key in styleType.keys) {
       if (widget.itemData.tags.contains(key)) {
-        theme = styleType[key]!;
+        theme = styleType[key] ?? DefaultStyle(context: context);
         found = true;
         break;
       }
     }
     if (!found) {
-      theme = styleType["default"]!;
+      theme = styleType["default"] ?? DefaultStyle(context: context);
     }
 
     var style = theme.getThemeData();
     var item = widget.itemData;
 
-    Color conditionColor = conditionBackground[item.condition]!;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    var image;
+
+    if (item.imagePath[0] == "NOIMAGE") {
+      image = Image.asset(
+        "assets/portraits/cameron.webp",
+        fit: BoxFit.fitWidth,
+      );
+    } else {
+      image = Image.network(
+        item.imagePath[0],
+        fit: BoxFit.fitWidth,
+      );
+    }
+
+    Color conditionColor = conditionBackground[item.condition] ?? Colors.black;
 
     return Padding(
         padding: const EdgeInsets.all(5.0),
@@ -91,13 +108,7 @@ class _ItemBoxState extends State<ItemBox> {
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(15)),
                                 child: AspectRatio(
-                                  aspectRatio: 30 / 26,
-                                  child: Image.network(
-                                    item.imagePath[0],
-                                    fit: BoxFit.fitWidth,
-                                    // height: screenWidth * 0.1,
-                                  ),
-                                ))),
+                                    aspectRatio: 30 / 26, child: image))),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -123,8 +134,8 @@ class _ItemBoxState extends State<ItemBox> {
                                           color:
                                               conditionColor.withOpacity(0.75)),
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.symmetric(horizontal: 3),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 3),
                                         child: Text(
                                             '${item.condition[0]}${item.condition.substring(1).toLowerCase()}',
                                             style:
