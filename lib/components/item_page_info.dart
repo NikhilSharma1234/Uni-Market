@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
-import 'package:uni_market/pages/ChatService.dart';
+import 'package:uni_market/pages/chat_service.dart';
 import 'package:uni_market/pages/chat.dart';
 
 SingleChildScrollView itemPageInfo(
@@ -41,6 +41,7 @@ SingleChildScrollView itemPageInfo(
                       print("Chat session ID: $sessionId");
                     }
                     // Navigate to the ChatPage with sessionId
+                    // ignore: use_build_context_synchronously
                     Navigator.push(
                       context,
                       MaterialPageRoute(

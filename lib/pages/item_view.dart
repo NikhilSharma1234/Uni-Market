@@ -19,7 +19,7 @@ class ItemView extends StatefulWidget {
 }
 
 class _ItemViewState extends State<ItemView> {
-  // TODO: Make this page more generalized for whatever needs of items displays.
+  // todo later: Make this page more generalized for whatever needs of items displays.
   late List<Widget> items = [const Text("")];
   var db = FirebaseFirestore.instance;
   AbstractItemFactory factory = AbstractItemFactory();

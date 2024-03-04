@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/app_themes.dart';
 
 class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
-  bool _isDark = ThemeMode.system == ThemeMode.dark ? true : false;
-
   ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
@@ -19,16 +17,14 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   bool setThemeToggleSwitch() {
     if (_themeMode == ThemeMode.light) {
-      _isDark = true;
       return false;
     } else if (_themeMode == ThemeMode.dark) {
-      _isDark = false;
       return true;
     } else {
       // Use system theme
       final Brightness platformBrightness =
+          // ignore: deprecated_member_use
           WidgetsBinding.instance.window.platformBrightness;
-      _isDark = (platformBrightness == Brightness.dark);
       return platformBrightness == Brightness.dark;
     }
   }

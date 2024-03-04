@@ -8,7 +8,7 @@ class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
-  _ForgotPasswordPageState createState() => _ForgotPasswordPageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
@@ -79,10 +79,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     String email = emailController.text.trim();
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      // ignore: use_build_context_synchronously
       _showSnackBar(context,
           'If your email: $email is registered with us, you will receive a password reset link.');
     } on FirebaseAuthException {
       // Display a generic error message
+      // ignore: use_build_context_synchronously
       _showSnackBar(context, 'There was a problem handling your request.');
     } finally {
       submitEnabled.value = false;

@@ -29,16 +29,13 @@ class FirebaseUploadService extends UploadService {
   Future<String?> uploadFileFromBytes(
       Uint8List fileBytes, String fileName) async {
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
+      final userId = FirebaseAuth.instance.currentUser?.email;
       var fileRef = FirebaseStorage.instance
           .ref()
           .child('verification/$userId/$fileName');
-      var uploadTask = fileRef.putData(fileBytes);
-      var downloadUrl = await (await uploadTask).ref.getDownloadURL();
-      if (downloadUrl != null) {
-        return fileName;
-      }
-      return "Could not upload file, please try again.";
+      var uploadTask = await fileRef.putData(fileBytes);
+      await uploadTask.ref.getDownloadURL();
+      return fileName;
     } catch (e) {
       if (kDebugMode) {
         print('Error uploading file: $e');
