@@ -12,7 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:uni_market/helpers/profile_pic_shuffler.dart';
-import 'package:uni_market/pages/item_page.dart';
 import 'package:uni_market/pages/item_view.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -23,11 +22,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late GlobalKey<_ProfilePageState> profilePageKey =
+  late GlobalKey<_ProfilePageState> key =
       GlobalKey<_ProfilePageState>();
   late bool _switchValue;
-  bool _profileSettingsChanged = false;
   XFile? newProfilePic;
+  bool loading = false;
 
   @override
   void initState() {
@@ -36,7 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
     _switchValue = Provider.of<ThemeProvider>(context, listen: false)
         .setThemeToggleSwitch();
   }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -50,171 +48,72 @@ class _ProfilePageState extends State<ProfilePage> {
       bottomNavigationBar: !kIsWeb
           ? const UserNavBarMobile(activeIndex: 2)
           : null, // Custom app bar here
-      body: Center(
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: getUserProfileData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator(); // or any loading indicator
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: getUserProfileData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child:CircularProgressIndicator()); // or any loading indicator
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            // Successful DB data snapshot
+            Map<String, dynamic> userProfileData = snapshot.data!;
+            
+
+      
+            List<String> schoolsInMarketplace =
+                List<String>.from(userProfileData["schoolsInMarketplace"]);
+            schoolsInMarketplace.remove(userProfileData["institution"]);
+      
+            // Get available profile pic (starting or assignable)
+            String profilePic;
+      
+            if (userProfileData["assignable_profile_pic_path"] == null) {
+              // Starting Pic Exists, New User / User Has not set an assignable profile
+              profilePic = userProfileData["starting_profile_pic_url"];
             } else {
-              // Successful DB data snapshot
-              Map<String, dynamic> userProfileData = snapshot.data!;
+              // Assignable Pic Exists, User has changed profile pics
+              profilePic = userProfileData["assignable_profile_pic_url"];
+            }
 
-              List<String> schoolsInMarketplace =
-                  List<String>.from(userProfileData["schoolsInMarketplace"]);
-              schoolsInMarketplace.remove(userProfileData["institution"]);
-
-              // Get available profile pic (starting or assignable)
-              var profilePic;
-
-              if (userProfileData["assignable_profile_pic_path"] == null) {
-                // Starting Pic Exists, New User / User Has not set an assignable profile
-                profilePic = userProfileData["starting_profile_pic_url"];
-              } else {
-                // Assignable Pic Exists, User has changed profile pics
-                profilePic = userProfileData["assignable_profile_pic_url"];
-              }
-
-              return SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: SizedBox(
-                  width: screenWidth * 0.85,
+            if (loading) return const Center(child:CircularProgressIndicator());
+      
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Scrollbar(
+                trackVisibility: true,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Spacer box sized through trial and error to fit mobile / desktop
-                      SizedBox(
-                        height: screenHeight * 0.0195,
+                      const Text(
+                        'Profile',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 24
+                        )
                       ),
-                      //
-                      // MODIFIABLE USER PROFILE PIC
-                      InkWell(
-                        borderRadius:
-                            BorderRadius.circular(screenHeight * 0.025),
-                        onTap: () async {
-                          newProfilePic = await singleImagePicker(context);
-                          if (newProfilePic != null) {
-                            setState(() {
-                              _profileSettingsChanged = true;
-                            });
-                          }
-                        },
-                        child: Stack(children: [
-                          AdvancedAvatar(
-                            size: screenHeight * .11,
-                            image: NetworkImage(profilePic),
-                          ),
-                          const Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Icon(
-                              Icons.edit,
-                              size: 20,
-                            ),
-                          )
-                        ]),
-                      ),
-                      //
-                      // Spacer box sized through trial and error to fit mobile / desktop
-                      SizedBox(
-                        height: screenHeight * 0.015,
-                      ),
-                      //
-                      // USER NAME BOX
-                      SizedBox(
-                        height: screenHeight * 0.025,
-                        child: Text(
-                          "Name: ${userProfileData["name"]}",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      //
-                      // USER EMAIL BOX
-                      SizedBox(
-                        height: screenHeight * 0.025,
-                        child: Text(
-                          "Email: ${userProfileData["email"]}",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(
-                        height: screenHeight * 0.019,
-                      ),
-                      //
-                      // DARK MODE TOGGLE BOX (Text and Stateful Switch)
-                      SizedBox(
-                        height: screenHeight * 0.029,
-                        width: screenWidth * 0.95,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Dark Mode:"),
-                            SizedBox(
-                              width: screenWidth * 0.005,
-                            ),
-                            CustomSwitch(
-                              value: _switchValue,
-                              onChanged: (bool val) {
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12, bottom: 12),
+                        child: Center(
+                          child: InkWell(
+                            onTap: () async {
+                              newProfilePic = await singleImagePicker(context);
+                              if (newProfilePic != null) {
                                 setState(() {
-                                  _switchValue = val;
+                                  loading = true;
                                 });
-                                Provider.of<ThemeProvider>(context,
-                                        listen: false)
-                                    .setThemeMode(
-                                        val ? ThemeMode.dark : ThemeMode.light);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      //
-                      // Spacer box sized through trial and error to fit mobile / desktop
-                      SizedBox(
-                        height: screenHeight * 0.03,
-                      ),
-                      //
-                      // USER INSTITUTION BOX
-                      SizedBox(
-                        height: screenHeight * 0.025,
-                        width: screenWidth * 0.65,
-                        child: Text(
-                          "Institution: ${userProfileData["institution"]}",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      //
-                      // SCHOOLS IN MARKETPLACE BOX
-                      SizedBox(
-                        height: screenHeight * 0.025,
-                        width: screenWidth * 0.65,
-                        child: Text(
-                          "Other Schools in Marketplace: $schoolsInMarketplace",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(
-                        height: screenHeight * 0.019,
-                      ),
-                      //
-                      // UPDATE PROFILE
-                      SizedBox(
-                        height: screenHeight * 0.034,
-                        width: screenWidth * 0.38,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            if (_profileSettingsChanged == true) {
-                              _updateProfilePicture(newProfilePic)
-                                  .then((success) {
-                                if (success != null) {
-                                  showDialog(
+                                _updateProfilePicture(newProfilePic)
+                                .then((success) {
+                                  if (success != null) {
+                                    showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: const Text(
-                                              "Profile Settings Changed!"),
-                                          content: const Text(
-                                              "Profile Settings Updated"),
+                                          title: const Text("Profile Settings Changed!"),
+                                          content: const Text("Profile Image Updated"),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
@@ -224,117 +123,199 @@ class _ProfilePageState extends State<ProfilePage> {
                                             )
                                           ],
                                         );
-                                      });
-                                }
-                              });
-                            } else {
-                              // "Don't invoke print in production code" - This linter can put a sock in it
-                              print("No changes to apply!!");
-                            }
-                          },
-                          style: _profileSettingsChanged
-                              ? ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.greenAccent[400])
-                              : null,
-                          child: const Text("APPLY CHANGES"),
+                                      }
+                                    );
+                                  }
+                                });
+                              }
+                            },
+                            child: Stack(children: [
+                              AdvancedAvatar(
+                                size: 160,
+                                image: NetworkImage(profilePic),
+                              ),
+                              const Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                ),
+                              )
+                            ]),
+                          ),
                         ),
                       ),
-                      //
-                      // Spacer box sized through trial and error to fit mobile / desktop
-                      SizedBox(
-                        height: screenHeight * 0.0125,
-                        width: screenWidth * 0.65,
+                      const Text("Name", style: 
+                        TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        )
                       ),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            SizedBox(
-                              height: screenHeight * 0.01,
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey.shade400,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.blue.shade900,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemView(
-                                        sellerID: FirebaseAuth
-                                            .instance.currentUser?.email),
-                                  ),
-                                );
-                              },
-                              child: const Text("Items you've listed"),
-                            ),
-                            SizedBox(
-                              height: screenHeight * 0.01,
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey.shade400,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.blue.shade900,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: const Text("Items Bought"),
-                            ),
-                            SizedBox(
-                              height: screenHeight * 0.01,
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey.shade400,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.blue.shade900,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: const Text("Items Sold"),
-                            ),
-                            SizedBox(
-                              height: screenHeight * 0.01,
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                              ),
-                              onPressed: () async {
-                                await FirebaseAuth.instance.signOut();
-                              },
-                              child: const Text('LOG OUT'),
-                            ),
-                          ]),
-                      // Delete Account Button, NO LOGIC
+                      Text(userProfileData["name"], style:
+                        const TextStyle(
+                          fontSize: 12
+                        )
+                      ),
+                      const Text("Email", style: 
+                        TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        )
+                      ),
+                      Text(userProfileData["email"], style:
+                        const TextStyle(
+                          fontSize: 12
+                        )
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Dark Mode", style: 
+                            TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                            )
+                          ),
+                          CustomSwitch(
+                            value: _switchValue,
+                            onChanged: (bool val) {
+                              setState(() {
+                                _switchValue = val;
+                              });
+                              Provider.of<ThemeProvider>(context,
+                                      listen: false)
+                                  .setThemeMode(
+                                      val ? ThemeMode.dark : ThemeMode.light);
+                            },
+                          ),
+                        ],
+                      ),
+                      const Text("Institution", style: 
+                        TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        )
+                      ),
+                      Text(
+                        userProfileData["institutionFullName"],
+                        style: const TextStyle(
+                          fontSize: 12
+                        )
+                      ),
+                      const Text("Other Schools in Marketplace",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        )
+                      ),
+                      Text(
+                        schoolsInMarketplace.join(', '),
+                        style: const TextStyle(
+                          fontSize: 12
+                        )
+                      ),
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(200, 36),
+                              backgroundColor: Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              shadowColor: Colors.blue.shade900,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ItemView(
+                                      sellerID: FirebaseAuth
+                                          .instance.currentUser?.email),
+                                ),
+                              );
+                            },
+                            child: const Text("Items you've listed"),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(200, 36),
+                              backgroundColor: Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              shadowColor: Colors.blue.shade900,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: const Text("Items Bought"),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(200, 36),
+                              backgroundColor: Colors.grey.shade400,
+                              foregroundColor: Colors.white,
+                              shadowColor: Colors.blue.shade900,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: const Text("Items Sold"),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(200, 36),
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shadowColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await FirebaseAuth.instance.signOut();
+                            },
+                            child: const Text('LOG OUT'),
+                          ),
+                        ),
+                      ),
+                      // Delete Account Button, NO LOGIC
+                      Center(
                         child: TextButton(
                           onPressed: () {},
-                          child: const Text("Delete Account"),
+                          child: const Text(
+                            "Delete Account",
+                            style: TextStyle(
+                              color: Colors.red
+                            )
+                          ),
                         ),
                       ),
-                    ],
+                    ]
                   ),
                 ),
-              );
-            }
-          },
-        ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -346,6 +327,7 @@ Future<Map<String, dynamic>> getUserProfileData() async {
     "name": null,
     "email": null,
     "institution": null,
+    "institutionFullName": null,
     "schoolsInMarketplace": null,
     "marketplaceId": null,
     "profile_pic_path": null,
@@ -393,12 +375,20 @@ Future<Map<String, dynamic>> getUserProfileData() async {
 
     // read schools in users marketplace Id from db
     await FirebaseFirestore.instance
-        .collection("marketplace")
-        .doc(userProfile["marketplaceId"])
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      userProfile["schoolsInMarketplace"] = documentSnapshot.get("schoolIds");
-    });
+      .collection("marketplace")
+      .doc(userProfile["marketplaceId"])
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+              userProfile["schoolsInMarketplace"] = documentSnapshot.get("schoolIds");
+      });
+    // read school fullname
+    await FirebaseFirestore.instance
+      .collection("schools")
+      .doc(userProfile["institution"])
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+        userProfile["institutionFullName"] = documentSnapshot.get("name");
+      });
   }
 
   return userProfile;
