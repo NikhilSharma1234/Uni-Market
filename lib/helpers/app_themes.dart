@@ -11,7 +11,7 @@ ThemeData lightTheme = ThemeData(
       bodyMedium: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
       bodySmall: TextStyle(color: Colors.black, fontWeight: FontWeight.w500)),
   useMaterial3: true,
-  scaffoldBackgroundColor: const Color(0xFAF96FF),
+  scaffoldBackgroundColor: const Color(0x0faf96ff),
   fontFamily: "Ubuntu",
   hoverColor: Colors.transparent,
   shadowColor: Colors.transparent,
