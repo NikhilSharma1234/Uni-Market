@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:uni_market/components/dialog.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
@@ -48,54 +49,56 @@ class _AboutYouContentState extends State<AboutYouContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FutureBuilder(
-            future: _list,
-            builder: (BuildContext context,
-                AsyncSnapshot<Map<String, String>> snapshot) {
-              if (snapshot.hasData) {
-                return _buildSchoolDropdown(snapshot.data);
-              }
-              return const Text('Loading');
-            }),
-        const SizedBox(height: 8),
-        _buildFileUpload(
-            title: 'File 1*',
-            fileNumber: 1, // Added fileNumber argument
-            onUpload: (url) {
-              setState(() {
-                firstFileName = url;
-              });
-            }),
-        const SizedBox(height: 8),
-        _buildFileUpload(
-            title: 'File 2*',
-            fileNumber: 2, // Added fileNumber argument
-            onUpload: (url) {
-              setState(() {
-                secondFileName = url;
-              });
-            }),
-        Padding(
-          padding: const EdgeInsets.only(top: 16), // Add more padding
-          child: Center(
-            // Center the button
-            child: ValueListenableBuilder<bool>(
-              valueListenable: isSubmitting,
-              builder: (context, isLoading, child) {
-                return isLoading
-                    ? const CircularProgressIndicator() // Show loading indicator
-                    : ElevatedButton(
-                        onPressed: checkUpload,
-                        child: const Text('Submit'),
-                      );
-              },
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FutureBuilder(
+              future: _list,
+              builder: (BuildContext context,
+                  AsyncSnapshot<Map<String, String>> snapshot) {
+                if (snapshot.hasData) {
+                  return _buildSchoolDropdown(snapshot.data);
+                }
+                return const Text('Loading');
+              }),
+          const SizedBox(height: 8),
+          _buildFileUpload(
+              title: 'File 1*',
+              fileNumber: 1, // Added fileNumber argument
+              onUpload: (url) {
+                setState(() {
+                  firstFileName = url;
+                });
+              }),
+          const SizedBox(height: 8),
+          _buildFileUpload(
+              title: 'File 2*',
+              fileNumber: 2, // Added fileNumber argument
+              onUpload: (url) {
+                setState(() {
+                  secondFileName = url;
+                });
+              }),
+          Padding(
+            padding: const EdgeInsets.only(top: 16, bottom: 16), // Add more padding
+            child: Center(
+              // Center the button
+              child: ValueListenableBuilder<bool>(
+                valueListenable: isSubmitting,
+                builder: (context, isLoading, child) {
+                  return isLoading
+                      ? const CircularProgressIndicator() // Show loading indicator
+                      : ElevatedButton(
+                          onPressed: checkUpload,
+                          child: const Text('Submit'),
+                        );
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -192,6 +195,14 @@ class _AboutYouContentState extends State<AboutYouContent> {
     );
   }
 
+  bool validFileExtension(String fileName) {
+    if (fileName.endsWith('.jpeg')) return true;
+    if (fileName.endsWith('.jpg')) return true;
+    if (fileName.endsWith('.png')) return true;
+    if (fileName.endsWith('.pdf')) return true;
+    return false;
+  }
+
   Future<String?> uploadFile(FilePickerResult result, String fileName) async {
     if (kIsWeb) {
       Uint8List? fileBytes = result.files.single.bytes;
@@ -223,6 +234,15 @@ class _AboutYouContentState extends State<AboutYouContent> {
     isSubmitting.value = true;
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
       try {
+        if (!validFileExtension(firstFileName!) || !validFileExtension(secondFileName!)) {
+          showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => 
+              appDialog(context, 'Invalid File', 'One or more of your files is an invalid file extension. Please select a file with extensions .jpeg, .jpg, .png or .pdf.', 'Ok')
+          );
+          isSubmitting.value = false;
+          return;
+        }
         // Use uploadFile function for both files
         String? uploadedFileName1 =
             await uploadFile(fileResult1!, firstFileName!);
@@ -242,7 +262,11 @@ class _AboutYouContentState extends State<AboutYouContent> {
               .collection('users')
               .doc(FirebaseAuth.instance.currentUser?.email)
               .update(
-                  {'schoolId': selectedSchool, 'marketplaceId': marketplaceId});
+                  {
+                    'schoolId': selectedSchool,
+                    'marketplaceId': marketplaceId,
+                    'verificationDocsUploaded': true
+                  });
 
           // Additional actions after successful upload
           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/home.dart';
@@ -22,8 +23,18 @@ class _WrapperState extends State<Wrapper> {
   }
 
   //Updates state when user state changes in the app
-  updateUserState(event) {
+  updateUserState(event) async {
     if (mounted && event != null && event.emailVerified) {
+      var snapshot = await FirebaseFirestore.instance.collection('users').doc(event.email).get();
+      bool verificationDocsUploaded = snapshot.get('verificationDocsUploaded');
+      if(verificationDocsUploaded == false) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const SignUpPage(title: 'Sign Up', signUpStep: 2),
+          ),
+        );
+        return;
+      }
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => const HomePage(),

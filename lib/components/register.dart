@@ -129,7 +129,10 @@ class _RegistirationState extends State<Registiration> {
         "marketplaceId": null,
         "darkMode": null,
         "emailVerified": null,
+        "verificationDocsUploaded": false,
         "verifiedUniStudent": false,
+        "verifiedBy": null,
+        "verifiedAt": null,
         "assignable_profile_pic": null,
         "starting_profile_pic": chosenProfilePicPath,
       };

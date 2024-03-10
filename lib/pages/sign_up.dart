@@ -72,42 +72,43 @@ class _SignUpPageState extends State<SignUpPage> {
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          SizedBox(
-              width: widthScreen(screenWidth),
-              child: Column(children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 10.0),
-                  child: AutoSizeText(
-                    'Welcome to the marketplace made for students.',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.w500,
+          SingleChildScrollView(
+            child: SizedBox(
+                width: widthScreen(screenWidth),
+                child: Column(children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    child: AutoSizeText(
+                      'Welcome to the marketplace made for students.',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      minFontSize: 16,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
                     ),
-                    minFontSize: 16,
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
                   ),
-                ),
-                ConstrainedBox(
-                    constraints:
-                        BoxConstraints.tightFor(height: (screenHeight * 0.6)),
-                    child: Stepper(
-                      type: StepperType.horizontal,
-                      currentStep: currentStep(),
-                      controlsBuilder: (context, controller) {
-                        return const SizedBox();
-                      },
-                      onStepCancel: cancel,
-                      onStepContinue: continued,
-                      onStepTapped: (step) => tapped(step),
-                      physics: const ScrollPhysics(),
-                      steps: <Step>[
-                        register(index, () => tapped(1), _focusNode),
-                        verify(index, () => tapped(2)),
-                        aboutYou(index),
-                      ],
-                    ))
-              ])),
+                  SizedBox(
+                      height: 450,
+                      child: Stepper(
+                        type: StepperType.horizontal,
+                        currentStep: currentStep(),
+                        controlsBuilder: (context, controller) {
+                          return const SizedBox();
+                        },
+                        onStepCancel: cancel,
+                        onStepContinue: continued,
+                        onStepTapped: (step) => tapped(step),
+                        physics: const ScrollPhysics(),
+                        steps: <Step>[
+                          register(index, () => tapped(1), _focusNode),
+                          verify(index, () => tapped(2)),
+                          aboutYou(index),
+                        ],
+                      ))
+                ])),
+          ),
         ],
       ),
     );
