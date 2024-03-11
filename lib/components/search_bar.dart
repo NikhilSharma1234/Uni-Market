@@ -26,6 +26,7 @@ class ItemSearchBar extends StatefulWidget {
 }
 
 class _ItemSearchBarState extends State<ItemSearchBar> {
+  late FocusNode _focusNode;
   bool isDark = true;
   late String searchVal;
   final SearchController controller = SearchController();
@@ -54,6 +55,12 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
   }
 
   @override
+  void initState() {
+    _focusNode = FocusNode();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -79,6 +86,14 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
                   EdgeInsets.symmetric(horizontal: 16.0)),
               onTap: () {
                 controller.openView();
+              },
+              onChanged: (value) {
+                if (!controller.isOpen) {
+                  print(
+                      value); // CURRENTLY EATS THIS BECAUSE IT HIGHLIGHTS THE TEXT ON TAP
+                  controller.openView();
+                  print(controller.value.text);
+                }
               },
               leading: const Icon(Icons.search),
             );
@@ -171,7 +186,9 @@ class SearchPageController {
     try {
       image = await FirebaseStorage.instance.ref(imageURL).getDownloadURL();
     } catch (e) {
-      image = "Missing Image";
+      image = await FirebaseStorage.instance
+          .ref("images/missing_image.jpg")
+          .getDownloadURL();
     }
     return image;
   }
