@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uni_market/components/image_carousel.dart';
+import 'package:uni_market/helpers/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,11 +26,77 @@ class _PostFormState extends State<PostForm> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _tagsController = TextEditingController();
   final double _maxPrice = 10000.0;
 
   bool submitting = false;
   bool isFlagged = false;
   List<String> _imageDataUrls = [];
+  static const int MAXTAGS = 8;
+  final List<String?> _tags = [];
+  final List<String?> suggestedTags = [
+    // temporary constant tags
+    "desk",
+    "chair",
+    "lamp",
+    "bed",
+    "rug",
+    "phone",
+    "headphone",
+    "sign",
+    "book",
+    "keyboard"
+  ];
+
+  Widget tagSuggestionsBuilder(String input) {
+    // update suggestedTags with tags from typesense
+    // leave selected tags in place as the first couple in suggestedTags, give an x button for those to de-select them
+
+    List<Widget> selected = List.generate(_tags.length, (int index) {
+      return InkWell(
+        child: Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.all(Radius.circular(15))),
+            child: Row(
+              children: [
+                Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(_tags[index]!)),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        String? temp = _tags.removeAt(index);
+                        suggestedTags.add(temp);
+                      });
+                    },
+                    icon: const Icon(Icons.close))
+              ],
+            )),
+      );
+    });
+
+    List<Widget> suggested = List.generate(MAXTAGS - _tags.length, (int index) {
+      return InkWell(
+          onTap: () => setState(() {
+                _tags.add(suggestedTags[index]);
+                suggestedTags.removeAt(index);
+              }),
+          child: Container(
+            decoration: const BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.all(Radius.circular(15))),
+            child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 5, bottom: 5, left: 10, right: 10),
+                child: Text(suggestedTags[index]!)),
+          ));
+    });
+
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: selected + suggested);
+  }
 
   void _flag(bool flag) {
     setState(() => isFlagged = !isFlagged);
@@ -36,168 +104,191 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilder(
-      key: _fbKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Create a post!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
+    return Scaffold(
+      body: FormBuilder(
+        key: _fbKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Create a post!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          // Title box
-          const SizedBox(height: 8),
-          FormBuilderTextField(
-            name: 'title',
-            style: const TextStyle(fontSize: 13),
-            decoration: const InputDecoration(labelText: 'Title'),
-            controller: _titleController,
-            validator: FormBuilderValidators.required(context),
-            maxLines: 1,
-            maxLength: 30, // Set a maximum character limit
-          ),
-          // Description
-          const SizedBox(height: 8),
-          FormBuilderTextField(
-            name: 'description',
-            controller: _descriptionController,
-            maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Description'),
-            validator: FormBuilderValidators.required(context),
-            maxLength: 150, // Set a maximum character limit
-          ),
-          // Price Box
-          const SizedBox(height: 8),
-          FormBuilderTextField(
-            name: 'price',
-            controller: _priceController,
-            decoration: const InputDecoration(
-              labelText: 'Price',
+            // Title box
+            const SizedBox(height: 8),
+            FormBuilderTextField(
+              name: 'title',
+              style: const TextStyle(fontSize: 13),
+              decoration: const InputDecoration(labelText: 'Title'),
+              controller: _titleController,
+              validator: FormBuilderValidators.required(context),
+              maxLines: 1,
+              maxLength: 30, // Set a maximum character limit
             ),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(context),
-              (value) {
-                // Custom validator for price format
-                if (value != null && !isValidPrice(value)) {
-                  return 'Invalid price format';
-                }
-                if (value != null && double.parse(value) > _maxPrice) {
-                  return 'Price cannot exceed \$${_maxPrice.toStringAsFixed(2)}';
-                }
-                return null;
-              },
-            ]),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-          const SizedBox(height: 16),
-          // Condition Box
-          FormBuilderDropdown(
-            name: 'condition',
-            hint: const Text('Select Condition'),
-            items: ['USED', 'NEW', 'WORN']
-                .map((condition) => DropdownMenuItem(
-                      value: condition,
-                      child: Text(condition),
-                    ))
-                .toList(),
-            validator: FormBuilderValidators.required(context),
-          ),
-          const SizedBox(height: 38),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shadowColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0))),
-            onPressed: () async {
-              if (kIsWeb) {
-                List<XFile> clientImageFiles = await multiImagePicker(context);
+            // Description
+            const SizedBox(height: 8),
+            FormBuilderTextField(
+              name: 'description',
+              controller: _descriptionController,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Description'),
+              validator: FormBuilderValidators.required(context),
+              maxLength: 150, // Set a maximum character limit
+            ),
+            // Price Box
+            const SizedBox(height: 8),
+            FormBuilderTextField(
+              name: 'price',
+              controller: _priceController,
+              decoration: const InputDecoration(
+                labelText: 'Price',
+              ),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(context),
+                (value) {
+                  // Custom validator for price format
+                  if (value != null && !isValidPrice(value)) {
+                    return 'Invalid price format';
+                  }
+                  if (value != null && double.parse(value) > _maxPrice) {
+                    return 'Price cannot exceed \$${_maxPrice.toStringAsFixed(2)}';
+                  }
+                  return null;
+                },
+              ]),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+            ),
+            const SizedBox(height: 16),
+            // Condition Box
+            FormBuilderDropdown(
+              name: 'condition',
+              hint: const Text('Select Condition'),
+              items: ['USED', 'NEW', 'WORN']
+                  .map((condition) => DropdownMenuItem(
+                        value: condition,
+                        child: Text(condition),
+                      ))
+                  .toList(),
+              validator: FormBuilderValidators.required(context),
+            ),
+            const SizedBox(height: 38),
+            // check if tag is in list of tags (stored in firebase but for now just here)
+            FormBuilderTextField(
+              name: 'tags',
+              style: const TextStyle(fontSize: 13),
+              decoration: const InputDecoration(labelText: 'Tags'),
+              controller: _tagsController,
+              maxLines: 1,
+              maxLength: 30,
 
-                if (clientImageFiles.isNotEmpty) {
-                  List<String> dataUrls =
-                      await convertXFilesToDataUrls(clientImageFiles);
+              onSubmitted: (value) {
+                // check if tag is in global tags database via typsense, if not do not allow it to be added
+                setState(() {
+                  _tags.add(value);
+                  _tagsController.clear();
+                });
+              }, // Set a maximum character limit
+            ),
+            tagSuggestionsBuilder(_tagsController.text),
+            const SizedBox(height: 38),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shadowColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0))),
+              onPressed: () async {
+                if (kIsWeb) {
+                  List<XFile> clientImageFiles =
+                      await multiImagePicker(context);
 
-                  // Show the pop-up dialog for image confirmation
-                  if (context.mounted) {
-                    bool confirmSelection = await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        // Assign the captured context
-                        return ImageCarouselDialog(imageDataUrls: dataUrls);
-                      },
-                    );
+                  if (clientImageFiles.isNotEmpty) {
+                    List<String> dataUrls =
+                        await convertXFilesToDataUrls(clientImageFiles);
 
-                    // Check if the user confirmed the selection
-                    if (confirmSelection == true) {
-                      setState(() {
-                        _imageDataUrls = dataUrls;
-                      });
+                    // Show the pop-up dialog for image confirmation
+                    if (context.mounted) {
+                      bool confirmSelection = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          // Assign the captured context
+                          return ImageCarouselDialog(imageDataUrls: dataUrls);
+                        },
+                      );
+
+                      // Check if the user confirmed the selection
+                      if (confirmSelection == true) {
+                        setState(() {
+                          _imageDataUrls = dataUrls;
+                        });
+                      }
                     }
                   }
-                }
-              } else {
-                // HERE LIES MOBILE IMAGE SELECTION CODE
-                if (kDebugMode) {
-                  print("not on web");
-                }
-              }
-            },
-            child: Column(
-              children: [
-                const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
-                if (_imageDataUrls.isNotEmpty)
-                  const Text("✅",
-                      style: TextStyle(fontSize: 20, color: Colors.green)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shadowColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0))),
-            onPressed: () async {
-              // Check form data validitiy
-              if (_fbKey.currentState!.saveAndValidate()) {
-                // Store form data in Map for db upload
-                Map<String, dynamic> formData =
-                    Map.from(_fbKey.currentState!.value);
-                String inputText =
-                    formData["title"] + " " + formData["description"];
-
-                try {
-                  checkProfanity(inputText).then((value) => _flag(value));
-                } catch (e) {
+                } else {
+                  // HERE LIES MOBILE IMAGE SELECTION CODE
                   if (kDebugMode) {
-                    print("Failed to perform profanity checking: $e");
+                    print("not on web");
                   }
                 }
+              },
+              child: Column(
+                children: [
+                  const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
+                  if (_imageDataUrls.isNotEmpty)
+                    const Text("✅",
+                        style: TextStyle(fontSize: 20, color: Colors.green)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shadowColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0))),
+              onPressed: () async {
+                // Check form data validitiy
+                if (_fbKey.currentState!.saveAndValidate()) {
+                  // Store form data in Map for db upload
+                  Map<String, dynamic> formData =
+                      Map.from(_fbKey.currentState!.value);
+                  String inputText =
+                      formData["title"] + " " + formData["description"];
 
-                _createPost(context, formData, _imageDataUrls);
-              }
-            },
-            child: const Text('Submit'),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                shadowColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0))),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
+                  try {
+                    checkProfanity(inputText).then((value) => _flag(value));
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print("Failed to perform profanity checking: $e");
+                    }
+                  }
+
+                  _createPost(context, formData, _imageDataUrls);
+                }
+              },
+              child: const Text('Submit'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0))),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -244,8 +335,8 @@ class _PostFormState extends State<PostForm> {
         "price": double.parse(formData["price"]),
         "schoolId": data_store.user.schoolId,
         "sellerId": data_store.user.email,
-        "tags": [],
         "isFlagged": isFlagged,
+        "tags": FieldValue.arrayUnion(_tags),
         "lastReviewedBy": null
       };
 
@@ -276,6 +367,7 @@ class _PostFormState extends State<PostForm> {
         );
       }
     } catch (e) {
+      print(e);
       // Show failure snackbar
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
