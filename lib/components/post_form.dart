@@ -244,8 +244,8 @@ class _PostFormState extends State<PostForm> {
       final userPost = <String, dynamic>{
         "buyerId": null,
         "condition": formData["condition"],
-        "dateDeleted": null,
-        "dateListed": Timestamp.now(),
+        "deletedAt": null,
+        "createdAt": Timestamp.now(),
         "dateUpdated": Timestamp.now(),
         "description": formData["description"],
         "images": formData["images"],
@@ -254,7 +254,9 @@ class _PostFormState extends State<PostForm> {
         "price": double.parse(formData["price"]),
         "schoolId": schoolId,
         "sellerId": sellerId,
-        "tags": []
+        "tags": [],
+        "isFlagged": false,
+        "lastReviewedBy": null
       };
 
       // POTENTIAL PLACEHOLDER FOR UNACCEPTABLE STRING CHECKING (profanity, racism ...)
