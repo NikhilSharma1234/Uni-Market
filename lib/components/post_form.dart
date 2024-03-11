@@ -104,191 +104,187 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FormBuilder(
-        key: _fbKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Create a post!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
+    return FormBuilder(
+      key: _fbKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Create a post!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
             ),
-            // Title box
-            const SizedBox(height: 8),
-            FormBuilderTextField(
-              name: 'title',
-              style: const TextStyle(fontSize: 13),
-              decoration: const InputDecoration(labelText: 'Title'),
-              controller: _titleController,
-              validator: FormBuilderValidators.required(context),
-              maxLines: 1,
-              maxLength: 30, // Set a maximum character limit
+            textAlign: TextAlign.center,
+          ),
+          // Title box
+          const SizedBox(height: 8),
+          FormBuilderTextField(
+            name: 'title',
+            style: const TextStyle(fontSize: 13),
+            decoration: const InputDecoration(labelText: 'Title'),
+            controller: _titleController,
+            validator: FormBuilderValidators.required(context),
+            maxLines: 1,
+            maxLength: 30, // Set a maximum character limit
+          ),
+          // Description
+          const SizedBox(height: 8),
+          FormBuilderTextField(
+            name: 'description',
+            controller: _descriptionController,
+            maxLines: 3,
+            decoration: const InputDecoration(labelText: 'Description'),
+            validator: FormBuilderValidators.required(context),
+            maxLength: 150, // Set a maximum character limit
+          ),
+          // Price Box
+          const SizedBox(height: 8),
+          FormBuilderTextField(
+            name: 'price',
+            controller: _priceController,
+            decoration: const InputDecoration(
+              labelText: 'Price',
             ),
-            // Description
-            const SizedBox(height: 8),
-            FormBuilderTextField(
-              name: 'description',
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Description'),
-              validator: FormBuilderValidators.required(context),
-              maxLength: 150, // Set a maximum character limit
-            ),
-            // Price Box
-            const SizedBox(height: 8),
-            FormBuilderTextField(
-              name: 'price',
-              controller: _priceController,
-              decoration: const InputDecoration(
-                labelText: 'Price',
-              ),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(context),
-                (value) {
-                  // Custom validator for price format
-                  if (value != null && !isValidPrice(value)) {
-                    return 'Invalid price format';
-                  }
-                  if (value != null && double.parse(value) > _maxPrice) {
-                    return 'Price cannot exceed \$${_maxPrice.toStringAsFixed(2)}';
-                  }
-                  return null;
-                },
-              ]),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 16),
-            // Condition Box
-            FormBuilderDropdown(
-              name: 'condition',
-              hint: const Text('Select Condition'),
-              items: ['USED', 'NEW', 'WORN']
-                  .map((condition) => DropdownMenuItem(
-                        value: condition,
-                        child: Text(condition),
-                      ))
-                  .toList(),
-              validator: FormBuilderValidators.required(context),
-            ),
-            const SizedBox(height: 38),
-            // check if tag is in list of tags (stored in firebase but for now just here)
-            FormBuilderTextField(
-              name: 'tags',
-              style: const TextStyle(fontSize: 13),
-              decoration: const InputDecoration(labelText: 'Tags'),
-              controller: _tagsController,
-              maxLines: 1,
-              maxLength: 30,
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(context),
+              (value) {
+                // Custom validator for price format
+                if (value != null && !isValidPrice(value)) {
+                  return 'Invalid price format';
+                }
+                if (value != null && double.parse(value) > _maxPrice) {
+                  return 'Price cannot exceed \$${_maxPrice.toStringAsFixed(2)}';
+                }
+                return null;
+              },
+            ]),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          const SizedBox(height: 16),
+          // Condition Box
+          FormBuilderDropdown(
+            name: 'condition',
+            hint: const Text('Select Condition'),
+            items: ['USED', 'NEW', 'WORN']
+                .map((condition) => DropdownMenuItem(
+                      value: condition,
+                      child: Text(condition),
+                    ))
+                .toList(),
+            validator: FormBuilderValidators.required(context),
+          ),
+          const SizedBox(height: 38),
+          // check if tag is in list of tags (stored in firebase but for now just here)
+          FormBuilderTextField(
+            name: 'tags',
+            style: const TextStyle(fontSize: 13),
+            decoration: const InputDecoration(labelText: 'Tags'),
+            controller: _tagsController,
+            maxLines: 1,
+            maxLength: 30,
 
-              onSubmitted: (value) {
-                // check if tag is in global tags database via typsense, if not do not allow it to be added
-                setState(() {
-                  _tags.add(value);
-                  _tagsController.clear();
-                });
-              }, // Set a maximum character limit
-            ),
-            tagSuggestionsBuilder(_tagsController.text),
-            const SizedBox(height: 38),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  shadowColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0))),
-              onPressed: () async {
-                if (kIsWeb) {
-                  List<XFile> clientImageFiles =
-                      await multiImagePicker(context);
+            onSubmitted: (value) {
+              // check if tag is in global tags database via typsense, if not do not allow it to be added
+              setState(() {
+                _tags.add(value);
+                _tagsController.clear();
+              });
+            }, // Set a maximum character limit
+          ),
+          tagSuggestionsBuilder(_tagsController.text),
+          const SizedBox(height: 38),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0))),
+            onPressed: () async {
+              if (kIsWeb) {
+                List<XFile> clientImageFiles = await multiImagePicker(context);
 
-                  if (clientImageFiles.isNotEmpty) {
-                    List<String> dataUrls =
-                        await convertXFilesToDataUrls(clientImageFiles);
+                if (clientImageFiles.isNotEmpty) {
+                  List<String> dataUrls =
+                      await convertXFilesToDataUrls(clientImageFiles);
 
-                    // Show the pop-up dialog for image confirmation
-                    if (context.mounted) {
-                      bool confirmSelection = await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          // Assign the captured context
-                          return ImageCarouselDialog(imageDataUrls: dataUrls);
-                        },
-                      );
+                  // Show the pop-up dialog for image confirmation
+                  if (context.mounted) {
+                    bool confirmSelection = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // Assign the captured context
+                        return ImageCarouselDialog(imageDataUrls: dataUrls);
+                      },
+                    );
 
-                      // Check if the user confirmed the selection
-                      if (confirmSelection == true) {
-                        setState(() {
-                          _imageDataUrls = dataUrls;
-                        });
-                      }
+                    // Check if the user confirmed the selection
+                    if (confirmSelection == true) {
+                      setState(() {
+                        _imageDataUrls = dataUrls;
+                      });
                     }
                   }
-                } else {
-                  // HERE LIES MOBILE IMAGE SELECTION CODE
+                }
+              } else {
+                // HERE LIES MOBILE IMAGE SELECTION CODE
+                if (kDebugMode) {
+                  print("not on web");
+                }
+              }
+            },
+            child: Column(
+              children: [
+                const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
+                if (_imageDataUrls.isNotEmpty)
+                  const Text("✅",
+                      style: TextStyle(fontSize: 20, color: Colors.green)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0))),
+            onPressed: () async {
+              // Check form data validitiy
+              if (_fbKey.currentState!.saveAndValidate()) {
+                // Store form data in Map for db upload
+                Map<String, dynamic> formData =
+                    Map.from(_fbKey.currentState!.value);
+                String inputText =
+                    formData["title"] + " " + formData["description"];
+
+                try {
+                  checkProfanity(inputText).then((value) => _flag(value));
+                } catch (e) {
                   if (kDebugMode) {
-                    print("not on web");
+                    print("Failed to perform profanity checking: $e");
                   }
                 }
-              },
-              child: Column(
-                children: [
-                  const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
-                  if (_imageDataUrls.isNotEmpty)
-                    const Text("✅",
-                        style: TextStyle(fontSize: 20, color: Colors.green)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  shadowColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0))),
-              onPressed: () async {
-                // Check form data validitiy
-                if (_fbKey.currentState!.saveAndValidate()) {
-                  // Store form data in Map for db upload
-                  Map<String, dynamic> formData =
-                      Map.from(_fbKey.currentState!.value);
-                  String inputText =
-                      formData["title"] + " " + formData["description"];
 
-                  try {
-                    checkProfanity(inputText).then((value) => _flag(value));
-                  } catch (e) {
-                    if (kDebugMode) {
-                      print("Failed to perform profanity checking: $e");
-                    }
-                  }
-
-                  _createPost(context, formData, _imageDataUrls);
-                }
-              },
-              child: const Text('Submit'),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  shadowColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0))),
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-          ],
-        ),
+                _createPost(context, formData, _imageDataUrls);
+              }
+            },
+            child: const Text('Submit'),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0))),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }
