@@ -234,6 +234,15 @@ class _AboutYouContentState extends State<AboutYouContent> {
     isSubmitting.value = true;
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
       try {
+        if(firstFileName == secondFileName) {
+          showDialog<String>(
+            context: context,
+            builder: (BuildContext context) => 
+              appDialog(context, 'Invalid File', 'You have uploaded the same file. Please upload unique verification documents.', 'Ok')
+          );
+          isSubmitting.value = false;
+          return;
+        }
         if (!validFileExtension(firstFileName!) || !validFileExtension(secondFileName!)) {
           showDialog<String>(
             context: context,
