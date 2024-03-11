@@ -3,6 +3,7 @@ import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -39,6 +40,12 @@ class _ChatPageState extends State<ChatPage> {
         return Scaffold(
           appBar: AppBar(
             title: Text(title),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.location_on),
+                onPressed: () => _showLocationsModal(context),
+              ),
+            ],
           ),
           body: Column(
             children: [
@@ -196,5 +203,56 @@ class _ChatPageState extends State<ChatPage> {
     ),
   );
 }
+
+void _showLocationsModal(BuildContext context) async {
+  final locations = await _chatController.fetchLocationsBasedOnSession(widget.chatSessionId);
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return ListView.builder(
+        itemCount: locations.length,
+        itemBuilder: (BuildContext context, int index) {
+          var location = locations[index];
+          return ListTile(
+            title: Text(location['locationName']),
+            trailing: IconButton(
+              icon: Icon(Icons.info_outline),
+              onPressed: () => _showLocationInfo(context, location['info']),
+            ),
+            onTap: () => _openMapLink(location['mapLink']),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _showLocationInfo(BuildContext context, String info) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Location Info'),
+        content: Text(info),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Close'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+Future<void> _openMapLink(String urlString) async {
+  final url = Uri.parse(urlString);
+  if (!await launchUrl(url)) {
+    print('Could not launch $urlString');
+  }
+}
+
+
 
 }
