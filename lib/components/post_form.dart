@@ -56,7 +56,7 @@ class _PostFormState extends State<PostForm> {
       return InkWell(
         child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.all(Radius.circular(15))),
             child: Row(
               children: [
@@ -81,10 +81,11 @@ class _PostFormState extends State<PostForm> {
           onTap: () => setState(() {
                 _tags.add(suggestedTags[index]);
                 suggestedTags.removeAt(index);
+                _tagsController.clear();
               }),
           child: Container(
-            decoration: const BoxDecoration(
-                color: Colors.black,
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.all(Radius.circular(15))),
             child: Padding(
                 padding: const EdgeInsets.only(
