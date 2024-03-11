@@ -127,8 +127,22 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (items.isEmpty) {
-      body =
-          const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
+      body = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result...'),
+            ),
+          ],
+        ),
+      );
     }
 
     return Scaffold(
