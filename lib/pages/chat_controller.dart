@@ -19,6 +19,10 @@ class ChatController {
       String chatSessionId) async {
     return await _chatModel.getSessionDetails(chatSessionId);
   }
+  
+  Future<List<Map<String, dynamic>>> fetchLocationsBasedOnSession(String chatSessionId) async {
+  return await _chatModel.fetchLocationsBasedOnSession(chatSessionId);
+  }
 
   // If you need to expose _chatModel, provide a public getter
   ChatModel get chatModel => _chatModel;

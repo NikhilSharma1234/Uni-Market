@@ -63,4 +63,41 @@ class ChatModel {
       return null;
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchLocationsBasedOnSession(String chatSessionId) async {
+  try {
+    final sessionDetails = await getSessionDetails(chatSessionId);
+    if (sessionDetails == null) return [];
+
+    final productId = sessionDetails['productId'];
+    final itemDoc = await firestore.collection('items').doc(productId).get();
+    if (!itemDoc.exists) return [];
+
+    final marketplaceId = itemDoc.data()!['marketplaceId'];
+    final marketplaceDoc = await firestore.collection('marketplace').doc(marketplaceId).get();
+    if (!marketplaceDoc.exists) return [];
+
+    final List<dynamic> schoolIds = marketplaceDoc.data()!['schoolIds'];
+    List<Map<String, dynamic>> locations = [];
+
+    for (var schoolId in schoolIds) {
+  final schoolDoc = await firestore.collection('schools').doc(schoolId).get();
+  if (!schoolDoc.exists) continue;
+
+  // Ensure 'locations' field exists and is a list before proceeding.
+  final schoolLocations = schoolDoc.data()?['locations'];
+  if (schoolLocations is List) {
+    locations.addAll(List<Map<String, dynamic>>.from(schoolLocations));
+  }
+}
+
+    return locations;
+  } catch (e) {
+    if (kDebugMode) {
+      print("Error in fetchLocationsBasedOnSession: $e");
+    }
+    return [];
+  }
+}
+
 }
