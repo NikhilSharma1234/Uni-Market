@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
@@ -26,7 +28,6 @@ class ItemSearchBar extends StatefulWidget {
 }
 
 class _ItemSearchBarState extends State<ItemSearchBar> {
-  late FocusNode _focusNode;
   bool isDark = true;
   late String searchVal;
   final SearchController controller = SearchController();
@@ -56,52 +57,38 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
 
   @override
   void initState() {
-    _focusNode = FocusNode();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final FocusScopeNode focusNode = FocusScopeNode();
+
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SearchAnchor(
-          searchController: controller,
-          // viewOnSubmited and viewOnChanged added via this PR: https://github.com/flutter/flutter/pull/136840, allows us to grab submitted and changed values
-          viewOnSubmitted: (value) {
-            // redraw the page when the search has been done
-            ctrl.search(value, 30, context, widget.filter).then((value) {
-              widget.setPageState(value, false);
-            });
-            controller.closeView(value);
-          },
-          viewOnChanged: (value) {
-            updateSuggestions(value);
-            widget.updateSearchText(value);
-          },
-          builder: (BuildContext context, controller) {
-            // attempting to get the search bar to take an enter key to submit search
-            return SearchBar(
-              controller: controller,
-              padding: const MaterialStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.symmetric(horizontal: 16.0)),
-              onTap: () {
-                controller.openView();
-              },
-              onChanged: (value) {
-                if (!controller.isOpen) {
-                  print(
-                      value); // CURRENTLY EATS THIS BECAUSE IT HIGHLIGHTS THE TEXT ON TAP
-                  controller.openView();
-                  print(controller.value.text);
-                }
-              },
-              leading: const Icon(Icons.search),
-            );
-          },
-          suggestionsBuilder: (BuildContext context, controller) {
-            return suggestions;
-          }),
-    );
+        padding: const EdgeInsets.all(8.0),
+        child: FocusScope(
+            // this fixes the issues with unfocusing while text still selected
+            node: focusNode,
+            onFocusChange: (isFocused) {
+              focusNode.unfocus();
+            },
+            child: SearchAnchor.bar(
+                barHintText: "Search items",
+                searchController: controller,
+                onSubmitted: (value) {
+                  ctrl.search(value, 30, context, widget.filter).then((value) {
+                    widget.setPageState(value, false);
+                  });
+                  controller.closeView(value);
+                  FocusScope.of(context).unfocus();
+                },
+                onChanged: (value) {
+                  updateSuggestions(value);
+                  widget.updateSearchText(value);
+                },
+                suggestionsBuilder: (BuildContext context, controller) {
+                  return suggestions;
+                })));
   }
 }
 
@@ -110,6 +97,8 @@ class SearchPageController {
   search(String searchTerm, int number, BuildContext context,
       Filters filter) async {
     List<Widget> widgets = [];
+    var host = "34.125.158.70";
+    var API_KEY = '5RxNLWNEwIFn706Yz4nJw2CFfNaaQHJmfuVjUVgIT3OMfPhT';
     final config = Configuration(
       'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
       nodes: {
