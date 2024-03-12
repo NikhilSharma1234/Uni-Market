@@ -59,15 +59,17 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           },
           child: const Text('Chat'),
         ),
-        const MenuBar(
-          children: <Widget>[
-            SubmenuButton(
-              menuChildren: <Widget>[
-                SizedBox(width: 350, height: 525,child: ProfilePage())
-              ],
-              child: IconButton(icon: Icon(Icons.person, size: 40), onPressed: null,),
-            )]
-        ),
+        const MenuBar(children: <Widget>[
+          SubmenuButton(
+            menuChildren: <Widget>[
+              SizedBox(width: 350, height: 525, child: ProfilePage())
+            ],
+            child: IconButton(
+              icon: Icon(Icons.person, size: 40),
+              onPressed: null,
+            ),
+          )
+        ]),
       ],
     );
   }
