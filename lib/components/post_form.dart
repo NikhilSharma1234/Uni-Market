@@ -34,7 +34,7 @@ class _PostFormState extends State<PostForm> {
   List<String> _imageDataUrls = [];
   static const int MAXTAGS = 8;
   final List<String?> _tags = [];
-  final List<String?> suggestedTags = [
+  final List<String?> _suggestedTags = [
     // temporary constant tags
     "desk",
     "chair",
@@ -49,8 +49,8 @@ class _PostFormState extends State<PostForm> {
   ];
 
   Widget tagSuggestionsBuilder(String input) {
-    // update suggestedTags with tags from typesense
-    // leave selected tags in place as the first couple in suggestedTags, give an x button for those to de-select them
+    // update _suggestedTags with tags from typesense
+    // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
 
     List<Widget> selected = List.generate(_tags.length, (int index) {
       return InkWell(
@@ -67,7 +67,7 @@ class _PostFormState extends State<PostForm> {
                     onPressed: () {
                       setState(() {
                         String? temp = _tags.removeAt(index);
-                        suggestedTags.add(temp);
+                        _suggestedTags.add(temp);
                       });
                     },
                     icon: const Icon(Icons.close))
@@ -79,8 +79,8 @@ class _PostFormState extends State<PostForm> {
     List<Widget> suggested = List.generate(MAXTAGS - _tags.length, (int index) {
       return InkWell(
           onTap: () => setState(() {
-                _tags.add(suggestedTags[index]);
-                suggestedTags.removeAt(index);
+                _tags.add(_suggestedTags[index]);
+                _suggestedTags.removeAt(index);
                 _tagsController.clear();
               }),
           child: Container(
@@ -90,7 +90,7 @@ class _PostFormState extends State<PostForm> {
             child: Padding(
                 padding: const EdgeInsets.only(
                     top: 5, bottom: 5, left: 10, right: 10),
-                child: Text(suggestedTags[index]!)),
+                child: Text(_suggestedTags[index]!)),
           ));
     });
 
