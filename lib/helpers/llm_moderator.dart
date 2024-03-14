@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Moderator {
   const Moderator({Key? key});
 
-  Future<Object> checkForProfanity(String userInput) async {
+  Future<bool> checkForProfanity(String userInput) async {
     OpenAI.apiKey = "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";
     try {
       OpenAIModerationModel moderation =
@@ -12,7 +12,7 @@ class Moderator {
 
       return moderation.results.first.flagged;
     } catch (e) {
-      print(e);
+      print("Failed to acquire LLM Moderation Results: $e");
       return false;
     }
   }
