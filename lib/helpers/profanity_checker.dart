@@ -65,5 +65,8 @@ String preprocessWord(String word) {
   // Remove non-English characters
   word = word.replaceAll(RegExp(r'[^a-zA-Z\s]'), '');
 
+  // Remove consecutive repeated characters
+  word = word.replaceAllMapped(RegExp(r'(.)\1+'), (match) => match.group(1)!);
+
   return word;
 }
