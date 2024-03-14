@@ -40,14 +40,8 @@ Future<bool> checkProfanity(String userInput,
   }
 
   // LLM Second level Semantical Flagging on Title
-  final titleProfanity = await llmModerator.checkForProfanity(userInput);
-  if (titleProfanity) {
-    return true;
-  }
-
-  // LLM Second level Semantical Flagging on Description
-  final descriptionProfanity = await llmModerator.checkForProfanity(userInput);
-  if (descriptionProfanity) {
+  final semanticProfanity = await llmModerator.checkForProfanity(userInput);
+  if (semanticProfanity) {
     return true;
   }
 
