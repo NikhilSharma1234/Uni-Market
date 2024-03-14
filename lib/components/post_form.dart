@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'dart:convert';
 import 'dialog.dart';
+import 'package:uni_market/helpers/profanity_checker.dart';
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -26,7 +27,12 @@ class _PostFormState extends State<PostForm> {
   final double _maxPrice = 10000.0;
 
   bool submitting = false;
+  bool isFlagged = false;
   List<String> _imageDataUrls = [];
+
+  void _flag(bool flag) {
+    setState(() => isFlagged = !isFlagged);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,6 +170,14 @@ class _PostFormState extends State<PostForm> {
                 // Store form data in Map for db upload
                 Map<String, dynamic> formData =
                     Map.from(_fbKey.currentState!.value);
+                String inputText =
+                    formData["title"] + " " + formData["description"];
+
+                try {
+                  checkProfanity(inputText).then((value) => _flag(value));
+                } catch (e) {
+                  print("Failed to perform profanity checking: $e");
+                }
 
                 _createPost(context, formData, _imageDataUrls);
               }
@@ -255,7 +269,7 @@ class _PostFormState extends State<PostForm> {
         "schoolId": schoolId,
         "sellerId": sellerId,
         "tags": [],
-        "isFlagged": false,
+        "isFlagged": isFlagged,
         "lastReviewedBy": null
       };
 
@@ -275,11 +289,8 @@ class _PostFormState extends State<PostForm> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    // Close the success dialog
+                    _flag(false);
                     Navigator.of(context).pop();
-                    // Navigate to view post screen or any other logic
-                    // For example, you can use Navigator.push to navigate to a new screen
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => ViewPostScreen()));
                   },
                   child: const Text('Click here to view your post'),
                 ),

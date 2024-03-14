@@ -21,6 +21,7 @@ List<int> availableProfilePicsIndices = [
   // Llama: 15%
   // Rabbit: 15%
   //
+  0, // ASTRONAUGHT
   0,
   0,
   0,
@@ -29,13 +30,7 @@ List<int> availableProfilePicsIndices = [
   0,
   0,
   0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
+  1, // BEAR
   1,
   1,
   1,
@@ -50,22 +45,8 @@ List<int> availableProfilePicsIndices = [
   1,
   1,
   1,
-  1,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
-  2,
+  2, // RARE FOHLMER (BEARD)
+  3, // CAT
   3,
   3,
   3,
@@ -80,7 +61,7 @@ List<int> availableProfilePicsIndices = [
   3,
   3,
   3,
-  3,
+  4, // DOG
   4,
   4,
   4,
@@ -95,7 +76,7 @@ List<int> availableProfilePicsIndices = [
   4,
   4,
   4,
-  4,
+  5, // GORILLA
   5,
   5,
   5,
@@ -110,7 +91,7 @@ List<int> availableProfilePicsIndices = [
   5,
   5,
   5,
-  5,
+  6, // LLAMA
   6,
   6,
   6,
@@ -125,8 +106,7 @@ List<int> availableProfilePicsIndices = [
   6,
   6,
   6,
-  6,
-  7,
+  7, // RABBIT
   7,
   7,
   7,
