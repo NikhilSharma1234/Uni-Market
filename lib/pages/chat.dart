@@ -3,7 +3,7 @@ import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -81,50 +81,77 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildMessageBubble(
-      BuildContext context, QueryDocumentSnapshot message, bool isSentByMe) {
-    // Determine if we are in dark mode or light mode
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildMessageBubble(BuildContext context, QueryDocumentSnapshot<Object?> message, bool isSentByMe) {
+  // Determine if we are in dark mode or light mode
+  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Define bubble colors for light mode
-    Color senderBubbleColorLight = Colors.blueGrey.shade700;
-    Color receiverBubbleColorLight = Colors.blueGrey.shade700;
+  // Define bubble colors for light mode and dark mode
+  Color senderBubbleColorLight = Colors.blueGrey.shade700;
+  Color receiverBubbleColorLight = Colors.blueGrey.shade700;
+  Color senderBubbleColorDark = Colors.white;
+  Color receiverBubbleColorDark = Colors.grey.shade200;
 
-    // Define bubble colors for dark mode
-    Color senderBubbleColorDark = Colors.white;
-    Color receiverBubbleColorDark = Colors.grey.shade200;
+  // Set bubble color and text color based on the theme and sender
+  Color bubbleColor = isSentByMe ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight) : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
+  Color textColor = isDarkMode ? Colors.black : Colors.white;
 
-    // Set bubble color and text color based on the theme and sender
-    Color bubbleColor;
-    Color textColor;
+  final messageData = message.data() as Map<String, dynamic>?;
 
-    if (isDarkMode) {
-      bubbleColor =
-          isSentByMe ? senderBubbleColorDark : receiverBubbleColorDark;
-      textColor = Colors.black;
-    } else {
-      bubbleColor =
-          isSentByMe ? senderBubbleColorLight : receiverBubbleColorLight;
-      textColor = Colors.white;
-    }
+  // Use the safely casted Map to check for the 'type' key.
+  bool isLocationMessage = messageData?.containsKey('type') == true && messageData?['type'] == 'location';
 
+  if (isLocationMessage) {
+    // Special styling for location messages
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white, // Light blue color for location message
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "${message.get('content')}", // Display the formatted content
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black, // Text color for location message
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 5),
+            TextButton(
+              onPressed: () {
+                // Implement functionality to view the location
+                // For example, you might want to open the location in a map view
+              },
+              child: Text(
+                "View Location",
+                style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  } else {
+    // Regular text message layout
     return LayoutBuilder(
       builder: (context, constraints) {
         // Calculate dynamic width here, e.g., a percentage of the parent's width
-        double bubbleMaxWidth =
-            constraints.maxWidth * 0.8; // Example: 80% of parent width
+        double bubbleMaxWidth = constraints.maxWidth * 0.8; // Example: 80% of parent width
 
         return Row(
-          mainAxisAlignment:
-              isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: bubbleMaxWidth, // Use dynamic width
               ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: bubbleColor, // Use the determined bubble color
@@ -144,13 +171,13 @@ class _ChatPageState extends State<ChatPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      message['content'],
+                      message.get('content'),
                       style: TextStyle(color: textColor),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        message['timestamp'].toDate().toString(),
+                        message.get('timestamp').toDate().toString(),
                         style: TextStyle(
                           color: textColor.withOpacity(0.7),
                           fontSize: 10,
@@ -166,6 +193,8 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
   }
+}
+
 
   Widget _buildMessageComposer() {
     return Container(
@@ -227,16 +256,21 @@ class _ChatPageState extends State<ChatPage> {
               return ListTile(
                 title: Text(location['locationName']),
                 trailing: IconButton(
-                  icon: Icon(Icons.info_outline),
+                  icon: const Icon(Icons.info_outline),
                   onPressed: () {
                     Navigator.of(context).pop(); // Close the dialog
                     _showLocationInfo(location['schoolName'], location['address']);
                   },
                 ),
                 onTap: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                  // Implement sending the location message
-                },
+  Navigator.of(context).pop(); // Close the dialog
+  _chatController.sendLocationMessage(
+    widget.chatSessionId,
+    location['locationName'],
+    location['schoolName'],
+    location['address'],
+  );
+},
               );
             },
           ),

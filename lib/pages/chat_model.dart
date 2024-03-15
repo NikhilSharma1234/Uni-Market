@@ -88,7 +88,6 @@ class ChatModel {
       final data = schoolDoc.data();
       if (data != null) {
         locations.add({
-          'schoolId': schoolId,
           'schoolName': data['name'],
           'locationName': data['locationName'],
           'address': data['address'],
@@ -104,24 +103,23 @@ class ChatModel {
   return locations;
 }
 
-Future<void> sendLocationMessage(String chatSessionId, String locationName, String mapLink, String address) async {
-  if (locationName.isEmpty) return;
 
+Future<void> sendLocationMessage(String chatSessionId, String locationName, String schoolName, String address) async {
   try {
+    String messageContent = "$locationName at $schoolName"; // Format the content
     await firestore.collection('chat_sessions').doc(chatSessionId).collection('messages').add({
       'senderId': currentUser!.uid,
-      'type': 'location',
-      'content': locationName,
-      'location': {
-        'mapLink': mapLink,
-        'address': address,
-      },
+      'type': 'location', // New field to denote the message type
+      'content': messageContent, // The formatted message content
+      'locationName': locationName, // Store the locationName
+      'schoolName': schoolName, // Store the schoolName
+      'address': address, // Store the address
       'timestamp': Timestamp.now(),
     });
 
     // Optionally, update the last message preview and time in the chat session
     await firestore.collection('chat_sessions').doc(chatSessionId).update({
-      'lastMessage': "Location: $locationName",
+      'lastMessage': messageContent,
       'lastMessageAt': Timestamp.now(),
     });
   } catch (e) {
@@ -130,6 +128,9 @@ Future<void> sendLocationMessage(String chatSessionId, String locationName, Stri
     }
   }
 }
+
+
+
 
 
 }
