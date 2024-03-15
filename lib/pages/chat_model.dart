@@ -65,6 +65,8 @@ class ChatModel {
   }
 
   Future<List<Map<String, dynamic>>> fetchLocationsBasedOnSession(String chatSessionId) async {
+  List<Map<String, dynamic>> locations = [];
+
   try {
     final sessionDetails = await getSessionDetails(chatSessionId);
     if (sessionDetails == null) return [];
@@ -78,26 +80,56 @@ class ChatModel {
     if (!marketplaceDoc.exists) return [];
 
     final List<dynamic> schoolIds = marketplaceDoc.data()!['schoolIds'];
-    List<Map<String, dynamic>> locations = [];
 
     for (var schoolId in schoolIds) {
-  final schoolDoc = await firestore.collection('schools').doc(schoolId).get();
-  if (!schoolDoc.exists) continue;
+      final schoolDoc = await firestore.collection('schools').doc(schoolId).get();
+      if (!schoolDoc.exists) continue;
 
-  // Ensure 'locations' field exists and is a list before proceeding.
-  final schoolLocations = schoolDoc.data()?['locations'];
-  if (schoolLocations is List) {
-    locations.addAll(List<Map<String, dynamic>>.from(schoolLocations));
-  }
-}
-
-    return locations;
+      final data = schoolDoc.data();
+      if (data != null) {
+        locations.add({
+          'schoolId': schoolId,
+          'schoolName': data['name'],
+          'locationName': data['locationName'],
+          'address': data['address'],
+        });
+      }
+    }
   } catch (e) {
     if (kDebugMode) {
       print("Error in fetchLocationsBasedOnSession: $e");
     }
-    return [];
+  }
+
+  return locations;
+}
+
+Future<void> sendLocationMessage(String chatSessionId, String locationName, String mapLink, String address) async {
+  if (locationName.isEmpty) return;
+
+  try {
+    await firestore.collection('chat_sessions').doc(chatSessionId).collection('messages').add({
+      'senderId': currentUser!.uid,
+      'type': 'location',
+      'content': locationName,
+      'location': {
+        'mapLink': mapLink,
+        'address': address,
+      },
+      'timestamp': Timestamp.now(),
+    });
+
+    // Optionally, update the last message preview and time in the chat session
+    await firestore.collection('chat_sessions').doc(chatSessionId).update({
+      'lastMessage': "Location: $locationName",
+      'lastMessageAt': Timestamp.now(),
+    });
+  } catch (e) {
+    if (kDebugMode) {
+      print("Error in sendLocationMessage: $e");
+    }
   }
 }
+
 
 }
