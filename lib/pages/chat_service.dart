@@ -85,12 +85,12 @@ class ChatService {
   String senderEmail = currentUser!.email!;
 
   // Prevent creating a chat session with oneself
-  if (senderEmail == receiverEmail) {
-    if (kDebugMode) {
-      print("Error: Seller and buyer emails are the same");
-    }
-    return null;
-  }
+  // if (senderEmail == receiverEmail) {
+  //   if (kDebugMode) {
+  //     print("Error: Seller and buyer emails are the same");
+  //   }
+  //   return null;
+  // }
   
   String? buyerName = await getBuyerName(senderEmail);
   String? productName = await getProductName(productId);

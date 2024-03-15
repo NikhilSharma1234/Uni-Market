@@ -43,7 +43,8 @@ class _ChatPageState extends State<ChatPage> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.location_on),
-                onPressed: () => _showLocationsModal(context),
+                onPressed:
+                    _showLocationsModal, // Directly use the method without passing context.
               ),
             ],
           ),
@@ -166,93 +167,111 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
- Widget _buildMessageComposer() {
-  return Container(
-    padding: const EdgeInsets.all(8.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _chatController.messageController,
-            decoration: const InputDecoration(
-              labelText: "Type a message...",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+  Widget _buildMessageComposer() {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _chatController.messageController,
+              decoration: const InputDecoration(
+                labelText: "Type a message...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                ),
               ),
+              keyboardType: TextInputType.multiline,
+              maxLines: 5, // Allows the input box to expand up to 5 lines
+              minLines: 1, // Starts with a single line
+              textInputAction: TextInputAction.send,
+              onEditingComplete: () {
+                _chatController.sendMessage(widget.chatSessionId);
+                // Reset focus to the text field after sending message to allow continuous typing
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              inputFormatters: [
+                // Prevent new line characters on web
+                if (kIsWeb) FilteringTextInputFormatter.deny(RegExp('[\n]')),
+              ],
             ),
-            keyboardType: TextInputType.multiline,
-            maxLines: 5, // Allows the input box to expand up to 5 lines
-            minLines: 1, // Starts with a single line
-            textInputAction: TextInputAction.send,
-            onEditingComplete: () {
-              _chatController.sendMessage(widget.chatSessionId);
-              // Reset focus to the text field after sending message to allow continuous typing
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            inputFormatters: [
-              // Prevent new line characters on web
-              if (kIsWeb) FilteringTextInputFormatter.deny(RegExp('[\n]')),
-            ],
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.send),
-          onPressed: () => _chatController.sendMessage(widget.chatSessionId),
-        ),
-      ],
-    ),
-  );
-}
-
-void _showLocationsModal(BuildContext context) async {
-  final locations = await _chatController.fetchLocationsBasedOnSession(widget.chatSessionId);
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return ListView.builder(
-        itemCount: locations.length,
-        itemBuilder: (BuildContext context, int index) {
-          var location = locations[index];
-          return ListTile(
-            title: Text(location['locationName']),
-            trailing: IconButton(
-              icon: Icon(Icons.info_outline),
-              onPressed: () => _showLocationInfo(context, location['info']),
-            ),
-            onTap: () => _openMapLink(location['mapLink']),
-          );
-        },
-      );
-    },
-  );
-}
-
-void _showLocationInfo(BuildContext context, String info) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Location Info'),
-        content: Text(info),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Close'),
-            onPressed: () => Navigator.of(context).pop(),
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: () => _chatController.sendMessage(widget.chatSessionId),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showLocationsModal() async {
+  final locations = await _chatController.fetchLocationsBasedOnSession(widget.chatSessionId);
+
+  // Check if the widget is still mounted (i.e., part of the widget tree) after the async gap.
+  if (!mounted) return;
+
+  // Since we're now inside the 'if' block, we're sure 'context' can be safely used.
+  showDialog(
+    context: context, // Directly using 'context' from the stateful widget.
+    builder: (BuildContext context) {
+      return Dialog(
+        child: Container(
+          height: 200.0,
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: locations.length,
+            itemBuilder: (BuildContext context, int index) {
+              var location = locations[index];
+              return ListTile(
+                title: Text(location['locationName']),
+                trailing: IconButton(
+                  icon: Icon(Icons.info_outline),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                    _showLocationInfo(location['schoolName'], location['address']);
+                  },
+                ),
+                onTap: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                  // Implement sending the location message
+                },
+              );
+            },
+          ),
+        ),
       );
     },
   );
 }
 
 
-Future<void> _openMapLink(String urlString) async {
-  final url = Uri.parse(urlString);
-  if (!await launchUrl(url)) {
-    print('Could not launch $urlString');
+  void _showLocationInfo(String schoolName, String address) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Info'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('School: $schoolName'),
+                const SizedBox(height: 8.0),
+                Text('Address: $address'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
-}
-
-
-
 }
