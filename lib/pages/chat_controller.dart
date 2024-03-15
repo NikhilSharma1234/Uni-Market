@@ -24,6 +24,11 @@ class ChatController {
   return await _chatModel.fetchLocationsBasedOnSession(chatSessionId);
   }
 
+  Future<void> sendLocationMessage(String chatSessionId, String locationName, String schoolName, String address) async {
+  await _chatModel.sendLocationMessage(chatSessionId, locationName, schoolName, address);
+}
+
+
   // If you need to expose _chatModel, provide a public getter
   ChatModel get chatModel => _chatModel;
 }
