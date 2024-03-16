@@ -19,7 +19,6 @@ class ChatModel {
     if (messageContent.isEmpty) return;
 
     try {
-      // Send the message
       await firestore
           .collection('chat_sessions')
           .doc(chatSessionId)
@@ -30,16 +29,13 @@ class ChatModel {
         'timestamp': Timestamp.now(),
       });
 
-      // Prepare the lastMessage content, trimming to the first 30 characters if necessary
       String lastMessagePreview = messageContent.length > 30
           ? messageContent.substring(0, 30)
           : messageContent;
 
-      // Update the lastMessage field in the chat session document
       await firestore.collection('chat_sessions').doc(chatSessionId).update({
         'lastMessage': lastMessagePreview,
-        'lastMessageAt': Timestamp
-            .now(), // Optionally update a timestamp for sorting or display
+        'lastMessageAt': Timestamp.now(),
       });
     } catch (e) {
       if (kDebugMode) {
@@ -64,73 +60,102 @@ class ChatModel {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchLocationsBasedOnSession(String chatSessionId) async {
-  List<Map<String, dynamic>> locations = [];
+  Future<List<Map<String, dynamic>>> fetchLocationsBasedOnSession(
+      String chatSessionId) async {
+    List<Map<String, dynamic>> locations = [];
 
-  try {
-    final sessionDetails = await getSessionDetails(chatSessionId);
-    if (sessionDetails == null) return [];
+    try {
+      final sessionDetails = await getSessionDetails(chatSessionId);
+      if (sessionDetails == null) return [];
 
-    final productId = sessionDetails['productId'];
-    final itemDoc = await firestore.collection('items').doc(productId).get();
-    if (!itemDoc.exists) return [];
+      final productId = sessionDetails['productId'];
+      final itemDoc = await firestore.collection('items').doc(productId).get();
+      if (!itemDoc.exists) return [];
 
-    final marketplaceId = itemDoc.data()!['marketplaceId'];
-    final marketplaceDoc = await firestore.collection('marketplace').doc(marketplaceId).get();
-    if (!marketplaceDoc.exists) return [];
+      final marketplaceId = itemDoc.data()!['marketplaceId'];
+      final marketplaceDoc =
+          await firestore.collection('marketplace').doc(marketplaceId).get();
+      if (!marketplaceDoc.exists) return [];
 
-    final List<dynamic> schoolIds = marketplaceDoc.data()!['schoolIds'];
+      final List<dynamic> schoolIds = marketplaceDoc.data()!['schoolIds'];
 
-    for (var schoolId in schoolIds) {
-      final schoolDoc = await firestore.collection('schools').doc(schoolId).get();
-      if (!schoolDoc.exists) continue;
+      for (var schoolId in schoolIds) {
+        final schoolDoc =
+            await firestore.collection('schools').doc(schoolId).get();
+        if (!schoolDoc.exists) continue;
 
-      final data = schoolDoc.data();
-      if (data != null) {
-        locations.add({
-          'schoolName': data['name'],
-          'locationName': data['locationName'],
-          'address': data['address'],
-        });
+        final data = schoolDoc.data();
+        if (data != null) {
+          locations.add({
+            'schoolName': data['name'],
+            'locationName': data['locationName'],
+            'address': data['address'],
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error in fetchLocationsBasedOnSession: $e");
       }
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print("Error in fetchLocationsBasedOnSession: $e");
+
+    return locations;
+  }
+
+  Future<void> sendLocationMessage(String chatSessionId, String locationName,
+      String schoolName, String address) async {
+    try {
+      String userName = await getCurrentUserName();
+
+      String messageContent =
+          "$userName SELECTED -- $locationName at $schoolName";
+
+      await firestore
+          .collection('chat_sessions')
+          .doc(chatSessionId)
+          .collection('messages')
+          .add({
+        'senderId': currentUser!.uid,
+        'type': 'location',
+        'content': messageContent,
+        'locationName': locationName,
+        'schoolName': schoolName,
+        'address': address,
+        'timestamp': Timestamp.now(),
+      });
+
+      await firestore.collection('chat_sessions').doc(chatSessionId).update({
+        'lastMessage': messageContent,
+        'lastMessageAt': Timestamp.now(),
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error in sendLocationMessage: $e");
+      }
     }
   }
 
-  return locations;
-}
+  Future<String> getCurrentUserName() async {
+    String userEmail = currentUser?.email ?? "";
+    if (userEmail.isEmpty) {
+      return "Unknown User";
+    }
 
-
-Future<void> sendLocationMessage(String chatSessionId, String locationName, String schoolName, String address) async {
-  try {
-    String messageContent = "$locationName at $schoolName"; // Format the content
-    await firestore.collection('chat_sessions').doc(chatSessionId).collection('messages').add({
-      'senderId': currentUser!.uid,
-      'type': 'location', // New field to denote the message type
-      'content': messageContent, // The formatted message content
-      'locationName': locationName, // Store the locationName
-      'schoolName': schoolName, // Store the schoolName
-      'address': address, // Store the address
-      'timestamp': Timestamp.now(),
-    });
-
-    // Optionally, update the last message preview and time in the chat session
-    await firestore.collection('chat_sessions').doc(chatSessionId).update({
-      'lastMessage': messageContent,
-      'lastMessageAt': Timestamp.now(),
-    });
-  } catch (e) {
-    if (kDebugMode) {
-      print("Error in sendLocationMessage: $e");
+    try {
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(userEmail).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> userData =
+            userDoc.data() as Map<String, dynamic>? ?? {};
+        return userData['name'] ?? "No Name";
+      } else {
+        return "User Not Found";
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching user name: $e");
+      }
+      return "Error";
     }
   }
-}
-
-
-
-
-
 }
