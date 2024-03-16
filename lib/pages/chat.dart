@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 
-
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
 
@@ -81,80 +80,90 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildMessageBubble(BuildContext context, QueryDocumentSnapshot<Object?> message, bool isSentByMe) {
-  // Determine if we are in dark mode or light mode
-  bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildMessageBubble(BuildContext context,
+      QueryDocumentSnapshot<Object?> message, bool isSentByMe) {
+    // Determine if we are in dark mode or light mode
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-  // Define bubble colors for light mode and dark mode
-  Color senderBubbleColorLight = Colors.blueGrey.shade700;
-  Color receiverBubbleColorLight = Colors.blueGrey.shade700;
-  Color senderBubbleColorDark = Colors.white;
-  Color receiverBubbleColorDark = Colors.grey.shade200;
+    // Define bubble colors for light mode and dark mode
+    Color senderBubbleColorLight = Colors.blueGrey.shade700;
+    Color receiverBubbleColorLight = Colors.blueGrey.shade700;
+    Color senderBubbleColorDark = Colors.white;
+    Color receiverBubbleColorDark = Colors.grey.shade200;
+    Color locationBubbleColor = isDarkMode ? Colors.white :Colors.blueGrey.shade700;
 
-  // Set bubble color and text color based on the theme and sender
-  Color bubbleColor = isSentByMe ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight) : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
-  Color textColor = isDarkMode ? Colors.black : Colors.white;
+    // Set bubble color and text color based on the theme and sender
+    Color bubbleColor = isSentByMe
+        ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight)
+        : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
+    Color textColor = isDarkMode ? Colors.black : Colors.white;
+    
 
-  final messageData = message.data() as Map<String, dynamic>?;
+    final messageData = message.data() as Map<String, dynamic>?;
 
-  // Use the safely casted Map to check for the 'type' key.
-  bool isLocationMessage = messageData?.containsKey('type') == true && messageData?['type'] == 'location';
+    // Use the safely casted Map to check for the 'type' key.
+    bool isLocationMessage = messageData?.containsKey('type') == true &&
+        messageData?['type'] == 'location';
 
-  if (isLocationMessage) {
-    // Special styling for location messages
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white, // Light blue color for location message
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
+      
+
+    return LayoutBuilder(
+    builder: (context, constraints) {
+      // Calculate dynamic width here, e.g., a percentage of the parent's width
+      double bubbleMaxWidth = constraints.maxWidth * 0.8; // Example: 80% of parent width
+
+      if (isLocationMessage) {
+  return Center(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: locationBubbleColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: IntrinsicWidth(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "${message.get('content')}", // Display the formatted content
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black, // Text color for location message
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                "${message.get('content')}: ", // Message content
+                style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(height: 5),
-            TextButton(
-              onPressed: () {
-                // Implement functionality to view the location
-                // For example, you might want to open the location in a map view
-              },
+            InkWell(
+              onTap: () => _showLocationInfo(message.get('schoolName'), message.get('address')),
               child: Text(
-                "View Location",
-                style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                "view location",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
       ),
-    );
-  } else {
-    // Regular text message layout
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Calculate dynamic width here, e.g., a percentage of the parent's width
-        double bubbleMaxWidth = constraints.maxWidth * 0.8; // Example: 80% of parent width
+    ),
+  );
+}
 
+else {
+        // Regular text message layout
         return Row(
           mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: bubbleMaxWidth, // Use dynamic width
+                maxWidth: bubbleMaxWidth, // Use dynamic width for text messages too
               ),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: bubbleColor, // Use the determined bubble color
+                  color: bubbleColor,
                   borderRadius: isSentByMe
                       ? const BorderRadius.only(
                           topLeft: Radius.circular(20),
@@ -187,15 +196,13 @@ class _ChatPageState extends State<ChatPage> {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         );
-      },
-    );
-  }
+      }
+    },
+  );
 }
-
-
   Widget _buildMessageComposer() {
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -235,51 +242,45 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _showLocationsModal() async {
-  final locations = await _chatController.fetchLocationsBasedOnSession(widget.chatSessionId);
+    final locations = await _chatController
+        .fetchLocationsBasedOnSession(widget.chatSessionId);
 
-  // Check if the widget is still mounted (i.e., part of the widget tree) after the async gap.
-  if (!mounted) return;
+    // Check if the widget is still mounted (i.e., part of the widget tree) after the async gap.
+    if (!mounted) return;
 
-  // Since we're now inside the 'if' block, we're sure 'context' can be safely used.
-  showDialog(
-    context: context, // Directly using 'context' from the stateful widget.
-    builder: (BuildContext context) {
-      return Dialog(
-        child: Container(
-          height: 200.0,
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: locations.length,
-            itemBuilder: (BuildContext context, int index) {
-              var location = locations[index];
-              return ListTile(
-                title: Text(location['locationName']),
-                trailing: IconButton(
-                  icon: const Icon(Icons.info_outline),
-                  onPressed: () {
+    // Since we're now inside the 'if' block, we're sure 'context' can be safely used.
+    showDialog(
+      context: context, // Directly using 'context' from the stateful widget.
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            height: 200.0,
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: locations.length,
+              itemBuilder: (BuildContext context, int index) {
+                var location = locations[index];
+                return ListTile(
+                  title: Text(location['locationName']),
+                  
+                  onTap: () {
                     Navigator.of(context).pop(); // Close the dialog
-                    _showLocationInfo(location['schoolName'], location['address']);
+                    _chatController.sendLocationMessage(
+                      widget.chatSessionId,
+                      location['locationName'],
+                      location['schoolName'],
+                      location['address'],
+                    );
                   },
-                ),
-                onTap: () {
-  Navigator.of(context).pop(); // Close the dialog
-  _chatController.sendLocationMessage(
-    widget.chatSessionId,
-    location['locationName'],
-    location['schoolName'],
-    location['address'],
-  );
-},
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   void _showLocationInfo(String schoolName, String address) {
     showDialog(
