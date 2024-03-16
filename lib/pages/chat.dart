@@ -117,6 +117,7 @@ class _ChatPageState extends State<ChatPage> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(
               style: TextStyle(
                   fontSize: 16, color: textColor), // Default text style
