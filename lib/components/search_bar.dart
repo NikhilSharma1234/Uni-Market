@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart'
 import 'package:uni_market/helpers/filters.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:typesense/typesense.dart';
+import 'package:http/http.dart' as http;
 
 class ItemSearchBar extends StatefulWidget {
   // passing a function from the parent down so we can use its setState to redraw the items
@@ -151,14 +153,52 @@ class SearchPageController {
 
     final searchParameters = {
       'q': searchTerm,
-      'query_by': 'embedding',
+      'query_by': 'name',
       'sort_by': sort,
       'filter_by': filterString,
     };
-    final Map<String, dynamic> data =
-        await client.collection('items').documents.search(searchParameters);
+
+    String search_type = "name";
+
+    // await client.collecton('items2').documents.search(searchParameters);
+
+    // final Map<String, dynamic> data =
+    //     await client.collection('items').documents.search(searchParameters);
+
+    final typesense_key = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr';
+
+    String url = "https://6bdc-71-89-244-12.ngrok-free.app/collections/items2";
+
+    Uri search_url = Uri.parse(
+        "$url/documents/search?q=$searchTerm&query_by=$search_type&sort_by=$sort&filter_by=$filterString");
+    search_url =
+        Uri.parse("$url/documents/search?q=test&query_by=$search_type");
+    final Map<String, String> headers = {
+      'Access-Control-Allow-Methods': 'true',
+      "X-TYPESENSE-API-KEY": typesense_key,
+    };
+
+    Map<String, dynamic> data = {};
+
+    try {
+      // search typesense
+      final response = await http.get(search_url, headers: headers);
+
+      if (response.statusCode == 200) {
+        // Decode the JSON response
+        data = json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        // Handle error
+        throw Exception('Failed to fetch items: ${response.statusCode}');
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    print(data);
+
     if (context.mounted) {
-      widgets = await generateItems(data, context);
+      // widgets = await generateItems(data, context);
     } else {
       if (kDebugMode) {
         print("no clue as to whats going on, buildcontext wasnt mounded");
