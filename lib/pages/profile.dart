@@ -22,8 +22,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late GlobalKey<_ProfilePageState> key =
-      GlobalKey<_ProfilePageState>();
+  late GlobalKey<_ProfilePageState> key = GlobalKey<_ProfilePageState>();
   late bool _switchValue;
   XFile? newProfilePic;
   bool loading = false;
@@ -35,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _switchValue = Provider.of<ThemeProvider>(context, listen: false)
         .setThemeToggleSwitch();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,22 +49,21 @@ class _ProfilePageState extends State<ProfilePage> {
         future: getUserProfileData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child:CircularProgressIndicator()); // or any loading indicator
+            return const Center(
+                child: CircularProgressIndicator()); // or any loading indicator
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
             // Successful DB data snapshot
             Map<String, dynamic> userProfileData = snapshot.data!;
-            
 
-      
             List<String> schoolsInMarketplace =
                 List<String>.from(userProfileData["schoolsInMarketplace"]);
             schoolsInMarketplace.remove(userProfileData["institution"]);
-      
+
             // Get available profile pic (starting or assignable)
             String profilePic;
-      
+
             if (userProfileData["assignable_profile_pic_path"] == null) {
               // Starting Pic Exists, New User / User Has not set an assignable profile
               profilePic = userProfileData["starting_profile_pic_url"];
@@ -73,241 +72,208 @@ class _ProfilePageState extends State<ProfilePage> {
               profilePic = userProfileData["assignable_profile_pic_url"];
             }
 
-            if (loading) return const Center(child:CircularProgressIndicator());
-      
+            if (loading)
+              return const Center(child: CircularProgressIndicator());
+
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Scrollbar(
                 trackVisibility: true,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+                  padding: const EdgeInsets.only(
+                      top: 8, bottom: 8, left: 16, right: 16),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Profile',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 24
-                        )
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12, bottom: 12),
-                        child: Center(
-                          child: InkWell(
-                            onTap: () async {
-                              newProfilePic = await singleImagePicker(context);
-                              if (newProfilePic != null) {
-                                setState(() {
-                                  loading = true;
-                                });
-                                _updateProfilePicture(newProfilePic)
-                                .then((success) {
-                                  if (success != null) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text("Profile Settings Changed!"),
-                                          content: const Text("Profile Image Updated"),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text("Continue"),
-                                            )
-                                          ],
-                                        );
-                                      }
-                                    );
-                                  }
-                                });
-                              }
-                            },
-                            child: Stack(children: [
-                              AdvancedAvatar(
-                                size: 160,
-                                image: NetworkImage(profilePic),
-                              ),
-                              const Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Icon(
-                                  Icons.edit,
-                                  size: 20,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Profile',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(fontSize: 24)),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 12),
+                          child: Center(
+                            child: InkWell(
+                              onTap: () async {
+                                newProfilePic =
+                                    await singleImagePicker(context);
+                                if (newProfilePic != null) {
+                                  setState(() {
+                                    loading = true;
+                                  });
+                                  _updateProfilePicture(newProfilePic)
+                                      .then((success) {
+                                    if (success != null) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  "Profile Settings Changed!"),
+                                              content: const Text(
+                                                  "Profile Image Updated"),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text("Continue"),
+                                                )
+                                              ],
+                                            );
+                                          });
+                                    }
+                                  });
+                                }
+                              },
+                              child: Stack(children: [
+                                AdvancedAvatar(
+                                  size: 160,
+                                  image: NetworkImage(profilePic),
                                 ),
-                              )
-                            ]),
-                          ),
-                        ),
-                      ),
-                      const Text("Name", style: 
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        )
-                      ),
-                      Text(userProfileData["name"], style:
-                        const TextStyle(
-                          fontSize: 12
-                        )
-                      ),
-                      const Text("Email", style: 
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        )
-                      ),
-                      Text(userProfileData["email"], style:
-                        const TextStyle(
-                          fontSize: 12
-                        )
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text("Dark Mode", style: 
-                            TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                            )
-                          ),
-                          CustomSwitch(
-                            value: _switchValue,
-                            onChanged: (bool val) {
-                              setState(() {
-                                _switchValue = val;
-                              });
-                              Provider.of<ThemeProvider>(context,
-                                      listen: false)
-                                  .setThemeMode(
-                                      val ? ThemeMode.dark : ThemeMode.light);
-                            },
-                          ),
-                        ],
-                      ),
-                      const Text("Institution", style: 
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        )
-                      ),
-                      Text(
-                        userProfileData["institutionFullName"],
-                        style: const TextStyle(
-                          fontSize: 12
-                        )
-                      ),
-                      const Text("Other Schools in Marketplace",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        )
-                      ),
-                      Text(
-                        schoolsInMarketplace.join(', '),
-                        style: const TextStyle(
-                          fontSize: 12
-                        )
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(200, 36),
-                              backgroundColor: Colors.grey.shade400,
-                              foregroundColor: Colors.white,
-                              shadowColor: Colors.blue.shade900,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                              ),
+                                const Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Icon(
+                                    Icons.edit,
+                                    size: 20,
+                                  ),
+                                )
+                              ]),
                             ),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ItemView(
-                                      sellerID: FirebaseAuth
-                                          .instance.currentUser?.email),
-                                ),
-                              );
-                            },
-                            child: const Text("Items you've listed"),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(200, 36),
-                              backgroundColor: Colors.grey.shade400,
-                              foregroundColor: Colors.white,
-                              shadowColor: Colors.blue.shade900,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                              ),
-                            ),
-                            onPressed: () {},
-                            child: const Text("Items Bought"),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(200, 36),
-                              backgroundColor: Colors.grey.shade400,
-                              foregroundColor: Colors.white,
-                              shadowColor: Colors.blue.shade900,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                              ),
-                            ),
-                            onPressed: () {},
-                            child: const Text("Items Sold"),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(200, 36),
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              shadowColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0),
-                              ),
-                            ),
-                            onPressed: () async {
-                              await FirebaseAuth.instance.signOut();
-                            },
-                            child: const Text('LOG OUT'),
-                          ),
-                        ),
-                      ),
-                      // Delete Account Button, NO LOGIC
-                      Center(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            "Delete Account",
+                        const Text("Name",
                             style: TextStyle(
-                              color: Colors.red
-                            )
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(userProfileData["name"],
+                            style: const TextStyle(fontSize: 12)),
+                        const Text("Email",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(userProfileData["email"],
+                            style: const TextStyle(fontSize: 12)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Dark Mode",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                            CustomSwitch(
+                              value: _switchValue,
+                              onChanged: (bool val) {
+                                setState(() {
+                                  _switchValue = val;
+                                });
+                                Provider.of<ThemeProvider>(context,
+                                        listen: false)
+                                    .setThemeMode(
+                                        val ? ThemeMode.dark : ThemeMode.light);
+                              },
+                            ),
+                          ],
+                        ),
+                        const Text("Institution",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(userProfileData["institutionFullName"],
+                            style: const TextStyle(fontSize: 12)),
+                        const Text("Other Schools in Marketplace",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(schoolsInMarketplace.join(', '),
+                            style: const TextStyle(fontSize: 12)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(200, 36),
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ItemView(
+                                        sellerID: FirebaseAuth
+                                            .instance.currentUser?.email),
+                                  ),
+                                );
+                              },
+                              child: const Text("Items you've listed"),
+                            ),
                           ),
                         ),
-                      ),
-                    ]
-                  ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(200, 36),
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Text("Items Bought"),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(200, 36),
+                                backgroundColor: Colors.grey.shade400,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.blue.shade900,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Text("Items Sold"),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                fixedSize: const Size(200, 36),
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                shadowColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                              ),
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                await FirebaseAuth.instance.signOut();
+                              },
+                              child: const Text('LOG OUT'),
+                            ),
+                          ),
+                        ),
+                        // Delete Account Button, NO LOGIC
+                        Center(
+                          child: TextButton(
+                            onPressed: () {},
+                            child: const Text("Delete Account",
+                                style: TextStyle(color: Colors.red)),
+                          ),
+                        ),
+                      ]),
                 ),
               ),
             );
@@ -372,20 +338,20 @@ Future<Map<String, dynamic>> getUserProfileData() async {
 
     // read schools in users marketplace Id from db
     await FirebaseFirestore.instance
-      .collection("marketplace")
-      .doc(userProfile["marketplaceId"])
-      .get()
-      .then((DocumentSnapshot documentSnapshot) {
-              userProfile["schoolsInMarketplace"] = documentSnapshot.get("schoolIds");
-      });
+        .collection("marketplace")
+        .doc(userProfile["marketplaceId"])
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      userProfile["schoolsInMarketplace"] = documentSnapshot.get("schoolIds");
+    });
     // read school fullname
     await FirebaseFirestore.instance
-      .collection("schools")
-      .doc(userProfile["institution"])
-      .get()
-      .then((DocumentSnapshot documentSnapshot) {
-        userProfile["institutionFullName"] = documentSnapshot.get("name");
-      });
+        .collection("schools")
+        .doc(userProfile["institution"])
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      userProfile["institutionFullName"] = documentSnapshot.get("name");
+    });
   }
 
   return userProfile;
