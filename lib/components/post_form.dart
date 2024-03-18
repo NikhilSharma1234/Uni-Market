@@ -8,9 +8,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:uni_market/pages/item_page.dart';
 import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -273,13 +275,33 @@ class _PostFormState extends State<PostForm> {
         "lastReviewedBy": null
       };
 
-      // POTENTIAL PLACEHOLDER FOR UNACCEPTABLE STRING CHECKING (profanity, racism ...)
-
       // create post in db
       await FirebaseFirestore.instance.collection("items").doc().set(userPost);
 
+      // Convert Selected Images from Firebase Storage path to download url
+      List<String> downloadUrlsForItemPage = [];
+
+      for (String url in formData["images"]) {
+        Reference ref = FirebaseStorage.instance.ref().child(url);
+        Future<String> downloadUrl = ref.getDownloadURL();
+        downloadUrl.then((value) => downloadUrlsForItemPage.add(value));
+      }
+
+      Item userItem = Item(
+          formData["title"],
+          Timestamp.now().toString(),
+          formData["description"],
+          formData["condition"],
+          schoolId ?? "",
+          10.99,
+          Timestamp.now(),
+          downloadUrlsForItemPage,
+          sellerId ?? "",
+          [""]);
+
       // show see post dialog upon successful creation
       if (context.mounted) {
+        Navigator.pop(context);
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -289,8 +311,15 @@ class _PostFormState extends State<PostForm> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    _flag(false);
-                    Navigator.of(context).pop();
+                    // _flag(false);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ItemPage(data: userItem)),
+                      );
+                    }
                   },
                   child: const Text('Click here to view your post'),
                 ),
@@ -383,4 +412,9 @@ Future<List<String>> convertXFilesToDataUrls(List<XFile> xFiles) async {
   }
 
   return dataUrls;
+}
+
+Future<String> getImageDownloadUrl(String imagePath) async {
+  Reference ref = FirebaseStorage.instance.ref().child(imagePath);
+  return await ref.getDownloadURL();
 }
