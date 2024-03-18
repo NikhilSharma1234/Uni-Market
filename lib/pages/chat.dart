@@ -238,40 +238,33 @@ class _ChatPageState extends State<ChatPage> {
 
   if (!mounted) return;
 
-  // Calculate dialog height based on number of locations
-  double dialogHeight = math.min(56.0 * locations.length + 64.0, // Adding extra space for the title
-      MediaQuery.of(context).size.height * 0.8);
-
-  // Calculate dialog width as a percentage of screen width
-  double screenWidth = MediaQuery.of(context).size.width;
-  double dialogWidth = screenWidth * 0.4; // Adjust this value as needed
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return Dialog(
-        child: SizedBox(
-          height: dialogHeight,
-          width: dialogWidth,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                alignment: Alignment.center,
-                width: double.infinity,
-                child: const Text(
-                  "Available Locations",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: locations.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var location = locations[index];
-                    return ListTile(
-                      title: Text(location['locationName']),
+      return AlertDialog(
+        title: const Text(
+          "Recommended locations",
+          textAlign: TextAlign.center,
+        ),
+        content: const Text(
+          "Suggest a location for the trade of the item",
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 4),
+            child: Column(
+              children: [
+                const Divider(),
+                for (var location in locations)
+                  ...[
+                    ListTile(
+                      title: Text(
+                        location['locationName'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
                       onTap: () {
                         Navigator.of(context).pop();
                         _chatController.sendLocationMessage(
@@ -281,20 +274,25 @@ class _ChatPageState extends State<ChatPage> {
                           location['address'],
                         );
                       },
-                    );
-                  },
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
-                ),
-              ),
-            ],
-          ),
-        ),
+                    ),
+                    const Divider()
+                  ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: TextButton.styleFrom(
+                      foregroundColor:const Color(0xFF041E42),
+                      padding: const EdgeInsets.all(16.0),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    child: const Text('Close'),
+                  ),
+                )
+              ]
+            ),
+          )
+        ]
       );
     },
   );
