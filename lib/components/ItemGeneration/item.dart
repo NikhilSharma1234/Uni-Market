@@ -7,12 +7,12 @@ class Item {
   String condition;
   String schoolId;
   double price;
-  Timestamp dateListed;
+  Timestamp createdAt;
   List<String> imagePath;
   String sellerId;
   List<dynamic> tags;
   Item(this.name, this.id, this.description, this.condition, this.schoolId,
-      this.price, this.dateListed, this.imagePath, this.sellerId, this.tags);
+      this.price, this.createdAt, this.imagePath, this.sellerId, this.tags);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
@@ -22,7 +22,7 @@ class Item {
         condition = "missing",
         schoolId = "missing",
         price = 0.0,
-        dateListed = Timestamp(0, 0),
+        createdAt = Timestamp(0, 0),
         sellerId = "missing",
         imagePath = [],
         tags = [] {
@@ -32,7 +32,7 @@ class Item {
     condition = map['condition'];
     schoolId = map['schoolId'];
     price = map['price'].toDouble();
-    dateListed = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
+    createdAt = Timestamp.fromMicrosecondsSinceEpoch(map['dateListed']);
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
@@ -48,7 +48,7 @@ class Item {
         condition = "missing",
         schoolId = "missing",
         price = 0.0,
-        dateListed = Timestamp(0, 0),
+        createdAt = Timestamp(0, 0),
         sellerId = "missing",
         imagePath = [],
         tags = [] {
@@ -58,7 +58,7 @@ class Item {
     condition = map['condition'];
     schoolId = map['schoolId'];
     price = map['price'];
-    dateListed = map['dateListed'];
+    createdAt = map['createdAt'];
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
@@ -68,7 +68,7 @@ class Item {
 
   @override
   toString() {
-    return '$name $price $dateListed $sellerId $imagePath $tags';
+    return '$name $price $createdAt $sellerId $imagePath $tags';
   }
 }
 

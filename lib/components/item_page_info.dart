@@ -26,7 +26,7 @@ SingleChildScrollView itemPageInfo(
                   textAlign: TextAlign.start),
             ),
             Text(
-                'Listed ${DateFormat('yMd').format(itemData.dateListed.toDate())} at ${itemData.schoolId}',
+                'Listed ${DateFormat('yMd').format(itemData.createdAt.toDate())} at ${itemData.schoolId}',
                 style: const TextStyle(fontSize: 16)),
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 4),
