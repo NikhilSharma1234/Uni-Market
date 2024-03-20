@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uni_market/components/dialog.dart';
+import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
@@ -11,6 +11,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
 Step aboutYou(int index) {
   return Step(
@@ -269,14 +270,14 @@ class _AboutYouContentState extends State<AboutYouContent> {
           // Update the user with marketplace and school id
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(FirebaseAuth.instance.currentUser?.email)
+              .doc(data_store.user.email)
               .update(
                   {
                     'schoolId': selectedSchool,
                     'marketplaceId': marketplaceId,
                     'verificationDocsUploaded': true
                   });
-
+          await loadCurrentUser(data_store.user.email);
           // Additional actions after successful upload
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Upload successful!')),

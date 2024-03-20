@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uni_market/data_models/current_user.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final User? currentUser = FirebaseAuth.instance.currentUser;
+  final CurrentUser currentUser = data_store.user;
 
   Future<String?> getUserEmail(String productId) async {
     try {
@@ -67,7 +68,7 @@ class ChatService {
   }
 
   Future<String?> createChatSession(String productId) async {
-  if (currentUser == null || currentUser!.email == null) {
+  if (currentUser.email == "") {
     if (kDebugMode) {
       print("Error: Current user is null or has no email");
     }
@@ -82,7 +83,7 @@ class ChatService {
     return null;
   }
 
-  String senderEmail = currentUser!.email!;
+  String senderEmail = currentUser.email;
 
   // Prevent creating a chat session with oneself
   //Commented out the if statement to allow for testing

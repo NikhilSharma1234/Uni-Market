@@ -5,7 +5,7 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
   BuildContext context;
 
   ThemeProvider({required this.context});
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.dark;
 
   ThemeMode get themeMode => _themeMode;
 

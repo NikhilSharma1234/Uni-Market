@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -127,8 +128,8 @@ class _RegistirationState extends State<Registiration> {
         "email": userEmail,
         "schoolId": null,
         "marketplaceId": null,
-        "darkMode": null,
-        "emailVerified": null,
+        "darkMode": 0,
+        "emailVerified": false,
         "verificationDocsUploaded": false,
         "verifiedUniStudent": false,
         "verifiedBy": null,
@@ -142,6 +143,7 @@ class _RegistirationState extends State<Registiration> {
           .collection('users')
           .doc(userEmail)
           .set(user);
+      await loadCurrentUser(userEmail);
       Timer(const Duration(seconds: 2), () async {
         submitting = false;
         tapped();
