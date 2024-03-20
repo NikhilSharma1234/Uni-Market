@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uni_market/components/image_carousel.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -227,29 +227,8 @@ class _PostFormState extends State<PostForm> {
         }
         return;
       }
-
-      String? marketplaceId;
-      String? schoolId;
-      String? sellerId = "";
-
-      // Initialize db connection for current user
-      var currentUser = FirebaseAuth.instance.currentUser;
-
-      // Conditionally set userId from current user email
-      if (currentUser != null) {
-        sellerId = currentUser.email;
-      }
-
-      // get users marketplace ID(s) and fill form data structure
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(sellerId)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        // Get data from current user doc snapshot
-        marketplaceId = documentSnapshot.get("marketplaceId");
-        schoolId = documentSnapshot.get("schoolId");
-      });
+      // Get current user
+      var currentUser = data_store.user;
 
       // POTENTIAL PLACEHOLDER FOR TAG SETTING
       // NO proper item ID stored (empty string)
@@ -263,11 +242,11 @@ class _PostFormState extends State<PostForm> {
         "dateUpdated": Timestamp.now(),
         "description": formData["description"],
         "images": formData["images"],
-        "marketplaceId": marketplaceId,
+        "marketplaceId": data_store.user.marketplaceId,
         "name": formData["title"],
         "price": double.parse(formData["price"]),
-        "schoolId": schoolId,
-        "sellerId": sellerId,
+        "schoolId": data_store.user.schoolId,
+        "sellerId": data_store.user.email,
         "tags": [],
         "isFlagged": isFlagged,
         "lastReviewedBy": null

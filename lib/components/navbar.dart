@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/about_us.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/pages/sign_in.dart';
@@ -14,8 +16,8 @@ class NavBar extends AppBar {
 class _NavBarState extends State<NavBar> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool darkModeOn = brightness == Brightness.dark;
+    bool darkModeOn = Provider.of<ThemeProvider>(context, listen: true)
+      .themeMode == ThemeMode.dark;
     return AppBar(
       automaticallyImplyLeading: false,
       actions: <Widget>[

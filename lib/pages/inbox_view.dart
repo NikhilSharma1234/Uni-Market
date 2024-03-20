@@ -3,9 +3,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/data_models/current_user.dart';
 import 'inbox_controller.dart'; 
+import 'package:uni_market/data_store.dart' as data_store;
 
 class InboxView extends StatelessWidget {
   final InboxController _controller = InboxController();
@@ -15,11 +16,11 @@ class InboxView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Retrieve the current user's email from FirebaseAuth
-    final User? currentUser = FirebaseAuth.instance.currentUser;
-    final String? userEmail = currentUser?.email;
+    final CurrentUser currentUser = data_store.user;
+    final String userEmail = currentUser.email;
 
     // Handle the case where there is no signed-in user.
-    if (userEmail == null) {
+    if (userEmail == "") {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Inbox'),

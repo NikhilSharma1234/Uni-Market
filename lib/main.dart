@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: const Wrapper(),
       title: 'Uni-Market',
-      theme: Provider.of<ThemeProvider>(context).currentTheme,
+      theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
     );

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_market/helpers/functions.dart';
 import 'dart:async';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,6 +62,7 @@ class _VerificationState extends State<Verification>
                       .collection('users')
                       .doc(FirebaseAuth.instance.currentUser?.email)
                       .update({"emailVerified": true});
+                  await loadCurrentUser(FirebaseAuth.instance.currentUser?.email);
                   setVerified();
                   toggleVerification();
                   Timer(const Duration(seconds: 2), () async {
