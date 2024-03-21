@@ -20,4 +20,6 @@ CurrentUser user = CurrentUser(
   verifiedUniStudent : false,
   verifiedBy: null,
   verifiedAt: null,
+  institutionFullName: '',
+  schoolsInMarketplace: [],
 );

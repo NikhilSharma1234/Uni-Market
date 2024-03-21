@@ -11,9 +11,11 @@ class CurrentUser {
   Timestamp? deletedAt;
   late String email;
   late bool emailVerified;
+  late String institutionFullName;
   late String marketplaceId;
   late String name;
   late String schoolId;
+  late List<dynamic> schoolsInMarketplace;
   late String starting_profile_pic;
   late String starting_profile_pic_url;
   late Timestamp updatedAt;
@@ -30,9 +32,11 @@ class CurrentUser {
     required Timestamp? deletedAt,
     required String email,
     required bool emailVerified,
+    required String institutionFullName,
     required String marketplaceId,
     required String name,
     required String schoolId,
+    required List<dynamic> schoolsInMarketplace,
     required String starting_profile_pic,
     required String starting_profile_pic_url,
     required Timestamp updatedAt,
@@ -48,9 +52,11 @@ class CurrentUser {
     _user.deletedAt =deletedAt;
     _user.email = email;
     _user.emailVerified = emailVerified;
+    _user.institutionFullName = institutionFullName;
     _user.marketplaceId = marketplaceId;
     _user.name = name;
     _user.schoolId = schoolId;
+    _user.schoolsInMarketplace = schoolsInMarketplace;
     _user.starting_profile_pic = starting_profile_pic;
     _user.starting_profile_pic_url = starting_profile_pic_url;
     _user.updatedAt = updatedAt;
