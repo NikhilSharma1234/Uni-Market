@@ -8,7 +8,7 @@
 
 from firebase_admin import firestore, initialize_app
 import google.cloud.firestore
-import typesense
+import requests
 
 from firebase_functions.firestore_fn import (
   on_document_created,
@@ -21,22 +21,22 @@ from firebase_functions.firestore_fn import (
 )
 
 initialize_app()
-client = typesense.Client({
-  'nodes': [{
-    'host': 'hawk-perfect-frog.ngrok-free.app',
-    'port': '80',
-    'protocol': 'http'
-  }],
-  'api_key': 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
-  'connection_timeout_seconds': 2,
-  'connection_retries': 3
-  })
+
+API_KEY = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr'
+base_url = "https://hawk-perfect-frog.ngrok-free.app"
 
 @on_document_created(document="items/{itemId}")
 def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
   item = event.data.to_dict()
+
+  url = f"{base_url}/collections/items/documents"
+
+  headers = {
+      "Content-Type": "application/json",
+      "x-typesense-api-key": API_KEY
+  }
   
-  client.collections['items'].documents.create({
+  data = {
     'id': event.params['itemId'],
     'buyerId': item['buyerId'],
     'condition': item['condition'],
@@ -52,7 +52,9 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
     'sellerId': item['sellerId'],
     'tags': item['tags'],
     'isFlagged': item['isFlagged']
-    })
+  }
+  
+  requests.post(url, headers=headers, json=data)
 
 @on_document_created(document="typesense_sync/{backfillId}")
 def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
@@ -63,13 +65,21 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
 
     for doc in docs:
       item = doc.to_dict()
-      try:
-        # if doc exists
-        client.collections['items'].documents[str(doc.id)].retrieve()
+      url = f"{base_url}/collections/items/documents/{str(doc.id)}"
+
+      req = requests.get(url, headers={"X-TYPESENSE-API-KEY": API_KEY})
+      if req.status_code == 200:
         break
-      except:
+      else:
+        url = f"{base_url}/collections/items/documents"
+
+        headers = {
+            "Content-Type": "application/json",
+            "x-typesense-api-key": API_KEY
+        }
+
         # if doc doesnt exist, add it
-        client.collections['items'].documents.create({
+        data = {
         'id':doc.id,
         'buyerId': item['buyerId'],
         'condition': item['condition'],
@@ -85,4 +95,6 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
         'sellerId': item['sellerId'],
         'tags': item['tags'],
         'isFlagged': item['isFlagged']
-        })
+        }
+
+        requests.post(url, headers=headers, json=data)
