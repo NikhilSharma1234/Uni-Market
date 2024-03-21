@@ -3,7 +3,6 @@ import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
-import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 
 class ChatPage extends StatefulWidget {
@@ -48,33 +47,36 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ],
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream:
-                      _chatController.getMessageStream(widget.chatSessionId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    return ListView.builder(
-                      reverse: true,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        var message = snapshot.data!.docs[index];
-                        bool isSentByMe = message['senderId'] ==
-                            _chatController.chatModel.currentUser?.uid;
-                        return _buildMessageBubble(
-                            context, message, isSentByMe);
-                      },
-                    );
-                  },
+          body: Padding(
+            padding: const EdgeInsets.only(bottom: 32),
+            child: Column(
+              children: [
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream:
+                        _chatController.getMessageStream(widget.chatSessionId),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+            
+                      return ListView.builder(
+                        reverse: true,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          var message = snapshot.data!.docs[index];
+                          bool isSentByMe = message['senderId'] ==
+                              _chatController.chatModel.currentUser?.uid;
+                          return _buildMessageBubble(
+                              context, message, isSentByMe);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-              _buildMessageComposer(),
-            ],
+                _buildMessageComposer(),
+              ],
+            ),
           ),
         );
       },
