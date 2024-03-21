@@ -63,7 +63,7 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
           children: <Widget>[
             SubmenuButton(
               menuChildren: <Widget>[
-                SizedBox(width: 300, height: 500,child: ProfilePage())
+                SizedBox(width: 350, height: 525,child: ProfilePage())
               ],
               child: IconButton(icon: Icon(Icons.person, size: 40), onPressed: null,),
             )]

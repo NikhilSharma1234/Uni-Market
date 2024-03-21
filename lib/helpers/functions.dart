@@ -9,18 +9,42 @@ Future<void> loadCurrentUser(email) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   var tempUserSnapshot = await firestore.collection('users').where('email', isEqualTo: email).limit(1).get();
   var userData = tempUserSnapshot.docs[0].data();
+  // Non DB defined fields
   String? assignable_profile_pic_url;
   String starting_profile_pic_url;
+  String institutionFullName = "";
+  List<dynamic> schoolsInMarketplace = [];
+
+  // Get assignable profile pic URL
   if (userData["assignable_profile_pic_path"] != null) {
     assignable_profile_pic_url = await FirebaseStorage.instance
       .ref()
       .child(userData["assignable_profile_pic"])
       .getDownloadURL();
   }
+
+  // Get starting profile pic url
   starting_profile_pic_url = await FirebaseStorage.instance
     .ref()
     .child(userData["starting_profile_pic"])
     .getDownloadURL();
+
+  // Read schools in users marketplace Id from db
+  await FirebaseFirestore.instance
+      .collection("marketplace")
+      .doc(userData["marketplaceId"])
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+    schoolsInMarketplace = documentSnapshot.get("schoolIds");
+  });
+  // read school fullname
+  await FirebaseFirestore.instance
+      .collection("schools")
+      .doc(userData["schoolId"])
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+    institutionFullName = documentSnapshot.get("name");
+  });
   data_store.user = CurrentUser(
     assignable_profile_pic: userData['assignable_profile_pic'],
     assignable_profile_pic_url: assignable_profile_pic_url,
@@ -29,9 +53,11 @@ Future<void> loadCurrentUser(email) async {
     deletedAt : userData['deletedAt'],
     email : userData['email'],
     emailVerified : userData['emailVerified'],
+    institutionFullName : institutionFullName,
     marketplaceId : userData['marketplaceId'],
     name : userData['name'],
     schoolId : userData['schoolId'],
+    schoolsInMarketplace: schoolsInMarketplace,
     starting_profile_pic : userData['starting_profile_pic'],
     starting_profile_pic_url: starting_profile_pic_url,
     updatedAt : userData['updatedAt'],
