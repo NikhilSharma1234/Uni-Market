@@ -57,7 +57,7 @@ class Item {
     description = map['description'];
     condition = map['condition'];
     schoolId = map['schoolId'];
-    price = map['price'];
+    price = map['price'].toDouble();
     createdAt = map['createdAt'];
     sellerId = map['sellerId'];
     for (String path in map['images']) {
