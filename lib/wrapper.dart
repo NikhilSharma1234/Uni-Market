@@ -6,6 +6,7 @@ import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/sign_up.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import 'package:uni_market/pages/splash_screen.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({Key? key}) : super(key: key);
@@ -29,11 +30,13 @@ class _WrapperState extends State<Wrapper> {
   updateUserState(event) async {
     if (mounted && event != null && event.emailVerified) {
       await loadCurrentUser(event.email);
+      await Future.delayed(const Duration(seconds: 3));
       bool verificationDocsUploaded = data_store.user.verificationDocsUploaded;
-      if(verificationDocsUploaded == false) {
+      if (verificationDocsUploaded == false) {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const SignUpPage(title: 'Sign Up', signUpStep: 2),
+            builder: (context) =>
+                const SignUpPage(title: 'Sign Up', signUpStep: 2),
           ),
         );
         return;
@@ -42,11 +45,11 @@ class _WrapperState extends State<Wrapper> {
       switch (darkMode) {
         case 1:
           Provider.of<ThemeProvider>(context, listen: false)
-            .setThemeMode(ThemeMode.dark);
+              .setThemeMode(ThemeMode.dark);
           break;
         case 2:
           Provider.of<ThemeProvider>(context, listen: false)
-            .setThemeMode(ThemeMode.light);
+              .setThemeMode(ThemeMode.light);
           break;
       }
       Navigator.of(context).push(
@@ -78,7 +81,7 @@ class _WrapperState extends State<Wrapper> {
     return SizedBox(
       width: screenWidth,
       height: screenHeight,
-      child: const Center(child:CircularProgressIndicator()),
+      child: const SplashScreen(),
     );
   }
 }
