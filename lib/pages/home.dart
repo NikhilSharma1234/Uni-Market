@@ -6,6 +6,7 @@ import 'package:uni_market/components/user_navbar_mobile.dart';
 import 'package:uni_market/components/search_bar.dart'; // SearchPageController is a flutter class so this is just to make sure it uses the correct one
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:web_smooth_scroll/web_smooth_scroll.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Widget> items = [const Text("")];
+  late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
 
   // Controllers

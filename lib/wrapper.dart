@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/home.dart';
@@ -41,6 +42,7 @@ class _WrapperState extends State<Wrapper> {
         );
         return;
       }
+      await search("", 10, context, Filters.none());
       int darkMode = data_store.user.darkMode;
       switch (darkMode) {
         case 1:
