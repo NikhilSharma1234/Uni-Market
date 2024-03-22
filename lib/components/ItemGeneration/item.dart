@@ -28,7 +28,7 @@ class Item {
     id = map['id'];
     description = map['description'];
     condition = map['condition'];
-    schoolId = map['schoolId'];
+    schoolId = map['schoolId'].toString();
     price = map['price'].toDouble();
     createdAt = DateTime.parse(map['createdAt']);
     sellerId = map['sellerId'];

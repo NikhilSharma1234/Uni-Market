@@ -1,7 +1,6 @@
 {
   "hosting": {
-    "public": ".",
-    "source": ".",
+    "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "frameworksBackend": {
       "region": "us-west1"
@@ -18,5 +17,16 @@
       "enabled": true
     },
     "singleProjectMode": true
-  }
+  },
+  "functions": [
+    {
+      "target": "main",
+      "source": "functions",
+      "codebase": "default",
+      "ignore": ["venv", ".git", "firebase-debug.log", "firebase-debug.*.log"]
+    }
+  ],
+  "predeploy": [
+    "source functions/venv/bin/activate && python3.11 -m pip install -r functions/requirements.txt"
+  ]
 }
