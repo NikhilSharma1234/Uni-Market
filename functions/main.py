@@ -34,9 +34,8 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
       "Content-Type": "application/json",
       "x-typesense-api-key": API_KEY
   }
-  
   data = {
-    'id': event.params['itemId'],
+    'id': str(event.params['itemId']),
     'buyerId': item['buyerId'],
     'condition': item['condition'],
     'deletedAt': str(item['deletedAt']),
@@ -45,19 +44,17 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
     'description': item['description'],
     'images': item['images'],
     'marketplaceId': item['marketplaceId'],
-    # 'name': item['name'],
-    # 'price': item['price'],
-    # 'schoolId': item['schoolId'],
+    'name': item['name'],
+    'price': item['price'],
+    'schoolId': item['schoolId'],
     'sellerId': item['sellerId'],
     'tags': item['tags'],
-    'isFlagged': item['isFlagged']
+    'isFlagged': item['isFlagged'],
+    'lastReviewedBy': item['lastReviewedBy']
   }
-
-  print(data)
   
   make_request([url, headers, data])
 
-@functions_framework.http
 @on_document_created(document="typesense_sync/{backfillId}")
 def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
   backfill_dict = event.data.to_dict()
@@ -82,21 +79,22 @@ def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
 
         # if doc doesnt exist, add it
         data = {
-        'id':doc.id,
-        'buyerId': item['buyerId'],
-        'condition': item['condition'],
-        'deletedAt': str(item['deletedAt']),
-        'createdAt': str(item['createdAt']),
-        'dateUpdated': str(item['dateUpdated']),
-        'description': item['description'],
-        'images': item['images'],
-        'marketplaceId': item['marketplaceId'],
-        'name': item['name'],
-        'price': item['price'],
-        'schoolId': item['schoolId'],
-        'sellerId': item['sellerId'],
-        'tags': item['tags'],
-        'isFlagged': item['isFlagged']
+          'id': str(event.params['itemId']),
+          'buyerId': item['buyerId'],
+          'condition': item['condition'],
+          'deletedAt': str(item['deletedAt']),
+          'createdAt': str(item['createdAt']),
+          'dateUpdated': str(item['dateUpdated']),
+          'description': item['description'],
+          'images': item['images'],
+          'marketplaceId': item['marketplaceId'],
+          'name': item['name'],
+          'price': item['price'],
+          'schoolId': item['schoolId'],
+          'sellerId': item['sellerId'],
+          'tags': item['tags'],
+          'isFlagged': item['isFlagged'],
+          'lastReviewedBy': item['lastReviewedBy']
         }
 
         make_request([url, headers, data])
