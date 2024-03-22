@@ -96,11 +96,11 @@ class SearchPageController {
       Filters filter) async {
     List<Widget> widgets = [];
     final config = Configuration(
-      'oR9PTRdUpGBUI3CbbKLLS16JtYavUU44',
+      'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
       nodes: {
         Node(
           Protocol.https,
-          "vzlsy6kriwp0at9bp-1.a1.typesense.net",
+          "hawk-perfect-frog.ngrok-free.app",
           port: 443, // stuff provided by the cloud hosting
         ),
       },
