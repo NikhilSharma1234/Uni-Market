@@ -1,14 +1,8 @@
-# Welcome to Cloud Functions for Firebase for Python!
-# To get started, simply uncomment the below code or create your own.
-# Deploy with `firebase deploy`
-
-# Welcome to Cloud Functions for Firebase for Python!
-# To get started, simply uncomment the below code or create your own.
-# Deploy with `firebase deploy`
-
 from firebase_admin import firestore, initialize_app
 import google.cloud.firestore
 import requests
+
+import functions_framework
 
 from firebase_functions.firestore_fn import (
   on_document_created,
@@ -25,6 +19,11 @@ initialize_app()
 API_KEY = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr'
 base_url = "https://hawk-perfect-frog.ngrok-free.app"
 
+@functions_framework.http
+def make_request(request):
+  requests.post(request[0], headers=request[1], json=request[2]).raise_for_status()
+
+
 @on_document_created(document="items/{itemId}")
 def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
   item = event.data.to_dict()
@@ -40,24 +39,27 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
     'id': event.params['itemId'],
     'buyerId': item['buyerId'],
     'condition': item['condition'],
-    'deletedAt': item['deletedAt'],
-    'createdAt': item['createdAt'],
-    'dateUpdated': item['dateUpdated'],
+    'deletedAt': str(item['deletedAt']),
+    'createdAt': str(item['createdAt']),
+    'dateUpdated': str(item['dateUpdated']),
     'description': item['description'],
     'images': item['images'],
     'marketplaceId': item['marketplaceId'],
-    'name': item['name'],
-    'price': item['price'],
-    'schoolId': item['schoolId'],
+    # 'name': item['name'],
+    # 'price': item['price'],
+    # 'schoolId': item['schoolId'],
     'sellerId': item['sellerId'],
     'tags': item['tags'],
     'isFlagged': item['isFlagged']
   }
-  
-  requests.post(url, headers=headers, json=data)
 
+  print(data)
+  
+  make_request([url, headers, data])
+
+@functions_framework.http
 @on_document_created(document="typesense_sync/{backfillId}")
-def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
+def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
   backfill_dict = event.data.to_dict()
   if event.params['backfillId'] == 'backfill' and backfill_dict['trigger'] == True:
     firestore_client: google.cloud.firestore.Client = firestore.client()
@@ -83,9 +85,9 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
         'id':doc.id,
         'buyerId': item['buyerId'],
         'condition': item['condition'],
-        'deletedAt': item['deletedAt'],
-        'createdAt': item['createdAt'],
-        'dateUpdated': item['dateUpdated'],
+        'deletedAt': str(item['deletedAt']),
+        'createdAt': str(item['createdAt']),
+        'dateUpdated': str(item['dateUpdated']),
         'description': item['description'],
         'images': item['images'],
         'marketplaceId': item['marketplaceId'],
@@ -97,4 +99,4 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
         'isFlagged': item['isFlagged']
         }
 
-        requests.post(url, headers=headers, json=data)
+        make_request([url, headers, data])
