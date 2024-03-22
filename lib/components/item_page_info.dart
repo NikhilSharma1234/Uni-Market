@@ -6,8 +6,8 @@ import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/pages/chat_service.dart';
 import 'package:uni_market/pages/chat.dart';
 
-SingleChildScrollView itemPageInfo(
-    Item itemData, String sellerName, String sellerProfilePic, BuildContext context) {
+SingleChildScrollView itemPageInfo(Item itemData, String sellerName,
+    String sellerProfilePic, BuildContext context) {
   return SingleChildScrollView(
     child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -26,7 +26,7 @@ SingleChildScrollView itemPageInfo(
                   textAlign: TextAlign.start),
             ),
             Text(
-                'Listed ${DateFormat('yMd').format(itemData.createdAt.toDate())} at ${itemData.schoolId}',
+                'Listed ${DateFormat('yMd').format(itemData.createdAt)} at ${itemData.schoolId}',
                 style: const TextStyle(fontSize: 16)),
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 4),
