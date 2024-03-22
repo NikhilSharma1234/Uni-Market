@@ -7,7 +7,6 @@ import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:typesense/typesense.dart';
 import 'package:http/http.dart' as http;
 
 class ItemSearchBar extends StatefulWidget {
@@ -15,8 +14,6 @@ class ItemSearchBar extends StatefulWidget {
   final Function(List<Widget> newItems, bool append) setPageState;
   final Function(String) updateSearchText;
   final Filters filter;
-
-  // final Filters filters;
 
   // requiring the function
   const ItemSearchBar(
@@ -151,31 +148,18 @@ class SearchPageController {
         break;
     }
 
-    final searchParameters = {
-      'q': searchTerm,
-      'query_by': 'name',
-      'sort_by': sort,
-      'filter_by': filterString,
-    };
+    final searchParameters = [searchTerm, "embedding", sort, filterString, 30];
 
-    String search_type = "name";
+    const typesenseKey = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr';
 
-    // await client.collecton('items2').documents.search(searchParameters);
-
-    // final Map<String, dynamic> data =
-    //     await client.collection('items').documents.search(searchParameters);
-
-    final typesense_key = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr';
-
-    String url = "https://6bdc-71-89-244-12.ngrok-free.app/collections/items2";
+    String url = "https://hawk-perfect-frog.ngrok-free.app";
 
     Uri search_url = Uri.parse(
-        "$url/documents/search?q=$searchTerm&query_by=$search_type&sort_by=$sort&filter_by=$filterString");
-    search_url =
-        Uri.parse("$url/documents/search?q=test&query_by=$search_type");
+        "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
     final Map<String, String> headers = {
+      "Access-Control-Allow-Origin": "*",
       'Access-Control-Allow-Methods': 'true',
-      "X-TYPESENSE-API-KEY": typesense_key,
+      "X-TYPESENSE-API-KEY": typesenseKey,
     };
 
     Map<String, dynamic> data = {};
@@ -195,10 +179,8 @@ class SearchPageController {
       print(e);
     }
 
-    print(data);
-
     if (context.mounted) {
-      // widgets = await generateItems(data, context);
+      widgets = await generateItems(data, context);
     } else {
       if (kDebugMode) {
         print("no clue as to whats going on, buildcontext wasnt mounded");
