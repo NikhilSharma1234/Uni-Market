@@ -45,42 +45,37 @@ class _RegistirationState extends State<Registiration> {
   @override
   Widget build(BuildContext context) {
     return Form(
-        child: Form(
-            key: _formKey,
-            child: Column(children: [
-              NameContainer(
-                nameController: nameController,
-                focusNode: widget.focusNode ?? widget.focusNode,
-              ),
-              const SizedBox(height: 10),
-              EmailContainer(emailController: emailController),
-              const SizedBox(height: 10),
-              PasswordContainer(
-                passwordController: passwordController,
-                isSignIn: false,
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(top: 24),
-                child: submitting
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: () {
-                          // Validate returns true if the form is valid, or false otherwise.
-                          if (_formKey.currentState!.validate()) {
-                            // Attempt to register user input into Firebase
-                            _createUser(
-                                context,
-                                nameController,
-                                emailController,
-                                passwordController,
-                                widget.tapped);
-                          }
-                        },
-                        child: const Text('Submit'),
-                      ),
-              ),
-            ])));
+        key: _formKey,
+        child: Column(children: [
+          NameContainer(
+            nameController: nameController,
+            focusNode: widget.focusNode ?? widget.focusNode,
+          ),
+          const SizedBox(height: 10),
+          EmailContainer(emailController: emailController),
+          const SizedBox(height: 10),
+          PasswordContainer(
+            passwordController: passwordController,
+            isSignIn: false,
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: submitting
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: () {
+                      // Validate returns true if the form is valid, or false otherwise.
+                      if (_formKey.currentState!.validate()) {
+                        // Attempt to register user input into Firebase
+                        _createUser(context, nameController, emailController,
+                            passwordController, widget.tapped);
+                      }
+                    },
+                    child: const Text('Submit'),
+                  ),
+          ),
+        ]));
   }
 
   // Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)

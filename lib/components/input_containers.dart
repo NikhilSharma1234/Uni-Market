@@ -17,15 +17,6 @@ class EmailContainer extends StatefulWidget {
 }
 
 class _EmailContainerState extends State<EmailContainer> {
-  String? validateEmail(String? value) {
-    const pattern = r"^[A-Za-z0-9._%+-]+@nevada\.unr\.edu$";
-    final regex = RegExp(pattern);
-
-    return value!.isNotEmpty && !regex.hasMatch(value)
-        ? 'Enter a valid email address.'
-        : null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -53,7 +44,14 @@ class _EmailContainerState extends State<EmailContainer> {
                     'Ok')),
             icon: const Icon(Icons.info_outlined)),
       ),
-      validator: validateEmail,
+      validator: (value) {
+        if (value == null || value.isEmpty) return 'Please enter an email';
+
+        const pattern = r"^[A-Za-z0-9._%+-]+@nevada\.unr\.edu$";
+        final regex = RegExp(pattern);
+
+        if (!regex.hasMatch(value)) return 'Enter a valid email address.';
+      },
     );
   }
 }
@@ -77,26 +75,40 @@ class _NameContainerState extends State<NameContainer> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        focusNode: widget.focusNode ?? widget.focusNode,
-        controller: widget.nameController,
-        keyboardType: TextInputType.name,
-        textInputAction: TextInputAction.next,
-        onSaved: (email) {},
-        decoration: InputDecoration(
-          prefixIconConstraints:
-              const BoxConstraints(minWidth: 23, maxHeight: 20),
-          hintText: "John Doe",
-          labelText: "Full Name",
-          prefixIcon: const Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: Icon(Icons.person_2_rounded)),
-          suffixIcon: IconButton(
-              onPressed: () => showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => appDialog(context,
-                      'Name Input', 'Please input your full name', 'Ok')),
-              icon: const Icon(Icons.info_outlined)),
-        ));
+      focusNode: widget.focusNode ?? widget.focusNode,
+      controller: widget.nameController,
+      keyboardType: TextInputType.name,
+      textInputAction: TextInputAction.next,
+      onSaved: (email) {},
+      decoration: InputDecoration(
+        prefixIconConstraints:
+            const BoxConstraints(minWidth: 23, maxHeight: 20),
+        hintText: "John Doe",
+        labelText: "Full Name",
+        prefixIcon: const Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(Icons.person_2_rounded)),
+        suffixIcon: IconButton(
+            onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => appDialog(context,
+                    'Name Input', 'Please input your full name', 'Ok')),
+            icon: const Icon(Icons.info_outlined)),
+      ),
+      validator: (value) {
+        const pattern = r'^[A-Za-z-. ]+$';
+        final regex = RegExp(pattern);
+        if (value == null || value.isEmpty) {
+          return 'Please enter your full name';
+        }
+
+        if (value.length > 60) {
+          return 'Please shorten your name to be less than 60 characters';
+        }
+
+        if (!regex.hasMatch(value)) return 'Enter only alphabetic characters';
+      },
+    );
   }
 }
 
@@ -120,15 +132,6 @@ class PasswordContainer extends StatefulWidget {
 // Password Input Field
 class _MyPasswordContainerState extends State<PasswordContainer> {
   bool _passwordVisible = false;
-  String? validatePassword(String? value) {
-    const pattern =
-        r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
-    final regex = RegExp(pattern);
-
-    return value!.isNotEmpty && !regex.hasMatch(value)
-        ? 'Enter a stronger password.'
-        : null;
-  }
 
   void togglePassword() {
     setState(() {
@@ -177,8 +180,20 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
                                   'Ok')),
                           icon: const Icon(Icons.info_outlined)),
                 ])),
-        validator: widget.isSignIn
-            ? null
-            : validatePassword); // No validation while in sign in
+        validator: (value) {
+          if (widget.isSignIn) return null;
+
+          if (value == null || value.isEmpty) return 'Please enter a password';
+
+          if (value.length > 60) {
+            return 'Please shorten your password to be less than 60 characters';
+          }
+
+          const pattern =
+              r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+          final regex = RegExp(pattern);
+
+          if (!regex.hasMatch(value)) return 'Enter a stronger password';
+        });
   }
 }
