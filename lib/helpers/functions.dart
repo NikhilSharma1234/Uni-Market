@@ -26,7 +26,7 @@ Future<void> loadCurrentUser(email) async {
   List<dynamic> schoolsInMarketplace = [];
 
   // Get assignable profile pic URL
-  if (userData["assignable_profile_pic_path"] != null) {
+  if (userData["assignable_profile_pic"] != null) {
     assignable_profile_pic_url = await FirebaseStorage.instance
         .ref()
         .child(userData["assignable_profile_pic"])

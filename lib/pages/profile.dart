@@ -57,255 +57,240 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.only(
               top: kIsWeb ? 8 : 64, bottom: 8, left: 16, right: 16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Profile',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(fontSize: 24)),
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 12),
-                child: Center(
-                  child: InkWell(
-                    onTap: () async {
-                      newProfilePic =
-                          await singleImagePicker(context);
-                      if (newProfilePic != null) {
-                        setState(() {
-                          loading = true;
-                        });
-                        _updateProfilePicture(newProfilePic)
-                            .then((success) {
-                          if (success != null) {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text(
-                                        "Profile Settings Changed!"),
-                                    content: const Text(
-                                        "Profile Image Updated"),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Continue"),
-                                      )
-                                    ],
-                                  );
-                                });
-                          }
-                        });
-                      }
-                    },
-                    child: Stack(children: [
-                      AdvancedAvatar(
-                        size: 160,
-                        image: NetworkImage(profilePic),
-                      ),
-                      const Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Icon(
-                          Icons.edit,
-                          size: 20,
-                        ),
-                      )
-                    ]),
-                  ),
-                ),
-              ),
-              const Text("Name",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(user.name,
-                  style: const TextStyle(fontSize: 12)),
-              const Text("Email",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(user.email,
-                  style: const TextStyle(fontSize: 12)),
-              Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Dark Mode",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16
-                      )
-                    ),
-                    SizedBox(
-                      width: 175,
-                      child: SegmentedButton(
-                        segments: const [
-                          ButtonSegment(
-                            value: 0,
-                            icon: Icon(Icons.computer)
-                          ),
-                          ButtonSegment(
-                            value: 1,
-                            icon: Icon(Icons.dark_mode)
-                          ),
-                          ButtonSegment(
-                            value: 2,
-                            icon: Icon(Icons.light_mode)
-                          ),
-                        ], 
-                        selected: themeMode,
-                        onSelectionChanged: (Set<int> selection) async{
-                          int darkModeSelection = selection.elementAt(0);
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Profile',
+                    textAlign: TextAlign.start, style: TextStyle(fontSize: 24)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12, bottom: 12),
+                  child: Center(
+                    child: InkWell(
+                      onTap: () async {
+                        newProfilePic = await singleImagePicker(context);
+                        if (newProfilePic != null) {
                           setState(() {
-                            themeMode = {darkModeSelection};
+                            loading = true;
                           });
-                          switch (darkModeSelection ) {
-                            case 0:
-                              Provider.of<ThemeProvider>(context, listen: false)
-                                .setThemeMode(ThemeMode.system);
-                            case 1:
-                              Provider.of<ThemeProvider>(context, listen: false)
-                                .setThemeMode(ThemeMode.dark);
-                              break;
-                            case 2:
-                              Provider.of<ThemeProvider>(context, listen: false)
-                                .setThemeMode(ThemeMode.light);
-                              break;
-                          }
-                          await FirebaseFirestore.instance.collection('users').doc(user.email).update({
-                            'darkMode' : selection.elementAt(0)
+                          _updateProfilePicture(newProfilePic).then((success) {
+                            if (success != null) {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                          "Profile Settings Changed!"),
+                                      content:
+                                          const Text("Profile Image Updated"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("Continue"),
+                                        )
+                                      ],
+                                    );
+                                  });
+                            }
                           });
                           await loadCurrentUser(data_store.user.email);
-                        },
-                        showSelectedIcon: false,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Text("Institution",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(user.institutionFullName,
-                  style: const TextStyle(fontSize: 12)),
-              const Text("Other Schools in Marketplace",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(schoolsInMarketplace.join(', '),
-                  style: const TextStyle(fontSize: 12)),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(200, 36),
-                      backgroundColor: Colors.grey.shade400,
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.blue.shade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ItemView(
-                              sellerID: data_store.user.email),
+                        }
+                      },
+                      child: Stack(children: [
+                        AdvancedAvatar(
+                          size: 160,
+                          image: NetworkImage(profilePic),
                         ),
-                      );
-                    },
-                    child: const Text("Items you've listed"),
+                        const Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Icon(
+                            Icons.edit,
+                            size: 20,
+                          ),
+                        )
+                      ]),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(200, 36),
-                      backgroundColor: Colors.grey.shade400,
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.blue.shade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
+                const Text("Name",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(user.name, style: const TextStyle(fontSize: 12)),
+                const Text("Email",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(user.email, style: const TextStyle(fontSize: 12)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Dark Mode",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      SizedBox(
+                        width: 175,
+                        child: SegmentedButton(
+                          segments: const [
+                            ButtonSegment(value: 0, icon: Icon(Icons.computer)),
+                            ButtonSegment(
+                                value: 1, icon: Icon(Icons.dark_mode)),
+                            ButtonSegment(
+                                value: 2, icon: Icon(Icons.light_mode)),
+                          ],
+                          selected: themeMode,
+                          onSelectionChanged: (Set<int> selection) async {
+                            int darkModeSelection = selection.elementAt(0);
+                            setState(() {
+                              themeMode = {darkModeSelection};
+                            });
+                            switch (darkModeSelection) {
+                              case 0:
+                                Provider.of<ThemeProvider>(context,
+                                        listen: false)
+                                    .setThemeMode(ThemeMode.system);
+                              case 1:
+                                Provider.of<ThemeProvider>(context,
+                                        listen: false)
+                                    .setThemeMode(ThemeMode.dark);
+                                break;
+                              case 2:
+                                Provider.of<ThemeProvider>(context,
+                                        listen: false)
+                                    .setThemeMode(ThemeMode.light);
+                                break;
+                            }
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user.email)
+                                .update({'darkMode': selection.elementAt(0)});
+                            await loadCurrentUser(data_store.user.email);
+                          },
+                          showSelectedIcon: false,
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+                const Text("Institution",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(user.institutionFullName,
+                    style: const TextStyle(fontSize: 12)),
+                const Text("Other Schools in Marketplace",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(schoolsInMarketplace.join(', '),
+                    style: const TextStyle(fontSize: 12)),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(200, 36),
+                        backgroundColor: Colors.grey.shade400,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.blue.shade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ItemView(sellerID: data_store.user.email),
+                          ),
+                        );
+                      },
+                      child: const Text("Items you've listed"),
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(200, 36),
+                        backgroundColor: Colors.grey.shade400,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.blue.shade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text("Items Bought"),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(200, 36),
+                        backgroundColor: Colors.grey.shade400,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.blue.shade900,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text("Items Sold"),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(200, 36),
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        shadowColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        data_store.user.delete();
+                        await FirebaseAuth.instance.signOut();
+                        // ignore: use_build_context_synchronously
+                        Provider.of<ThemeProvider>(context, listen: false)
+                            .setThemeMode(ThemeMode.dark);
+                      },
+                      child: const Text('LOG OUT'),
+                    ),
+                  ),
+                ),
+                // Delete Account Button, NO LOGIC
+                Center(
+                  child: TextButton(
                     onPressed: () {},
-                    child: const Text("Items Bought"),
+                    child: const Text("Delete Account",
+                        style: TextStyle(color: Colors.red)),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(200, 36),
-                      backgroundColor: Colors.grey.shade400,
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.blue.shade900,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                    onPressed: () {},
-                    child: const Text("Items Sold"),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(200, 36),
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      data_store.user.delete();
-                      await FirebaseAuth.instance.signOut();
-                      // ignore: use_build_context_synchronously
-                      Provider.of<ThemeProvider>(context, listen: false)
-                        .setThemeMode(ThemeMode.dark);
-                    },
-                    child: const Text('LOG OUT'),
-                  ),
-                ),
-              ),
-              // Delete Account Button, NO LOGIC
-              Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text("Delete Account",
-                    style: TextStyle(
-                      color: Colors.red
-                    )
-                  ),
-                ),
-              ),
-            ]
-          ),
+              ]),
         ),
       ),
     );
     if (kIsWeb) return child;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      bottomNavigationBar: !kIsWeb
-          ? const UserNavBarMobile(activeIndex: 2)
-          : null, // Custom app bar here
-      body: child
-    );
+        resizeToAvoidBottomInset: false,
+        bottomNavigationBar: !kIsWeb
+            ? const UserNavBarMobile(activeIndex: 2)
+            : null, // Custom app bar here
+        body: child);
   }
 }
-
 
 // Helper function for selecting new profile picture
 Future<XFile?> singleImagePicker(BuildContext context) async {
