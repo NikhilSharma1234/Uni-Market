@@ -1,4 +1,3 @@
-
 class Item {
   String name;
   String id;
@@ -57,7 +56,7 @@ class Item {
     condition = map['condition'];
     schoolId = map['schoolId'];
     price = map['price'].toDouble();
-    createdAt = map['createdAt'];
+    createdAt = map['createdAt'].toDate();
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
