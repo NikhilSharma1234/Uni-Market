@@ -1,5 +1,5 @@
 import 'package:dart_openai/dart_openai.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class Moderator {
   const Moderator({Key? key});
@@ -12,7 +12,9 @@ class Moderator {
 
       return moderation.results.first.flagged;
     } catch (e) {
-      print("Failed to acquire LLM Moderation Results: $e");
+      if (kDebugMode) {
+        print("Failed to acquire LLM Moderation Results: $e");
+      }
       return false;
     }
   }

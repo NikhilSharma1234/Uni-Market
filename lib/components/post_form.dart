@@ -176,7 +176,9 @@ class _PostFormState extends State<PostForm> {
                 try {
                   checkProfanity(inputText).then((value) => _flag(value));
                 } catch (e) {
-                  print("Failed to perform profanity checking: $e");
+                  if (kDebugMode) {
+                    print("Failed to perform profanity checking: $e");
+                  }
                 }
 
                 _createPost(context, formData, _imageDataUrls);
@@ -227,11 +229,6 @@ class _PostFormState extends State<PostForm> {
         }
         return;
       }
-      // Get current user
-      var currentUser = data_store.user;
-
-      // POTENTIAL PLACEHOLDER FOR TAG SETTING
-      // NO proper item ID stored (empty string)
 
       // create userPost map for firebase document data
       final userPost = <String, dynamic>{
