@@ -53,11 +53,16 @@ class _PostFormState extends State<PostForm> {
     // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
 
     List<Widget> selected = List.generate(_tags.length, (int index) {
+      final background = Theme.of(context).colorScheme.background;
       return InkWell(
         child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: BorderRadius.all(Radius.circular(15))),
+                color: background,
+                border: Border.all(
+                    color: background == Colors.white
+                        ? Colors.black
+                        : Colors.white),
+                borderRadius: const BorderRadius.all(Radius.circular(15))),
             child: Row(
               children: [
                 Padding(
