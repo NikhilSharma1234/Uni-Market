@@ -271,6 +271,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.pop(context);
                       data_store.user.delete();
                       await FirebaseAuth.instance.signOut();
+                      // ignore: use_build_context_synchronously
                       Provider.of<ThemeProvider>(context, listen: false)
                         .setThemeMode(ThemeMode.dark);
                     },

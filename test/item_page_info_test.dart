@@ -5,7 +5,6 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uni_market/components/item_page_info.dart';
@@ -15,7 +14,6 @@ void main() {
   testWidgets('Item Page Info test', (WidgetTester tester) async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
-
     Item itemData = Item(
       "Test Item 1",
       "12345",
@@ -23,7 +21,7 @@ void main() {
       "NEW",
       "University of Nevada, Reno",
       12.00,
-      Timestamp(0, 0),
+      DateTime(0, 0),
       ['image1path', 'secondImagePath'],
       "selleremailid@gmail.com",
       ['tag1', 'tag2'],
@@ -31,15 +29,12 @@ void main() {
     String sellerName = 'Nikhil Sharma';
     String sellerProfilePic = 'somelink';
     // Build our app and trigger a frame.
-    await tester.pumpWidget(Builder(
-      builder: (BuildContext context) {
-        return MaterialApp(
+    await tester.pumpWidget(Builder(builder: (BuildContext context) {
+      return MaterialApp(
           home: Scaffold(
-            body: itemPageInfo(itemData, sellerName, sellerProfilePic, context)
-          )
-        );
-      }
-    ));
+              body: itemPageInfo(
+                  itemData, sellerName, sellerProfilePic, context)));
+    }));
 
     // Verify that our counter starts at 0.
     expect(find.text('Test Item 1'), findsOneWidget);

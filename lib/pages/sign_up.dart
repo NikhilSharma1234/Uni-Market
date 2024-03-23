@@ -49,7 +49,6 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
 
     //  More defined screen width for applicable form UI
     widthScreen(double screenWidth) {
