@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +33,12 @@ class _WrapperState extends State<Wrapper> {
   //Updates state when user state changes in the app
   updateUserState(event) async {
     if (mounted && event != null && event.emailVerified) {
-      await loadCurrentUser(event.email);
-      await Future.delayed(const Duration(seconds: 3));
-      bool verificationDocsUploaded = data_store.user.verificationDocsUploaded;
+      var tempUser = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(event.email)
+          .get();
+      bool verificationDocsUploaded =
+          tempUser.data()!['verificationDocsUploaded'];
       if (verificationDocsUploaded == false) {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -44,6 +48,7 @@ class _WrapperState extends State<Wrapper> {
         );
         return;
       }
+      await loadCurrentUser(event.email);
       await search("", 10, context, Filters.none());
       int darkMode = data_store.user.darkMode;
       switch (darkMode) {

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uni_market/components/dialog.dart';
@@ -11,7 +12,6 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uni_market/data_store.dart' as data_store;
 
 Step aboutYou(int index) {
   return Step(
@@ -82,7 +82,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
                 });
               }),
           Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 16), // Add more padding
+            padding:
+                const EdgeInsets.only(top: 16, bottom: 16), // Add more padding
             child: Center(
               // Center the button
               child: ValueListenableBuilder<bool>(
@@ -219,15 +220,12 @@ class _AboutYouContentState extends State<AboutYouContent> {
 
   Future<Map<String, String>> getListOfSchools() async {
     final Map<String, String> list = {};
-    await FirebaseFirestore.instance
-        .collection('schools')
-        .get()
-        .then((value) {
-          for (var doc in value.docs) {
-              var name = doc.data()['name'];
-              list[name] = doc.id.toString();
-          }
-        });
+    await FirebaseFirestore.instance.collection('schools').get().then((value) {
+      for (var doc in value.docs) {
+        var name = doc.data()['name'];
+        list[name] = doc.id.toString();
+      }
+    });
     return list;
   }
 
@@ -235,21 +233,26 @@ class _AboutYouContentState extends State<AboutYouContent> {
     isSubmitting.value = true;
     if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
       try {
-        if(firstFileName == secondFileName) {
+        if (firstFileName == secondFileName) {
           showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => 
-              appDialog(context, 'Invalid File', 'You have uploaded the same file. Please upload unique verification documents.', 'Ok')
-          );
+              context: context,
+              builder: (BuildContext context) => appDialog(
+                  context,
+                  'Invalid File',
+                  'You have uploaded the same file. Please upload unique verification documents.',
+                  'Ok'));
           isSubmitting.value = false;
           return;
         }
-        if (!validFileExtension(firstFileName!) || !validFileExtension(secondFileName!)) {
+        if (!validFileExtension(firstFileName!) ||
+            !validFileExtension(secondFileName!)) {
           showDialog<String>(
-            context: context,
-            builder: (BuildContext context) => 
-              appDialog(context, 'Invalid File', 'One or more of your files is an invalid file extension. Please select a file with extensions .jpeg, .jpg, .png or .pdf.', 'Ok')
-          );
+              context: context,
+              builder: (BuildContext context) => appDialog(
+                  context,
+                  'Invalid File',
+                  'One or more of your files is an invalid file extension. Please select a file with extensions .jpeg, .jpg, .png or .pdf.',
+                  'Ok'));
           isSubmitting.value = false;
           return;
         }
@@ -270,14 +273,13 @@ class _AboutYouContentState extends State<AboutYouContent> {
           // Update the user with marketplace and school id
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(data_store.user.email)
-              .update(
-                  {
-                    'schoolId': selectedSchool,
-                    'marketplaceId': marketplaceId,
-                    'verificationDocsUploaded': true
-                  });
-          await loadCurrentUser(data_store.user.email);
+              .doc(FirebaseAuth.instance.currentUser!.email)
+              .update({
+            'schoolId': selectedSchool,
+            'marketplaceId': marketplaceId,
+            'verificationDocsUploaded': true
+          });
+          await loadCurrentUser(FirebaseAuth.instance.currentUser!.email);
           // Additional actions after successful upload
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Upload successful!')),
@@ -291,7 +293,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
         } else {
           // Handle the case where file upload failed
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File upload failed. Please try again.')),
+            const SnackBar(
+                content: Text('File upload failed. Please try again.')),
           );
           isSubmitting.value = false;
         }
