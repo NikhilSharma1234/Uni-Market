@@ -51,6 +51,8 @@ class _EmailContainerState extends State<EmailContainer> {
         final regex = RegExp(pattern);
 
         if (!regex.hasMatch(value)) return 'Enter a valid email address.';
+
+        return null;
       },
     );
   }
@@ -107,6 +109,8 @@ class _NameContainerState extends State<NameContainer> {
         }
 
         if (!regex.hasMatch(value)) return 'Enter only alphabetic characters';
+
+        return null;
       },
     );
   }
@@ -181,9 +185,9 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
                           icon: const Icon(Icons.info_outlined)),
                 ])),
         validator: (value) {
-          if (widget.isSignIn) return null;
-
           if (value == null || value.isEmpty) return 'Please enter a password';
+
+          if (widget.isSignIn) return null;
 
           if (value.length > 60) {
             return 'Please shorten your password to be less than 60 characters';
@@ -194,6 +198,8 @@ class _MyPasswordContainerState extends State<PasswordContainer> {
           final regex = RegExp(pattern);
 
           if (!regex.hasMatch(value)) return 'Enter a stronger password';
+
+          return null;
         });
   }
 }
