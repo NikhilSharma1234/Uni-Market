@@ -135,7 +135,6 @@ class _RegistirationState extends State<Registiration> {
           .collection('users')
           .doc(userEmail)
           .set(user);
-      await loadCurrentUser(userEmail);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Creating your account')),
