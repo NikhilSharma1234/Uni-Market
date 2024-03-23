@@ -87,9 +87,6 @@ class _RegistirationState extends State<Registiration> {
     Function() tapped,
   ) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Creating your account')),
-      );
       setState(() => submitting = true);
       // Get user input from text field controllers (Remove ending whitespaces)
       String userEmail = emailController.text.trim();
@@ -139,6 +136,10 @@ class _RegistirationState extends State<Registiration> {
           .doc(userEmail)
           .set(user);
       await loadCurrentUser(userEmail);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Creating your account')),
+      );
       Timer(const Duration(seconds: 2), () async {
         submitting = false;
         tapped();
@@ -148,11 +149,10 @@ class _RegistirationState extends State<Registiration> {
       if (kDebugMode) {
         print("Error creating user: $e");
       }
-      // If the form is valid, display a snackbar. In the real world,
-      // you'd often call a server or save the information in a database.
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error Creating User')),
+        const SnackBar(
+            content: Text('Error creating user or account may already exist')),
       );
       setState(() => submitting = false);
     }

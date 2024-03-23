@@ -20,6 +20,7 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  bool submitting = false;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -64,39 +65,11 @@ class _SignInPageState extends State<SignInPage> {
   }
 }
 
-// Function to recreate Firebase User with Email and Password (Pass in Register Form Controllers)
-Future<void> _signInUser(
-  BuildContext context,
-  TextEditingController emailController,
-  TextEditingController passwordController,
-) async {
-  try {
-    // Get user input from text field controllers (Remove ending whitespaces)
-    String userEmail = emailController.text.trim();
-    String password = passwordController.text.trim();
-
-    // Use Firebase Authentication to sign in the user
-    await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: userEmail, password: password);
-  } on FirebaseAuthException catch (e) {
-    // Handling Create User Errors (Currently Not Viable for Production using print)
-    if (e.code == 'user-not-found') {
-      if (kDebugMode) {
-        print('No user found for given email');
-      }
-    } else if (e.code == 'wrong-password') {
-      if (kDebugMode) {
-        print('Wrong password provided for that user.');
-      }
-    }
-  }
-}
-
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
 
   @override
-  State <SignInForm> createState() => _SignInFormState();
+  State<SignInForm> createState() => _SignInFormState();
 }
 
 // Register Form
@@ -106,6 +79,7 @@ class _SignInFormState extends State<SignInForm> {
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late FocusNode _focusNode;
+  bool submitting = false;
 
   @override
   void initState() {
@@ -120,51 +94,92 @@ class _SignInFormState extends State<SignInForm> {
       if (_formKey.currentState!.validate()) {
         // If the form is valid, display a snackbar. In the real world,
         // you'd often call a server or save the information in a database.
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logging in to your account')),
-        );
         // Attempt to register user input into Firebase
         _signInUser(context, emailController, passwordController);
       }
     }
 
     return Form(
-        child: Form(
-            key: _formKey,
-            child: Column(children: [
-              const SizedBox(height: 50),
-              EmailContainer(
-                  emailController: emailController, focusNode: _focusNode),
-              const SizedBox(height: 10),
-              PasswordContainer(
-                passwordController: passwordController,
-                isSignIn: true,
-                submitted: submit,
-              ),
-              const SizedBox(height: 25),
-              ElevatedButton(
-                onPressed: () {
-                  submit();
-                },
-                child: const Text('Login'),
-              ),
-              // Account Recovery Gestuer
-              const SizedBox(height: 20),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const ForgotPasswordPage(),
-                    ),
-                  );
-                },
-                child: const Text("Forgot Password?",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    )),
-              )
-            ])));
+        key: _formKey,
+        child: Column(children: [
+          const SizedBox(height: 50),
+          EmailContainer(
+              emailController: emailController, focusNode: _focusNode),
+          const SizedBox(height: 10),
+          PasswordContainer(
+            passwordController: passwordController,
+            isSignIn: true,
+            submitted: submit,
+          ),
+          const SizedBox(height: 25),
+          submitting
+              ? const CircularProgressIndicator()
+              : ElevatedButton(
+                  onPressed: () {
+                    submit();
+                  },
+                  child: const Text('Login'),
+                ),
+          // Account Recovery Gestuer
+          const SizedBox(height: 20),
+          OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ForgotPasswordPage(),
+                ),
+              );
+            },
+            child: const Text("Forgot Password?",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                )),
+          )
+        ]));
+  }
+
+  // Function to recreate Firebase User with Email and Password (Pass in Register Form Controllers)
+  Future<void> _signInUser(
+    BuildContext context,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+  ) async {
+    setState(() => submitting = true);
+    try {
+      // Get user input from text field controllers (Remove ending whitespaces)
+      String userEmail = emailController.text.trim();
+      String password = passwordController.text.trim();
+
+      // Use Firebase Authentication to sign in the user
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: userEmail, password: password);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Logging in')),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (kDebugMode) {
+        print(e.code);
+      }
+      if (e.code == 'too-many-requests') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Too many retries, please reset password')),
+        );
+        setState(() => submitting = false);
+        return;
+      }
+      if (e.code == 'invalid-credential') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid Credentials Provided')),
+        );
+        setState(() => submitting = false);
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error Logging In')),
+      );
+      setState(() => submitting = false);
+    }
   }
 }
