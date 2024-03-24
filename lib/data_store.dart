@@ -1,6 +1,7 @@
 library data_store;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/data_models/current_user.dart';
 
@@ -26,3 +27,6 @@ CurrentUser user = CurrentUser(
 );
 
 List<Widget> itemBoxes = [];
+
+final missingImage =
+    FirebaseStorage.instance.ref("images/missing_image.jpg").getDownloadURL();

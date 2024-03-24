@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uni_market/components/image_carousel.dart';
-import 'package:uni_market/helpers/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,7 +30,7 @@ class _PostFormState extends State<PostForm> {
   bool submitting = false;
   bool isFlagged = false;
   List<String> _imageDataUrls = [];
-  static const int MAXTAGS = 8;
+  static const int maxTags = 8;
   final List<String?> _tags = [];
   final List<String?> _suggestedTags = [
     // temporary constant tags
@@ -81,7 +79,7 @@ class _PostFormState extends State<PostForm> {
       );
     });
 
-    List<Widget> suggested = List.generate(MAXTAGS - _tags.length, (int index) {
+    List<Widget> suggested = List.generate(maxTags - _tags.length, (int index) {
       return InkWell(
           onTap: () => setState(() {
                 _tags.add(_suggestedTags[index]);
@@ -91,7 +89,7 @@ class _PostFormState extends State<PostForm> {
           child: Container(
             decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.background,
-                borderRadius: BorderRadius.all(Radius.circular(15))),
+                borderRadius: const BorderRadius.all(Radius.circular(15))),
             child: Padding(
                 padding: const EdgeInsets.only(
                     top: 5, bottom: 5, left: 10, right: 10),
@@ -369,7 +367,6 @@ class _PostFormState extends State<PostForm> {
         );
       }
     } catch (e) {
-      print(e);
       // Show failure snackbar
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';

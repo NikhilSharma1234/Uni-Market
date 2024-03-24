@@ -115,7 +115,7 @@ class _ItemViewState extends State<ItemView> {
       body = WebSmoothScroll(
         controller: _scrollController,
         scrollOffset: 100,
-        animationDuration: 300,
+        animationDuration: 400,
         child: SingleChildScrollView(
           physics: const NeverScrollableScrollPhysics(),
           controller: _scrollController,
@@ -133,8 +133,22 @@ class _ItemViewState extends State<ItemView> {
     }
 
     if (items.isEmpty) {
-      body =
-          const Text("Didnt find any items :(", style: TextStyle(fontSize: 20));
+      body = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result...'),
+            ),
+          ],
+        ),
+      );
     }
 
     return Scaffold(
