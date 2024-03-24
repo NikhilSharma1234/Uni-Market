@@ -96,22 +96,6 @@ class SearchPageController {
   search(String searchTerm, int number, BuildContext context,
       Filters filter) async {
     List<Widget> widgets = [];
-    var host = "34.125.158.70";
-    var API_KEY = '5RxNLWNEwIFn706Yz4nJw2CFfNaaQHJmfuVjUVgIT3OMfPhT';
-    final config = Configuration(
-      'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
-      nodes: {
-        Node(
-          Protocol.https,
-          "hawk-perfect-frog.ngrok-free.app",
-          port: 443, // stuff provided by the cloud hosting
-        ),
-      },
-      // numRetries: 3, // A total of 4 tries (1 original try + 3 retries)
-      connectionTimeout: const Duration(seconds: 2),
-    );
-
-    final client = Client(config);
 
     String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
 
