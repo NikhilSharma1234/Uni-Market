@@ -12,6 +12,12 @@ import 'package:uni_market/helpers/filters.dart';
 import 'package:http/http.dart' as http;
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 
+final Map<String, String> headers = {
+  "Access-Control-Allow-Origin": "*",
+  'Access-Control-Allow-Methods': 'true',
+  "X-TYPESENSE-API-KEY": 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
+}; // TODO: generate search api keys for each collection (waiting until formats are finalized so keys dont get nuked)
+
 Future<void> loadCurrentUser(email) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   var tempUserSnapshot = await firestore
@@ -78,6 +84,78 @@ Future<void> loadCurrentUser(email) async {
       verifiedAt: userData['verifiedAt']);
 }
 
+searchSuggestions(String searchTerm, int number) async {
+  List<String> suggestions = [];
+
+  String url = "https://hawk-perfect-frog.ngrok-free.app";
+
+  Uri searchUrl = Uri.parse(
+      "$url/collections/suggestions/documents/search?q=$searchTerm&query_by=embedding,suggestion&per_page=$number");
+
+  Map<String, dynamic> data = {};
+
+  try {
+    // search typesense
+    final response = await http.get(searchUrl, headers: headers);
+
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      data = json.decode(response.body) as Map<String, dynamic>;
+    } else {
+      // Handle error
+      throw Exception('Failed to fetch items: ${response.statusCode}');
+    }
+  } catch (e) {
+    // error snackbar
+  }
+
+  for (var item in data['hits']) {
+    suggestions.add(item['document']['suggestion']);
+  }
+  return suggestions;
+}
+
+searchTags(String searchTerm, int number, List<String?> currentTags) async {
+  List<String> tags = [];
+
+  String url = "https://hawk-perfect-frog.ngrok-free.app";
+  String items = "";
+  if (currentTags.isNotEmpty) {
+    items = "tag:!=[";
+    for (var tag in currentTags) {
+      items += "${tag!},";
+    }
+    items = "${items.substring(0, items.length - 1)}]";
+  } else {
+    items = "";
+  }
+
+  Uri searchUrl = Uri.parse(
+      "$url/collections/tags/documents/search?q=$searchTerm&query_by=embedding,tag&per_page=$number&filter_by=$items");
+
+  Map<String, dynamic> data = {};
+
+  try {
+    // search typesense
+    final response = await http.get(searchUrl, headers: headers);
+
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      data = json.decode(response.body) as Map<String, dynamic>;
+    } else {
+      // Handle error
+      throw Exception('Failed to fetch items: ${response.statusCode}');
+    }
+  } catch (e) {
+    // error snackbar
+  }
+
+  for (var item in data['hits']) {
+    tags.add(item['document']['tag']);
+  }
+  return tags;
+}
+
 search(
     String searchTerm, int number, BuildContext context, Filters filter) async {
   List<Widget> widgets = [];
@@ -120,20 +198,18 @@ search(
   filterString +=
       "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
 
-  final searchParameters = [searchTerm, "embedding", sort, filterString, 30];
-
-  const typesenseKey = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr';
+  final searchParameters = [
+    searchTerm,
+    "embedding,name,description,tags",
+    sort,
+    filterString,
+    30
+  ];
 
   String url = "https://hawk-perfect-frog.ngrok-free.app";
 
   Uri searchUrl = Uri.parse(
       "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
-  final Map<String, String> headers = {
-    "Access-Control-Allow-Origin": "*",
-    'Access-Control-Allow-Methods': 'true',
-    "X-TYPESENSE-API-KEY": typesenseKey,
-  };
-
   Map<String, dynamic> data = {};
 
   try {

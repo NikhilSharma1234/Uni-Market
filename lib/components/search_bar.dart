@@ -26,21 +26,23 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
   List<ListTile> suggestions = [];
 
   void updateSuggestions(String typedText) {
-    setState(() {
-      suggestions = List<ListTile>.generate(5, (int index) {
-        final String item = '$typedText$index';
-        return ListTile(
-          title: Text(item),
-          onTap: () {
-            setState(() {
-              // todo later: update the search function to include the now passed in filters using widget.filters
-              search(item, 30, context, widget.filter).then((value) {
-                widget.setPageState(value, false);
+    searchSuggestions(typedText, 5).then((value) {
+      setState(() {
+        suggestions = List<ListTile>.generate(5, (int index) {
+          final String item = value[index];
+          return ListTile(
+            title: Text(item),
+            onTap: () {
+              setState(() {
+                // todo later: update the search function to include the now passed in filters using widget.filters
+                search(item, 30, context, widget.filter).then((value) {
+                  widget.setPageState(value, false);
+                });
+                controller.closeView(item);
               });
-              controller.closeView(item);
-            });
-          },
-        );
+            },
+          );
+        });
       });
     });
   }

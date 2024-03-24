@@ -7,10 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:uni_market/helpers/functions.dart';
 import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import 'package:http/http.dart' as http;
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -30,10 +32,9 @@ class _PostFormState extends State<PostForm> {
   bool submitting = false;
   bool isFlagged = false;
   List<String> _imageDataUrls = [];
-  static const int maxTags = 8;
-  final List<String?> _tags = [];
-  final List<String?> _suggestedTags = [
-    // temporary constant tags
+  static const int maxTags = 6;
+  List<String?> _tags = [];
+  List<String?> _suggestedTags = [
     "desk",
     "chair",
     "lamp",
@@ -44,12 +45,18 @@ class _PostFormState extends State<PostForm> {
     "sign",
     "book",
     "keyboard"
-  ];
+  ]; // find a better way to animate the tags changing
+
+  @override
+  initState() {
+    searchTags("", maxTags, [])
+        .then((value) => setState(() => _suggestedTags = value));
+    super.initState();
+  }
 
   Widget tagSuggestionsBuilder(String input) {
     // update _suggestedTags with tags from typesense
     // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
-
     List<Widget> selected = List.generate(_tags.length, (int index) {
       final background = Theme.of(context).colorScheme.background;
       return InkWell(
@@ -187,14 +194,23 @@ class _PostFormState extends State<PostForm> {
             controller: _tagsController,
             maxLines: 1,
             maxLength: 30,
-
-            onSubmitted: (value) {
-              // check if tag is in global tags database via typsense, if not do not allow it to be added
-              setState(() {
-                _tags.add(value);
-                _tagsController.clear();
+            onChanged: (value) {
+              searchTags(value!, maxTags, _tags).then((value) {
+                setState(() => _suggestedTags = value);
               });
-            }, // Set a maximum character limit
+            },
+            onSubmitted: (value) {
+              if (_suggestedTags.contains(value)) {
+                setState(() {
+                  _tags.add(value);
+                  _tagsController.clear();
+                });
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Tag not found, try again!')));
+                _tagsController.clear();
+              }
+            },
           ),
           tagSuggestionsBuilder(_tagsController.text),
           const SizedBox(height: 38),
