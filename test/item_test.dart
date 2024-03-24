@@ -17,7 +17,7 @@ void main() {
         "NEW",
         "TestSchoolId",
         123.45,
-        Timestamp(0, 0),
+        DateTime(0, 0),
         ["NOIMAGE"],
         "TestSellerId",
         ["TestTags"]);
