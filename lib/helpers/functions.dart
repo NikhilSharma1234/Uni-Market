@@ -4,11 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:typesense/typesense.dart';
+import 'dart:convert';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/filters.dart';
+import 'package:http/http.dart' as http;
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 
 Future<void> loadCurrentUser(email) async {
@@ -80,20 +81,6 @@ Future<void> loadCurrentUser(email) async {
 search(
     String searchTerm, int number, BuildContext context, Filters filter) async {
   List<Widget> widgets = [];
-  final config = Configuration(
-    'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
-    nodes: {
-      Node(
-        Protocol.https,
-        "hawk-perfect-frog.ngrok-free.app",
-        port: 443, // stuff provided by the cloud hosting
-      ),
-    },
-    // numRetries: 3, // A total of 4 tries (1 original try + 3 retries)
-    connectionTimeout: const Duration(seconds: 2),
-  );
-
-  final client = Client(config);
 
   String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
 
@@ -130,14 +117,40 @@ search(
       break;
   }
 
-  final searchParameters = {
-    'q': searchTerm,
-    'query_by': 'embedding',
-    'sort_by': sort,
-    'filter_by': filterString,
+  filterString +=
+      "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
+
+  final searchParameters = [searchTerm, "embedding", sort, filterString, 30];
+
+  const typesenseKey = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr';
+
+  String url = "https://hawk-perfect-frog.ngrok-free.app";
+
+  Uri searchUrl = Uri.parse(
+      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
+  final Map<String, String> headers = {
+    "Access-Control-Allow-Origin": "*",
+    'Access-Control-Allow-Methods': 'true',
+    "X-TYPESENSE-API-KEY": typesenseKey,
   };
-  final Map<String, dynamic> data =
-      await client.collection('items').documents.search(searchParameters);
+
+  Map<String, dynamic> data = {};
+
+  try {
+    // search typesense
+    final response = await http.get(searchUrl, headers: headers);
+
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      data = json.decode(response.body) as Map<String, dynamic>;
+    } else {
+      // Handle error
+      throw Exception('Failed to fetch items: ${response.statusCode}');
+    }
+  } catch (e) {
+    // error snackbar
+  }
+
   if (context.mounted) {
     widgets = await generateItems(data, context);
   } else {
@@ -145,7 +158,10 @@ search(
       print("no clue as to whats going on, buildcontext wasnt mounded");
     }
   }
+
   data_store.itemBoxes = widgets;
+
+  return widgets;
 }
 
 generateItems(Map<String, dynamic> data, BuildContext context) async {

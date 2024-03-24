@@ -48,10 +48,7 @@ class _ItemBoxState extends State<ItemBox> {
     var style = theme.getThemeData();
     var item = widget.itemData;
 
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    var image;
+    Image image;
 
     if (item.imagePath[0] == "NOIMAGE") {
       image = Image.asset(
