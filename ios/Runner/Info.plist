@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To upload profile picture and photos for items</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To take photo of verification documents and item photos</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To record videos of items</string>
 </dict>
 </plist>
