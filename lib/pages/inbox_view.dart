@@ -1,35 +1,30 @@
-//inbox_view.dart
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:uni_market/components/user_navbar_mobile.dart';
-import 'package:uni_market/data_models/current_user.dart';
-import 'inbox_controller.dart'; 
+import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 
-class InboxView extends StatelessWidget {
-  final InboxController _controller = InboxController();
-
+class InboxView extends StatefulWidget {
   InboxView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // Retrieve the current user's email from FirebaseAuth
-    final CurrentUser currentUser = data_store.user;
-    final String userEmail = currentUser.email;
+  _InboxViewState createState() => _InboxViewState();
+}
 
-    // Handle the case where there is no signed-in user.
+class _InboxViewState extends State<InboxView> {
+  final InboxController _controller = InboxController();
+  final Set<String> _selectedSessionIds = Set<String>();
+
+  @override
+  Widget build(BuildContext context) {
+    final userEmail = data_store.user.email;
+
     if (userEmail == "") {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Inbox'),
         ),
         body: const Center(
-          child: Text(
-            'Not signed in',
-            style: TextStyle(fontSize: 24.0),
-          ),
+          child: Text('Not signed in', style: TextStyle(fontSize: 24.0)),
         ),
       );
     }
@@ -37,10 +32,20 @@ class InboxView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inbox'),
-        automaticallyImplyLeading: kIsWeb ? true : false,
+        actions: _selectedSessionIds.isNotEmpty
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    print(_selectedSessionIds.toList());
+                    setState(() {
+                      _selectedSessionIds.clear();
+                    });
+                  },
+                )
+              ]
+            : [],
       ),
-      bottomNavigationBar:
-          !kIsWeb ? const UserNavBarMobile(activeIndex: 1) : null,
       body: StreamBuilder<List<ChatSessionSummary>>(
         stream: _controller.chatSummariesStream(userEmail),
         builder: (context, snapshot) {
@@ -74,8 +79,33 @@ class InboxView extends StatelessWidget {
                     ),
                     onTap: () =>
                         _controller.onChatSelected(context, summary.sessionId),
+                    onLongPress: () {
+                      setState(() {
+                        if (_selectedSessionIds.contains(summary.sessionId)) {
+                          _selectedSessionIds.remove(summary.sessionId);
+                        } else {
+                          _selectedSessionIds.add(summary.sessionId);
+                        }
+                      });
+                    },
+                    trailing: IconButton(
+                      icon: Icon(
+                        _selectedSessionIds.contains(summary.sessionId)
+                            ? Icons.check_circle
+                            : Icons.check_circle_outline,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          if (_selectedSessionIds.contains(summary.sessionId)) {
+                            _selectedSessionIds.remove(summary.sessionId);
+                          } else {
+                            _selectedSessionIds.add(summary.sessionId);
+                          }
+                        });
+                      },
+                    ),
                   ),
-                  const Divider(), // Adds a divider line below each ListTile
+                  const Divider(),
                 ],
               );
             },
