@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:uni_market/components/image_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -53,7 +54,7 @@ class _PostFormState extends State<PostForm> {
     super.initState();
   }
 
-  Widget tagSuggestionsBuilder(String input) {
+  List<Widget> tagSuggestionsBuilder(String input) {
     // update _suggestedTags with tags from typesense
     // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
     List<Widget> selected = List.generate(_tags.length, (int index) {
@@ -103,9 +104,7 @@ class _PostFormState extends State<PostForm> {
           ));
     });
 
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: selected + suggested);
+    return selected + suggested;
   }
 
   void _flag(bool flag) {
@@ -211,57 +210,59 @@ class _PostFormState extends State<PostForm> {
               }
             },
           ),
-          tagSuggestionsBuilder(_tagsController.text),
-          const SizedBox(height: 38),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shadowColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0))),
-            onPressed: () async {
-              if (kIsWeb) {
-                List<XFile> clientImageFiles = await multiImagePicker(context);
-
-                if (clientImageFiles.isNotEmpty) {
-                  List<String> dataUrls =
-                      await convertXFilesToDataUrls(clientImageFiles);
-
-                  // Show the pop-up dialog for image confirmation
-                  if (context.mounted) {
-                    bool confirmSelection = await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        // Assign the captured context
-                        return ImageCarouselDialog(imageDataUrls: dataUrls);
-                      },
-                    );
-
-                    // Check if the user confirmed the selection
-                    if (confirmSelection == true) {
-                      setState(() {
-                        _imageDataUrls = dataUrls;
-                      });
-                    }
-                  }
-                }
-              } else {
-                // HERE LIES MOBILE IMAGE SELECTION CODE
-                if (kDebugMode) {
-                  print("not on web");
-                }
-              }
-            },
-            child: Column(
-              children: [
-                const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
-                if (_imageDataUrls.isNotEmpty)
-                  const Text("✅",
-                      style: TextStyle(fontSize: 20, color: Colors.green)),
-              ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: tagSuggestionsBuilder(_tagsController.text),
             ),
           ),
+          const SizedBox(height: 38),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  shadowColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0))),
+              onPressed: () async {
+                if (kIsWeb) {
+                  List<XFile> clientImageFiles =
+                      await multiImagePicker(context);
+
+                  if (clientImageFiles.isNotEmpty) {
+                    List<String> dataUrls =
+                        await convertXFilesToDataUrls(clientImageFiles);
+
+                    // Show the pop-up dialog for image confirmation
+                    if (context.mounted) {
+                      String confirmSelection = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          // Assign the captured context
+                          return ImageCarouselDialog(imageDataUrls: dataUrls);
+                        },
+                      );
+
+                      // Check if the user confirmed the selection
+                      if (confirmSelection == 'yes') {
+                        setState(() {
+                          _imageDataUrls = dataUrls;
+                        });
+                      }
+                    }
+                  }
+                } else {
+                  showOptions(context);
+                }
+              },
+              child: Column(
+                children: [
+                  const Text("Upload Image(s)", style: TextStyle(fontSize: 12)),
+                  if (_imageDataUrls.isNotEmpty)
+                    const Text("✅",
+                        style: TextStyle(fontSize: 20, color: Colors.green)),
+                ],
+              )),
           const SizedBox(height: 8),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -306,6 +307,140 @@ class _PostFormState extends State<PostForm> {
         ],
       ),
     );
+  }
+
+  Future showOptions(BuildContext context) async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            child: const Text('Photo Gallery'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from gallery
+              getImageFromGallery();
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: const Text('Camera'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from camera
+              getImageFromCamera();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future getImageFromGallery() async {
+    List<XFile> clientImageFiles = await multiImagePicker(context);
+
+    if (clientImageFiles.isNotEmpty) {
+      List<String> dataUrls = await convertXFilesToDataUrls(clientImageFiles);
+
+      // Show the pop-up dialog for image confirmation
+      if (context.mounted) {
+        String confirmSelection = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // Assign the captured context
+            return ImageCarouselDialog(imageDataUrls: dataUrls);
+          },
+        );
+
+        // Check if the user confirmed the selection
+        if (confirmSelection == 'yes') {
+          setState(() {
+            _imageDataUrls = dataUrls;
+          });
+        }
+      }
+    }
+  }
+
+  Future getImageFromCamera() async {
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
+    if (image != null) {
+      List<String> dataUrls = await convertXFilesToDataUrls([image]);
+
+      // Show the pop-up dialog for image confirmation
+      if (context.mounted) {
+        String confirmSelection = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // Assign the captured context
+            return ImageCarouselDialog(
+                imageDataUrls: dataUrls, cameraBasedImage: true);
+          },
+        );
+
+        // Check if the user confirmed the selection
+        if (confirmSelection == 'yes') {
+          setState(() {
+            _imageDataUrls = dataUrls;
+          });
+        }
+        if (confirmSelection == 'more') {
+          XFile? secondImage =
+              await ImagePicker().pickImage(source: ImageSource.camera);
+          if (secondImage != null) {
+            List<String> secondDataUrls =
+                await convertXFilesToDataUrls([image, secondImage]);
+
+            // Show the pop-up dialog for image confirmation
+            if (context.mounted) {
+              String confirmSelection = await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  // Assign the captured context
+                  return ImageCarouselDialog(
+                      imageDataUrls: secondDataUrls, cameraBasedImage: true);
+                },
+              );
+
+              // Check if the user confirmed the selection
+              if (confirmSelection == 'yes') {
+                setState(() {
+                  _imageDataUrls = secondDataUrls;
+                });
+              }
+              if (confirmSelection == 'more') {
+                XFile? thirdImage =
+                    await ImagePicker().pickImage(source: ImageSource.camera);
+                if (thirdImage != null) {
+                  List<String> secondDataUrls = await convertXFilesToDataUrls(
+                      [image, secondImage, thirdImage]);
+
+                  // Show the pop-up dialog for image confirmation
+                  if (context.mounted) {
+                    String confirmSelection = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // Assign the captured context
+                        return ImageCarouselDialog(
+                            imageDataUrls: secondDataUrls);
+                      },
+                    );
+
+                    // Check if the user confirmed the selection
+                    if (confirmSelection == 'yes') {
+                      setState(() {
+                        _imageDataUrls = secondDataUrls;
+                      });
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   // Helper functions for input form to database document
