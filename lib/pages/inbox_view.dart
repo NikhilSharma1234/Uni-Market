@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart'; // Make sure this is pointing to the correct file path
 import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import '../components/user_navbar_mobile.dart'; // Adjust the path as necessary
+import 'package:intl/intl.dart';
 
 class InboxView extends StatefulWidget {
   InboxView({Key? key}) : super(key: key);
@@ -13,6 +17,18 @@ class InboxView extends StatefulWidget {
 class _InboxViewState extends State<InboxView> {
   final InboxController _controller = InboxController();
   final Set<String> _selectedSessionIds = Set<String>();
+
+  Future<void> _initializeFirebase() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeFirebase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +48,13 @@ class _InboxViewState extends State<InboxView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inbox'),
+        automaticallyImplyLeading: kIsWeb,
+        leading: kIsWeb
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null, // Explicitly null for mobile or when not needed
         actions: _selectedSessionIds.isNotEmpty
             ? [
                 IconButton(
@@ -112,6 +135,8 @@ class _InboxViewState extends State<InboxView> {
           );
         },
       ),
+      bottomNavigationBar:
+          !kIsWeb ? const UserNavBarMobile(activeIndex: 1) : null,
     );
   }
 }
