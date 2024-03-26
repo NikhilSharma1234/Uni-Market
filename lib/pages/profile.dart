@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,8 +48,75 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     if (loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(
+          resizeToAvoidBottomInset: false,
+          bottomNavigationBar: !kIsWeb
+              ? UserNavBarMobile(activeIndex: 2)
+              : null, // Custom app bar here
+          body: Center(child: CircularProgressIndicator()));
     }
+    Future getImageFromCamera() async {
+      XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+      if (image != null) {
+        return image;
+      }
+    }
+
+    Future showOptions(BuildContext context) async {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              child: const Text('Photo Gallery'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // get image from gallery
+                var newProfilePic = await singleImagePicker(context);
+                if (newProfilePic != null) {
+                  setState(() {
+                    loading = true;
+                  });
+                  await _updateProfilePicture(newProfilePic)
+                      .then((success) async {
+                    if (success != null) {
+                      await loadCurrentUser(data_store.user.email);
+                    }
+                  });
+                  setState(() {
+                    loading = false;
+                  });
+                }
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: const Text('Camera'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // get image from gallery
+                var newProfilePic = await getImageFromCamera();
+                if (newProfilePic != null) {
+                  setState(() {
+                    loading = true;
+                  });
+                  await _updateProfilePicture(newProfilePic)
+                      .then((success) async {
+                    if (success != null) {
+                      await loadCurrentUser(data_store.user.email);
+                    }
+                  });
+                  setState(() {
+                    loading = false;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
     var child = SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Scrollbar(
@@ -67,6 +135,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Center(
                     child: InkWell(
                       onTap: () async {
+                        if (!kIsWeb) {
+                          showOptions(context);
+                          return;
+                        }
                         newProfilePic = await singleImagePicker(context);
                         if (newProfilePic != null) {
                           setState(() {
@@ -290,80 +362,81 @@ class _ProfilePageState extends State<ProfilePage> {
             : null, // Custom app bar here
         body: child);
   }
-}
 
 // Helper function for selecting new profile picture
-Future<XFile?> singleImagePicker(BuildContext context) async {
-  XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<XFile?> singleImagePicker(BuildContext context) async {
+    XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-  if (image != null) {
-    return image;
-  } else {
-    if (kDebugMode) {
-      print("Error: No image selected");
+    if (image != null) {
+      return image;
+    } else {
+      if (kDebugMode) {
+        print("Error: No image selected");
+      }
     }
+    return null;
   }
-  return null;
-}
 
-Future<bool?> _updateProfilePicture(XFile? profilePic) async {
-  if (profilePic != null) {
-    Future<String?> imageDataUrl = convertImageToDataUrl(profilePic);
-    try {
-      String? dataUrl = await imageDataUrl;
-      if (dataUrl != null) {
-        List<String> imageNames = [];
-        Uint8List imageBytes = base64Decode(dataUrl.split(',').last);
-        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-        final imageRef =
-            FirebaseStorage.instance.ref().child("profile_pics/$fileName.jpg");
-        try {
-          await imageRef.putData(imageBytes);
-          imageNames.add("profile_pics/$fileName.jpg");
-        } on FirebaseException catch (e) {
-          // Handle Firebase exception
-          if (kDebugMode) {
-            print(e);
+  Future<bool?> _updateProfilePicture(XFile? profilePic) async {
+    if (profilePic != null) {
+      Future<String?> imageDataUrl = convertImageToDataUrl(profilePic);
+      try {
+        String? dataUrl = await imageDataUrl;
+        if (dataUrl != null) {
+          List<String> imageNames = [];
+          Uint8List imageBytes = base64Decode(dataUrl.split(',').last);
+          String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+          final imageRef = FirebaseStorage.instance
+              .ref()
+              .child("profile_pics/$fileName.jpg");
+          try {
+            await imageRef.putData(imageBytes);
+            imageNames.add("profile_pics/$fileName.jpg");
+          } on FirebaseException catch (e) {
+            // Handle Firebase exception
+            if (kDebugMode) {
+              print(e);
+            }
+            return false;
           }
+
+          try {
+            if (data_store.user.email != "") {
+              await FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(data_store.user.email)
+                  .update({"assignable_profile_pic": imageNames[0]});
+              await loadCurrentUser(data_store.user.email);
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print("Error: $e");
+            }
+          }
+          Completer<List<String>> completer = Completer<List<String>>();
+          completer.complete(imageNames);
+          return true;
+        } else {
+          // Data URL is null
           return false;
         }
-
-        try {
-          if (data_store.user.email != "") {
-            await FirebaseFirestore.instance
-                .collection("users")
-                .doc(data_store.user.email)
-                .update({"assignable_profile_pic": imageNames[0]});
-            await loadCurrentUser(data_store.user.email);
-          }
-        } catch (e) {
-          if (kDebugMode) {
-            print("Error: $e");
-          }
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error updating profile picture: $e");
         }
-        Completer<List<String>> completer = Completer<List<String>>();
-        completer.complete(imageNames);
-        return true;
-      } else {
-        // Data URL is null
         return false;
       }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error updating profile picture: $e");
-      }
-      return false;
     }
+    return null;
   }
-  return null;
-}
 
-Future<String?> convertImageToDataUrl(XFile? imageFile) async {
-  if (imageFile != null) {
-    List<int> imageBytes = await imageFile.readAsBytes();
-    String? dataUrl =
-        'data:image/${imageFile.name.split('.').last};base64,${base64Encode(Uint8List.fromList(imageBytes))}';
-    return dataUrl;
+  Future<String?> convertImageToDataUrl(XFile? imageFile) async {
+    if (imageFile != null) {
+      List<int> imageBytes = await imageFile.readAsBytes();
+      String? dataUrl =
+          'data:image/${imageFile.name.split('.').last};base64,${base64Encode(Uint8List.fromList(imageBytes))}';
+      return dataUrl;
+    }
+    return null;
   }
-  return null;
 }
