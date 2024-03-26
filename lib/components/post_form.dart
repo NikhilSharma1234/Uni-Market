@@ -12,7 +12,6 @@ import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
-import 'package:http/http.dart' as http;
 
 class PostForm extends StatefulWidget {
   const PostForm({Key? key}) : super(key: key);
@@ -32,8 +31,8 @@ class _PostFormState extends State<PostForm> {
   bool submitting = false;
   bool isFlagged = false;
   List<String> _imageDataUrls = [];
-  static const int maxTags = 6;
-  List<String?> _tags = [];
+  static int maxTags = 6;
+  final List<String?> _tags = [];
   List<String?> _suggestedTags = [
     "desk",
     "chair",

@@ -34,7 +34,6 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
             title: Text(item),
             onTap: () {
               setState(() {
-                // todo later: update the search function to include the now passed in filters using widget.filters
                 search(item, 30, context, widget.filter).then((value) {
                   widget.setPageState(value, false);
                 });
