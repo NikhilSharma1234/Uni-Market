@@ -67,15 +67,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // called just after initstate, used to set the initial items displayed
-  @override
-  void didChangeDependencies() async {
-    search("", 30, context, filter).then((value) {
-      redrawItems(value, false);
-    });
-    super.didChangeDependencies();
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -155,12 +146,11 @@ class _HomePageState extends State<HomePage> {
           : PreferredSize(
               preferredSize: const Size.fromHeight(60),
               child: AppBar(
-                  title: Expanded(
-                      child: Center(
-                          child: ItemSearchBar(
-                              setPageState: redrawItems,
-                              updateSearchText: updateSearchText,
-                              filter: filter))))),
+                  title: Center(
+                      child: ItemSearchBar(
+                          setPageState: redrawItems,
+                          updateSearchText: updateSearchText,
+                          filter: filter)))),
       bottomNavigationBar:
           !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
