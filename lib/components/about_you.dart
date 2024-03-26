@@ -5,8 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:uni_market/components/dialog.dart';
 import 'package:uni_market/helpers/functions.dart';
+import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
@@ -58,6 +60,10 @@ class _AboutYouContentState extends State<AboutYouContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Text(
+            'Please select which school you go to.\nAdditionally, please upload two documents that may help prove that you attend the selected school. Common documents are student id cards and unofficial transcripts.',
+            textAlign: TextAlign.center,
+          ),
           FutureBuilder(
               future: _list,
               builder: (BuildContext context,
@@ -109,6 +115,9 @@ class _AboutYouContentState extends State<AboutYouContent> {
   }
 
   Widget _buildSchoolDropdown(list) {
+    bool darkModeOn =
+        Provider.of<ThemeProvider>(context, listen: true).themeMode ==
+            ThemeMode.dark;
     String? dropdownValue; // Ensure dropdown reflects the current state
 
     return Column(
@@ -135,7 +144,9 @@ class _AboutYouContentState extends State<AboutYouContent> {
               value: value,
               child: Text(
                 value,
-                style: const TextStyle(fontSize: 16),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: darkModeOn ? Colors.white : Colors.black),
               ),
             );
           }).toList(),
