@@ -27,21 +27,23 @@ class _PostingPageState extends State<PostingPage> {
     }
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    width: widthScreen(screenWidth) * 0.95,
-                    child: const PostForm(),
-                  ),
-                ],
-              )
-            ]));
+        resizeToAvoidBottomInset: false,
+        body: SingleChildScrollView(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      width: widthScreen(screenWidth) * 0.95,
+                      child: const PostForm(),
+                    ),
+                  ],
+                )
+              ]),
+        ));
   }
 }
