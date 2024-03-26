@@ -22,4 +22,8 @@ class InboxController {
       ),
     );
   }
+
+  Future<void> markChatSessionAsDeleted(String sessionId, String userEmail) async {
+    await _model.markChatSessionAsDeleted(sessionId, userEmail);
+  }
 }
