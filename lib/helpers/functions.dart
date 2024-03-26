@@ -89,8 +89,10 @@ searchSuggestions(String searchTerm, int number) async {
 
   String url = "https://hawk-perfect-frog.ngrok-free.app";
 
+  String query_weights = "1,2";
+
   Uri searchUrl = Uri.parse(
-      "$url/collections/suggestions/documents/search?q=$searchTerm&query_by=embedding,suggestion&per_page=$number");
+      "$url/collections/suggestions/documents/search?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,suggestion&per_page=$number");
 
   Map<String, dynamic> data = {};
 
@@ -130,8 +132,10 @@ searchTags(String searchTerm, int number, List<String?> currentTags) async {
     items = "";
   }
 
+  String query_weights = "1,2";
+
   Uri searchUrl = Uri.parse(
-      "$url/collections/tags/documents/search?q=$searchTerm&query_by=embedding,tag&per_page=$number&filter_by=$items");
+      "$url/collections/tags/documents/search?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,tag&per_page=$number&filter_by=$items");
 
   Map<String, dynamic> data = {};
 
@@ -195,12 +199,15 @@ search(
       break;
   }
 
+  // filterString +=
+  //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
+
   filterString +=
-      "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
+      "&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
 
   final searchParameters = [
     searchTerm,
-    "embedding,name,description,tags",
+    "name,embedding,description,tags",
     sort,
     filterString,
     30
@@ -208,8 +215,10 @@ search(
 
   String url = "https://hawk-perfect-frog.ngrok-free.app";
 
+  String query_weights = "5,4,2,1";
+
   Uri searchUrl = Uri.parse(
-      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
+      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by_weights$query_weights&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
   Map<String, dynamic> data = {};
 
   try {
@@ -236,6 +245,10 @@ search(
   }
 
   data_store.itemBoxes = widgets;
+
+  if (widgets.isEmpty) {
+    widgets = [const Text("No items found :(")];
+  }
 
   return widgets;
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/components/search_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';
@@ -151,7 +152,15 @@ class _HomePageState extends State<HomePage> {
               redrawItems: redrawItems,
               updateSearchText: updateSearchText,
               filter: filter)
-          : null,
+          : PreferredSize(
+              preferredSize: const Size.fromHeight(60),
+              child: AppBar(
+                  title: Expanded(
+                      child: Center(
+                          child: ItemSearchBar(
+                              setPageState: redrawItems,
+                              updateSearchText: updateSearchText,
+                              filter: filter))))),
       bottomNavigationBar:
           !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
