@@ -118,13 +118,16 @@ class _PostFormState extends State<PostForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Create a post!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
+          const Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Create a post!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           // Title box
           const SizedBox(height: 8),
