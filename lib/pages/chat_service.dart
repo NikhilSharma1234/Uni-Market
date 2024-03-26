@@ -99,7 +99,8 @@ class ChatService {
 
   // Generate composite key
   List<String> participantIds = [senderEmail, receiverEmail];
-  participantIds.sort();
+  List<String> participantIdsSorted = participantIds..sort();
+  participantIdsSorted.sort();
   String participantIdsKey = participantIds.join(':');
 
   // Check for existing session
@@ -124,6 +125,8 @@ class ChatService {
     'createdAt': Timestamp.now(),
     'lastMessage': '',
     'lastMessageAt': Timestamp.now(),
+    "deletedByUsers": []
+
   });
 
   return chatSessionRef.id;

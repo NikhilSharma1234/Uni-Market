@@ -54,17 +54,21 @@ class _InboxViewState extends State<InboxView> {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
               )
-            : null, // Explicitly null for mobile or when not needed
+            : null,     
         actions: _selectedSessionIds.isNotEmpty
             ? [
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    print(_selectedSessionIds.toList());
-                    setState(() {
-                      _selectedSessionIds.clear();
-                    });
-                  },
+                  onPressed: () async {
+    for (String sessionId in _selectedSessionIds) {
+      await _controller.markChatSessionAsDeleted(sessionId, data_store.user.email);
+    }
+    // After deletion, clear the selection and update UI
+    setState(() {
+      _selectedSessionIds.clear();
+    });
+    // Optionally, show feedback
+  },
                 )
               ]
             : [],
