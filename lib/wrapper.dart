@@ -38,7 +38,7 @@ class _WrapperState extends State<Wrapper> {
           .doc(event.email)
           .get();
       bool verificationDocsUploaded =
-          tempUser.data()!['verificationDocsUploaded'];
+          tempUser.data()?['verificationDocsUploaded'] ?? false;
       if (verificationDocsUploaded == false) {
         Navigator.of(context).push(
           MaterialPageRoute(
