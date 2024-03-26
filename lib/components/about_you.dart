@@ -1,8 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uni_market/components/dialog.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/home.dart';
@@ -38,6 +40,8 @@ class _AboutYouContentState extends State<AboutYouContent> {
   String? secondFileName;
   FilePickerResult? fileResult1;
   FilePickerResult? fileResult2;
+  XFile? imageResult1;
+  XFile? imageResult2;
   ValueNotifier<bool> isSubmitting = ValueNotifier(false);
   Future<Map<String, String>>? _list;
 
@@ -154,6 +158,92 @@ class _AboutYouContentState extends State<AboutYouContent> {
     required int fileNumber,
     required Function(String) onUpload,
   }) {
+    Future getImageFromGallery() async {
+      XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+      if (image != null) {
+        setState(() {
+          if (fileNumber == 1) {
+            imageResult1 = image;
+            fileResult1 = null;
+            firstFileName = image.name;
+          } else {
+            imageResult2 = image;
+            fileResult2 = null;
+            secondFileName = image.name;
+          }
+        });
+      }
+    }
+
+    Future getImageFromCamera() async {
+      XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+      if (image != null) {
+        setState(() {
+          if (fileNumber == 1) {
+            imageResult1 = image;
+            fileResult1 = null;
+            firstFileName = image.name;
+          } else {
+            imageResult2 = image;
+            fileResult2 = null;
+            secondFileName = image.name;
+          }
+        });
+      }
+    }
+
+    showOptions(BuildContext context) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              child: const Text('Photo Gallery'),
+              onPressed: () {
+                // close the options modal
+                Navigator.of(context).pop();
+                // get image from gallery
+                getImageFromGallery();
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: const Text('Camera'),
+              onPressed: () {
+                // close the options modal
+                Navigator.of(context).pop();
+                // get image from camera
+                getImageFromCamera();
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: const Text('Select File'),
+              onPressed: () async {
+                // close the options modal
+                Navigator.of(context).pop();
+                FilePickerResult? result =
+                    await FilePicker.platform.pickFiles();
+                if (result != null) {
+                  setState(() {
+                    if (fileNumber == 1) {
+                      fileResult1 = result;
+                      imageResult1 = null;
+                      firstFileName = result.files.single.name;
+                    } else {
+                      fileResult2 = result;
+                      imageResult2 = null;
+                      secondFileName = result.files.single.name;
+                    }
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,34 +255,39 @@ class _AboutYouContentState extends State<AboutYouContent> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: Row(
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles();
-                  if (result != null) {
-                    setState(() {
-                      if (fileNumber == 1) {
-                        fileResult1 = result;
-                        firstFileName = result.files.single.name;
-                      } else {
-                        fileResult2 = result;
-                        secondFileName = result.files.single.name;
-                      }
-                    });
-                  }
-                },
-                child: Text('Upload $title'),
-              ),
-              const SizedBox(width: 10),
-              Text(fileNumber == 1
-                  ? (firstFileName ?? '')
-                  : (secondFileName ?? '')),
-            ],
-          ),
-        ),
+            padding: const EdgeInsets.only(top: 16.0),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (kIsWeb) {
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles();
+                          if (result != null) {
+                            setState(() {
+                              if (fileNumber == 1) {
+                                fileResult1 = result;
+                                firstFileName = result.files.single.name;
+                              } else {
+                                fileResult2 = result;
+                                secondFileName = result.files.single.name;
+                              }
+                            });
+                          }
+                        } else {
+                          showOptions(context);
+                        }
+                      },
+                      child: Text('Upload $title'),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(fileNumber == 1
+                        ? (firstFileName ?? '')
+                        : (secondFileName ?? '')),
+                  ],
+                ))),
       ],
     );
   }
@@ -202,6 +297,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
     if (fileName.endsWith('.jpg')) return true;
     if (fileName.endsWith('.png')) return true;
     if (fileName.endsWith('.pdf')) return true;
+    if (fileName.endsWith('.JPG')) return true;
     return false;
   }
 
@@ -218,6 +314,10 @@ class _AboutYouContentState extends State<AboutYouContent> {
     return null;
   }
 
+  Future<String?> uploadImage(XFile result, String fileName) async {
+    return await uploadService.uploadImage(result, fileName);
+  }
+
   Future<Map<String, String>> getListOfSchools() async {
     final Map<String, String> list = {};
     await FirebaseFirestore.instance.collection('schools').get().then((value) {
@@ -231,7 +331,9 @@ class _AboutYouContentState extends State<AboutYouContent> {
 
   Future<void> checkUpload() async {
     isSubmitting.value = true;
-    if (selectedSchool != null && fileResult1 != null && fileResult2 != null) {
+    if (selectedSchool != null &&
+        (fileResult1 != null || imageResult1 != null) &&
+        (fileResult2 != null || imageResult2 != null)) {
       try {
         if (firstFileName == secondFileName) {
           showDialog<String>(
@@ -251,16 +353,18 @@ class _AboutYouContentState extends State<AboutYouContent> {
               builder: (BuildContext context) => appDialog(
                   context,
                   'Invalid File',
-                  'One or more of your files is an invalid file extension. Please select a file with extensions .jpeg, .jpg, .png or .pdf.',
+                  'One or more of your files is an invalid file extension. Please select a file with extensions .jpeg, .jpg, , .JPG, .png or .pdf.',
                   'Ok'));
           isSubmitting.value = false;
           return;
         }
         // Use uploadFile function for both files
-        String? uploadedFileName1 =
-            await uploadFile(fileResult1!, firstFileName!);
-        String? uploadedFileName2 =
-            await uploadFile(fileResult2!, secondFileName!);
+        String? uploadedFileName1 = fileResult1 != null
+            ? await uploadFile(fileResult1!, firstFileName!)
+            : await uploadImage(imageResult1!, firstFileName!);
+        String? uploadedFileName2 = fileResult2 != null
+            ? await uploadFile(fileResult2!, secondFileName!)
+            : await uploadImage(imageResult2!, secondFileName!);
 
         if (uploadedFileName1 != null && uploadedFileName2 != null) {
           var marketplaceId = '';

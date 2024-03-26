@@ -88,7 +88,7 @@ class _RegistirationState extends State<Registiration> {
     try {
       setState(() => submitting = true);
       // Get user input from text field controllers (Remove ending whitespaces)
-      String userEmail = emailController.text.trim();
+      String userEmail = emailController.text.trim().toLowerCase();
       String password = passwordController.text.trim();
       String displayName = nameController.text.trim();
 
