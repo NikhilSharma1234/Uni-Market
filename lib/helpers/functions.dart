@@ -233,7 +233,9 @@ search(
       throw Exception('Failed to fetch items: ${response.statusCode}');
     }
   } catch (e) {
-    // error snackbar
+    if (kDebugMode) {
+      print(e);
+    }
   }
 
   if (context.mounted) {
