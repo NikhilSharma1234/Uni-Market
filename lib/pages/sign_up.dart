@@ -89,7 +89,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   SizedBox(
-                      height: 600,
+                      height: 550,
                       child: Stepper(
                         type: StepperType.horizontal,
                         currentStep: currentStep(),
