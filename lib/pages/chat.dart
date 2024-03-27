@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -200,7 +201,9 @@ class _ChatPageState extends State<ChatPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      message.get('timestamp').toDate().toString(),
+                      // Here's the change: Format the timestamp to a more readable form
+                      DateFormat('yyyy-MM-dd -- HH:mm')
+                          .format(message.get('timestamp').toDate()),
                       style: TextStyle(
                         color: textColor.withOpacity(0.7),
                         fontSize: 10,
