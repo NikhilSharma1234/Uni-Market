@@ -17,12 +17,31 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
   late Future<Map<String, dynamic>?> _sessionDetailsFuture;
+  bool canCurrentUserSendMessages = true; // Updated flag
 
   @override
   void initState() {
     super.initState();
-    _sessionDetailsFuture =
-        _chatController.fetchChatSessionDetails(widget.chatSessionId);
+    _sessionDetailsFuture = _chatController
+        .fetchChatSessionDetails(widget.chatSessionId)
+        .then((sessionDetails) {
+      // Check if the session was deleted by any user
+      if (sessionDetails != null &&
+          (sessionDetails['deletedByUsers'] as List).isNotEmpty) {
+        // If there are any values in 'deletedByUsers', block message sending
+        canCurrentUserSendMessages = false;
+        _maybeShowDeletedSessionSnackbar();
+      }
+      return sessionDetails;
+    });
+  }
+
+  bool _isWidgetActive = true;
+
+  @override
+  void dispose() {
+    _isWidgetActive = false;
+    super.dispose();
   }
 
   @override
@@ -40,12 +59,14 @@ class _ChatPageState extends State<ChatPage> {
         return Scaffold(
           appBar: AppBar(
             title: Text(title),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.location_on),
-                onPressed: _showLocationsModal,
-              ),
-            ],
+            actions: canCurrentUserSendMessages
+                ? [
+                    IconButton(
+                      icon: const Icon(Icons.location_on),
+                      onPressed: _showLocationsModal,
+                    ),
+                  ]
+                : [],
           ),
           body: Padding(
             padding: const EdgeInsets.only(bottom: 32),
@@ -59,9 +80,13 @@ class _ChatPageState extends State<ChatPage> {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }
-            
+
                       return ListView.builder(
                         reverse: true,
+                        padding: EdgeInsets.only(
+                            bottom: canCurrentUserSendMessages
+                                ? 80
+                                : 20), // Adjust bottom padding
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           var message = snapshot.data!.docs[index];
@@ -74,7 +99,8 @@ class _ChatPageState extends State<ChatPage> {
                     },
                   ),
                 ),
-                _buildMessageComposer(),
+                // Conditionally render the message composer based on the deletion status
+                if (canCurrentUserSendMessages) _buildMessageComposer(),
               ],
             ),
           ),
@@ -197,6 +223,30 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void _maybeShowDeletedSessionSnackbar() {
+    if (_isWidgetActive && mounted) {
+      // Directly showing the dialog without adding a post-frame callback
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Session Deleted'),
+            content:
+                const Text('This session has been deleted by the other user.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   Widget _buildMessageComposer() {
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -235,37 +285,34 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _showLocationsModal() async {
-  final locations = await _chatController
-      .fetchLocationsBasedOnSession(widget.chatSessionId);
+    final locations = await _chatController
+        .fetchLocationsBasedOnSession(widget.chatSessionId);
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text(
-          "Recommended locations",
-          textAlign: TextAlign.center,
-        ),
-        content: const Text(
-          "Suggest a location for the trade of the item",
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 4),
-            child: Column(
-              children: [
-                const Divider(),
-                for (var location in locations)
-                  ...[
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Text(
+              "Recommended locations",
+              textAlign: TextAlign.center,
+            ),
+            content: const Text(
+              "Suggest a location for the trade of the item",
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              Padding(
+                padding:
+                    const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 4),
+                child: Column(children: [
+                  const Divider(),
+                  for (var location in locations) ...[
                     ListTile(
                       title: Text(
                         location['locationName'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       onTap: () {
                         Navigator.of(context).pop();
@@ -279,27 +326,24 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     const Divider()
                   ],
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: TextButton.styleFrom(
-                      foregroundColor:const Color(0xFF041E42),
-                      padding: const EdgeInsets.all(16.0),
-                      textStyle: const TextStyle(fontSize: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF041E42),
+                        padding: const EdgeInsets.all(16.0),
+                        textStyle: const TextStyle(fontSize: 20),
+                      ),
+                      child: const Text('Close'),
                     ),
-                    child: const Text('Close'),
-                  ),
-                )
-              ]
-            ),
-          )
-        ]
-      );
-    },
-  );
-}
-
+                  )
+                ]),
+              )
+            ]);
+      },
+    );
+  }
 
   void _showLocationInfo(String schoolName, String address) {
     showDialog(
