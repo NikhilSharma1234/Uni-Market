@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/helpers/functions.dart';
@@ -61,7 +62,9 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
             // this fixes the issues with unfocusing while text still selected
             node: focusNode,
             onFocusChange: (isFocused) {
-              focusNode.unfocus();
+              if (kIsWeb) {
+                focusNode.unfocus();
+              }
             },
             child: SearchAnchor.bar(
                 barHintText: "Search items",
