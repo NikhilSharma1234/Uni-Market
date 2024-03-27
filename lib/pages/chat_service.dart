@@ -68,82 +68,81 @@ class ChatService {
   }
 
   Future<String?> createChatSession(String productId) async {
-  if (currentUser.email == "") {
-    if (kDebugMode) {
-      print("Error: Current user is null or has no email");
+    if (currentUser.email == "") {
+      if (kDebugMode) {
+        print("Error: Current user is null or has no email");
+      }
+      return null;
     }
-    return null;
-  }
 
-  String? receiverEmail = await getUserEmail(productId);
-  if (receiverEmail == null) {
-    if (kDebugMode) {
-      print("Error: Could not find seller's email for product ID: $productId");
+    String? receiverEmail = await getUserEmail(productId);
+    if (receiverEmail == null) {
+      if (kDebugMode) {
+        print(
+            "Error: Could not find seller's email for product ID: $productId");
+      }
+      return null;
     }
-    return null;
-  }
 
-  String senderEmail = currentUser.email;
+    String senderEmail = currentUser.email;
 
-  // Prevent creating a chat session with oneself
-  //Commented out the if statement to allow for testing
-  if (senderEmail == receiverEmail) {
-    if (kDebugMode) {
-      print("Error: Seller and buyer emails are the same");
+    // Prevent creating a chat session with oneself
+    //Commented out the if statement to allow for testing
+    if (senderEmail == receiverEmail) {
+      if (kDebugMode) {
+        print("Error: Seller and buyer emails are the same");
+      }
+      return null;
     }
-    return null;
-  }
-  
-  String? buyerName = await getBuyerName(senderEmail);
-  String? productName = await getProductName(productId);
 
-  // Generate composite key
-  List<String> participantIds = [senderEmail, receiverEmail];
-  List<String> participantIdsSorted = participantIds..sort();
-  participantIdsSorted.sort();
-  String participantIdsKey = participantIds.join(':');
+    String? buyerName = await getBuyerName(senderEmail);
+    String? productName = await getProductName(productId);
 
-  // Check for existing session
-  final QuerySnapshot existingChatSessionQuery = await _firestore
-      .collection('chat_sessions')
-      .where('participantIdsKey', isEqualTo: participantIdsKey)
-      .where('productId', isEqualTo: productId)
-      .limit(1)
-      .get();
+    // Generate composite key
+    List<String> participantIds = [senderEmail, receiverEmail];
+    List<String> participantIdsSorted = participantIds..sort();
+    participantIdsSorted.sort();
+    String participantIdsKey = participantIds.join(':');
 
-  // if (existingChatSessionQuery.docs.isNotEmpty) {
-  //   return existingChatSessionQuery.docs.first.id;
-  // }
+    // Check for existing session
+    final QuerySnapshot existingChatSessionQuery = await _firestore
+        .collection('chat_sessions')
+        .where('participantIdsKey', isEqualTo: participantIdsKey)
+        .where('productId', isEqualTo: productId)
+        .limit(1)
+        .get();
 
-  for (var doc in existingChatSessionQuery.docs) {
+    // if (existingChatSessionQuery.docs.isNotEmpty) {
+    //   return existingChatSessionQuery.docs.first.id;
+    // }
+
+    for (var doc in existingChatSessionQuery.docs) {
       var data =
           doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
       var deletedByUsers = data['deletedByUsers'] as List<dynamic>? ?? [];
 
       //if deletedByUsers is empty, return the chat session ID
       if (deletedByUsers.isEmpty) {
+        print("Chat session already exists");
+        print(doc.id);
         return doc.id;
       }
     }
 
-  
+    // Create a new chat session if none exists
+    DocumentReference chatSessionRef =
+        await _firestore.collection('chat_sessions').add({
+      'participantIdsKey': participantIdsKey, // Store the composite key
+      'productName': productName,
+      'buyerName': buyerName,
+      'participantIds': participantIds,
+      'productId': productId,
+      'createdAt': Timestamp.now(),
+      'lastMessage': '',
+      'lastMessageAt': Timestamp.now(),
+      "deletedByUsers": []
+    });
 
-  // Create a new chat session if none exists
-  DocumentReference chatSessionRef = await _firestore.collection('chat_sessions').add({
-    'participantIdsKey': participantIdsKey, // Store the composite key
-    'productName': productName,
-    'buyerName': buyerName,
-    'participantIds': participantIds,
-    'productId': productId,
-    'createdAt': Timestamp.now(),
-    'lastMessage': '',
-    'lastMessageAt': Timestamp.now(),
-    "deletedByUsers": []
-
-  });
-
-  return chatSessionRef.id;
-}
-
-
+    return chatSessionRef.id;
+  }
 }
