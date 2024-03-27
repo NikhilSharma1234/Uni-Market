@@ -161,8 +161,8 @@ searchTags(String searchTerm, int number, List<String?> currentTags) async {
   return tags;
 }
 
-search(
-    String searchTerm, int number, BuildContext context, Filters filter) async {
+search(String searchTerm, int number, BuildContext context, Filters filter,
+    {int pageNum = 1}) async {
   List<Widget> widgets = [];
 
   String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
@@ -219,7 +219,7 @@ search(
   String query_weights = "5,4,2,1";
 
   Uri searchUrl = Uri.parse(
-      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by_weights$query_weights&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}");
+      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by_weights$query_weights&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}&page=$pageNum");
   Map<String, dynamic> data = {};
 
   try {
@@ -248,10 +248,6 @@ search(
   }
 
   data_store.itemBoxes = widgets;
-
-  if (widgets.isEmpty) {
-    widgets = [const Text("No items found :(")];
-  }
 
   return widgets;
 }
