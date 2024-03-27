@@ -201,8 +201,7 @@ class _ChatPageState extends State<ChatPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      // Here's the change: Format the timestamp to a more readable form
-                      DateFormat('yyyy-MM-dd -- HH:mm')
+                      DateFormat('dd/MM/yy hh:mm a')
                           .format(message.get('timestamp').toDate()),
                       style: TextStyle(
                         color: textColor.withOpacity(0.7),
