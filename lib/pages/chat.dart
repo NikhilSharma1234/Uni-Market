@@ -17,7 +17,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
   late Future<Map<String, dynamic>?> _sessionDetailsFuture;
-  bool canCurrentUserSendMessages = true; // Updated flag
+  bool canCurrentUserSendMessages = true;
 
   @override
   void initState() {
@@ -25,10 +25,8 @@ class _ChatPageState extends State<ChatPage> {
     _sessionDetailsFuture = _chatController
         .fetchChatSessionDetails(widget.chatSessionId)
         .then((sessionDetails) {
-      // Check if the session was deleted by any user
       if (sessionDetails != null &&
           (sessionDetails['deletedByUsers'] as List).isNotEmpty) {
-        // If there are any values in 'deletedByUsers', block message sending
         canCurrentUserSendMessages = false;
         _maybeShowDeletedSessionSnackbar();
       }
@@ -84,9 +82,7 @@ class _ChatPageState extends State<ChatPage> {
                       return ListView.builder(
                         reverse: true,
                         padding: EdgeInsets.only(
-                            bottom: canCurrentUserSendMessages
-                                ? 80
-                                : 20), // Adjust bottom padding
+                            bottom: canCurrentUserSendMessages ? 0 : 20),
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           var message = snapshot.data!.docs[index];
@@ -99,7 +95,6 @@ class _ChatPageState extends State<ChatPage> {
                     },
                   ),
                 ),
-                // Conditionally render the message composer based on the deletion status
                 if (canCurrentUserSendMessages) _buildMessageComposer(),
               ],
             ),
@@ -131,15 +126,14 @@ class _ChatPageState extends State<ChatPage> {
         messageData?['type'] == 'location';
 
     double screenWidth = MediaQuery.of(context).size.width;
-    double bubbleMaxWidth =
-        screenWidth * 0.6; // Limiting width to 60% of the screen width
+    double bubbleMaxWidth = screenWidth * 0.6;
 
     if (isLocationMessage) {
       return Center(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           margin: const EdgeInsets.symmetric(vertical: 10),
-          width: bubbleMaxWidth, // Adjusted width
+          width: bubbleMaxWidth,
           decoration: BoxDecoration(
             color: locationBubbleColor,
             borderRadius: BorderRadius.circular(20),
@@ -147,11 +141,10 @@ class _ChatPageState extends State<ChatPage> {
           child: RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: TextStyle(
-                  fontSize: 16, color: textColor), // Default text style
+              style: TextStyle(fontSize: 16, color: textColor),
               children: [
                 TextSpan(
-                  text: "${message.get('content')} -- ", // Message content
+                  text: "${message.get('content')} -- ",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
@@ -225,7 +218,6 @@ class _ChatPageState extends State<ChatPage> {
 
   void _maybeShowDeletedSessionSnackbar() {
     if (_isWidgetActive && mounted) {
-      // Directly showing the dialog without adding a post-frame callback
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -237,7 +229,7 @@ class _ChatPageState extends State<ChatPage> {
               TextButton(
                 child: const Text('OK'),
                 onPressed: () {
-                  Navigator.of(context).pop(); // Dismiss the dialog
+                  Navigator.of(context).pop();
                 },
               ),
             ],

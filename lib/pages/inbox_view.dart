@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart'; // Make sure this is pointing to the correct file path
+import '../firebase_options.dart';
 import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
-import '../components/user_navbar_mobile.dart'; // Adjust the path as necessary
+import '../components/user_navbar_mobile.dart';
 import 'package:intl/intl.dart';
 
 class InboxView extends StatefulWidget {
@@ -54,21 +54,12 @@ class _InboxViewState extends State<InboxView> {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.of(context).pop(),
               )
-            : null,     
+            : null,
         actions: _selectedSessionIds.isNotEmpty
             ? [
                 IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () async {
-    for (String sessionId in _selectedSessionIds) {
-      await _controller.markChatSessionAsDeleted(sessionId, data_store.user.email);
-    }
-    // After deletion, clear the selection and update UI
-    setState(() {
-      _selectedSessionIds.clear();
-    });
-    // Optionally, show feedback
-  },
+                  onPressed: _showDeleteConfirmationDialog,
                 )
               ]
             : [],
@@ -80,12 +71,20 @@ class _InboxViewState extends State<InboxView> {
             return const CircularProgressIndicator();
           }
 
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Text('No chats found.');
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.chat_bubble_outline,
+                      size: 80, color: Colors.grey[300]),
+                  Text(
+                    'You have no messages yet',
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            );
           }
 
           List<ChatSessionSummary> summaries = snapshot.data!;
@@ -104,8 +103,12 @@ class _InboxViewState extends State<InboxView> {
                       '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: () =>
-                        _controller.onChatSelected(context, summary.sessionId),
+                    onTap: () {
+                      _controller.onChatSelected(context, summary.sessionId);
+                      setState(() {
+                        _selectedSessionIds.clear();
+                      });
+                    },
                     onLongPress: () {
                       setState(() {
                         if (_selectedSessionIds.contains(summary.sessionId)) {
@@ -142,5 +145,45 @@ class _InboxViewState extends State<InboxView> {
       bottomNavigationBar:
           !kIsWeb ? const UserNavBarMobile(activeIndex: 1) : null,
     );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          int count = _selectedSessionIds.length;
+          return AlertDialog(
+            title: const Text(
+              'Delete Chat',
+              style: TextStyle(color: Colors.red),
+            ),
+            content: Text('Are you sure you want to delete $count chat(s)?'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  for (String sessionId in _selectedSessionIds) {
+                    await _controller.markChatSessionAsDeleted(
+                        sessionId, data_store.user.email);
+                  }
+
+                  setState(() {
+                    _selectedSessionIds.clear();
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 }
