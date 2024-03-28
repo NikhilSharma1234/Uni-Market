@@ -47,6 +47,28 @@ class ChatService {
     }
   }
 
+  //get imageUrl for product
+
+  Future<String?> getProductImageUrl(String productId) async {
+    try {
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('items').doc(productId).get();
+
+      if (!productSnapshot.exists) {
+        if (kDebugMode) {
+          print("Error: No product found with the provided ID: $productId");
+        }
+        return null;
+      }
+      return productSnapshot['images'][0];
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching product image url: $e");
+      }
+      return null;
+    }
+  }
+
   Future<String?> getBuyerName(String email) async {
     try {
       DocumentSnapshot userSnapshot =
@@ -97,6 +119,7 @@ class ChatService {
 
     String? buyerName = await getBuyerName(senderEmail);
     String? productName = await getProductName(productId);
+    String? productImageUrl = await getProductImageUrl(productId);
 
     // Generate composite key
     List<String> participantIds = [senderEmail, receiverEmail];
@@ -134,6 +157,7 @@ class ChatService {
         await _firestore.collection('chat_sessions').add({
       'participantIdsKey': participantIdsKey, // Store the composite key
       'productName': productName,
+      'productImageUrl': productImageUrl,
       'buyerName': buyerName,
       'participantIds': participantIds,
       'productId': productId,
