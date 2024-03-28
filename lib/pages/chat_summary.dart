@@ -6,6 +6,7 @@ class ChatSessionSummary {
   String productName;
   String lastMessage;
   DateTime lastMessageAt;
+  String productImageUrl;
 
   ChatSessionSummary({
     required this.sessionId,
@@ -13,6 +14,7 @@ class ChatSessionSummary {
     required this.productName,
     required this.lastMessage,
     required this.lastMessageAt,
+    required this.productImageUrl,
   });
 
   // Factory constructor to create a ChatSessionSummary from a Firestore DocumentSnapshot
@@ -25,6 +27,8 @@ class ChatSessionSummary {
       productName: data['productName'] ?? 'No Product Name',
       lastMessage: data['lastMessage'] ?? 'No messages yet',
       lastMessageAt: (data['lastMessageAt'] as Timestamp).toDate(),
+      productImageUrl: data['productImageUrl'] ?? '',
+
     );
   }
 }
