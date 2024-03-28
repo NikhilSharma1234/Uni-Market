@@ -18,24 +18,16 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
   late Future<Map<String, dynamic>?> _sessionDetailsFuture;
-  bool canCurrentUserSendMessages = true;
+  bool _isDialogShown = false; // Add this flag
+
+  bool _isWidgetActive = true;
 
   @override
   void initState() {
     super.initState();
-    _sessionDetailsFuture = _chatController
-        .fetchChatSessionDetails(widget.chatSessionId)
-        .then((sessionDetails) {
-      if (sessionDetails != null &&
-          (sessionDetails['deletedByUsers'] as List).isNotEmpty) {
-        canCurrentUserSendMessages = false;
-        _maybeShowDeletedSessionSnackbar();
-      }
-      return sessionDetails;
-    });
+    _sessionDetailsFuture =
+        _chatController.fetchChatSessionDetails(widget.chatSessionId);
   }
-
-  bool _isWidgetActive = true;
 
   @override
   void dispose() {
@@ -45,61 +37,77 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: _sessionDetailsFuture,
-      builder: (context, snapshot) {
-        String title = "Chat";
-        if (snapshot.connectionState == ConnectionState.done &&
-            snapshot.hasData) {
-          final data = snapshot.data!;
-          title = "${data['buyerName']} - ${data['productName']}";
+    return StreamBuilder<bool>(
+      stream: _chatController.getDeletedByUsersStream(widget.chatSessionId),
+      builder: (context, canSendSnapshot) {
+        if (canSendSnapshot.hasData &&
+            !canSendSnapshot.data! &&
+            !_isDialogShown) {
+          _isDialogShown = true; // Indicate that dialog is being shown
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _maybeShowDeletedSessionSnackbar();
+          });
         }
+        bool canCurrentUserSendMessages = canSendSnapshot.data ?? true;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-            actions: canCurrentUserSendMessages
-                ? [
-                    IconButton(
-                      icon: const Icon(Icons.location_on),
-                      onPressed: _showLocationsModal,
-                    ),
-                  ]
-                : [],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(bottom: 32),
-            child: Column(
-              children: [
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream:
-                        _chatController.getMessageStream(widget.chatSessionId),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+        return FutureBuilder<Map<String, dynamic>?>(
+          future: _sessionDetailsFuture,
+          builder: (context, sessionSnapshot) {
+            String title = "Chat";
+            if (sessionSnapshot.connectionState == ConnectionState.done &&
+                sessionSnapshot.hasData) {
+              final data = sessionSnapshot.data!;
+              title = "${data['buyerName']} - ${data['productName']}";
+            }
 
-                      return ListView.builder(
-                        reverse: true,
-                        padding: EdgeInsets.only(
-                            bottom: canCurrentUserSendMessages ? 0 : 20),
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          var message = snapshot.data!.docs[index];
-                          bool isSentByMe = message['senderId'] ==
-                              _chatController.chatModel.currentUser?.uid;
-                          return _buildMessageBubble(
-                              context, message, isSentByMe);
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(title),
+                actions: canCurrentUserSendMessages
+                    ? [
+                        IconButton(
+                          icon: const Icon(Icons.location_on),
+                          onPressed: _showLocationsModal,
+                        ),
+                      ]
+                    : [],
+              ),
+              body: Padding(
+                padding: const EdgeInsets.only(bottom: 32),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: _chatController
+                            .getMessageStream(widget.chatSessionId),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          return ListView.builder(
+                            reverse: true,
+                            padding: EdgeInsets.only(
+                                bottom: canCurrentUserSendMessages ? 0 : 20),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var message = snapshot.data!.docs[index];
+                              bool isSentByMe = message['senderId'] ==
+                                  _chatController.chatModel.currentUser?.uid;
+                              return _buildMessageBubble(
+                                  context, message, isSentByMe);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    if (canCurrentUserSendMessages) _buildMessageComposer(),
+                  ],
                 ),
-                if (canCurrentUserSendMessages) _buildMessageComposer(),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
