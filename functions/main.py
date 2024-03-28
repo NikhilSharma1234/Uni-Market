@@ -27,7 +27,7 @@ headers = {
 def compile_data(id, item):
   return {
     'id': str(id),
-    'buyerId': str(item['buyerId']),
+    'buyerId': item['buyerId'],
     'condition': item['condition'],
     'deletedAt': str(item['deletedAt']),
     'createdAt': str(item['createdAt']),
@@ -41,7 +41,7 @@ def compile_data(id, item):
     'sellerId': item['sellerId'],
     'tags': item['tags'],
     'isFlagged': item['isFlagged'],
-    'lastReviewedBy': str(item['lastReviewedBy'])
+    'lastReviewedBy': item['lastReviewedBy']
   }
 
 @functions_framework.http
@@ -49,8 +49,8 @@ def make_request(request):
   requests.post(request[0], headers=request[1], json=request[2]).raise_for_status()
 
 @on_document_updated(document="items/{itemId}")
-def update_in_typesense(event: Event[Change[DocumentSnapshot]]) -> None:
-  item = event.data.after.to_dict()
+def update_in_typesense(event: Event[DocumentSnapshot]) -> None:
+  item = event.data.to_dict()
 
   url = f"{base_url}/collections/items/documents?action=upsert"
 
