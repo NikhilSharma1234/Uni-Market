@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import '../components/user_navbar_mobile.dart';
 import 'package:intl/intl.dart';
 
 class InboxView extends StatefulWidget {
-  InboxView({Key? key}) : super(key: key);
+  const InboxView({Key? key}) : super(key: key);
 
   @override
-  _InboxViewState createState() => _InboxViewState();
+  InboxViewState createState() => InboxViewState();
 }
 
-class _InboxViewState extends State<InboxView> {
+class InboxViewState extends State<InboxView> {
   final InboxController _controller = InboxController();
-  final Set<String> _selectedSessionIds = Set<String>();
+  final Set<String> _selectedSessionIds = <String>{};
 
-  Future<void> _initializeFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeFirebase();
-  }
 
   @override
   Widget build(BuildContext context) {

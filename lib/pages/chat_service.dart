@@ -123,8 +123,8 @@ class ChatService {
 
       //if deletedByUsers is empty, return the chat session ID
       if (deletedByUsers.isEmpty) {
-        print("Chat session already exists");
-        print(doc.id);
+        // print("Chat session already exists");
+        // print(doc.id);
         return doc.id;
       }
     }
@@ -140,7 +140,9 @@ class ChatService {
       'createdAt': Timestamp.now(),
       'lastMessage': '',
       'lastMessageAt': Timestamp.now(),
-      "deletedByUsers": []
+      "deletedByUsers": [],
+      'unreadCountParticipant1': 0, // Initialize unread count for participant 1
+      'unreadCountParticipant2': 0,
     });
 
     return chatSessionRef.id;
