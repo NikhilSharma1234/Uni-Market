@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/components/image_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -9,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:uni_market/helpers/functions.dart';
+import 'package:uni_market/pages/item_page.dart';
 import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
@@ -502,6 +504,7 @@ class _PostFormState extends State<PostForm> {
       // POTENTIAL PLACEHOLDER FOR UNACCEPTABLE STRING CHECKING (profanity, racism ...)
 
       // create post in db
+
       await FirebaseFirestore.instance.collection("items").doc().set(userPost);
 
       // show see post dialog upon successful creation
@@ -514,9 +517,29 @@ class _PostFormState extends State<PostForm> {
               content: const Text('You have successfully created a post.'),
               actions: [
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     _flag(false);
-                    Navigator.of(context).pop();
+                    userPost['id'] = "placeHolder";
+                    userPost['tags'] = _tags;
+                    if (userPost['images'].length == 0) {
+                      userPost['images'] = [data_store.missingImage];
+                    } else {
+                      for (int i = 0; i < userPost['images'].length; i++) {
+                        userPost['images'][i] =
+                            await getURL(userPost['images'][i]);
+                      }
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ItemPage(data: Item.fromFirebase(userPost));
+                          },
+                        ),
+                      );
+                    }
                   },
                   child: const Text('Click here to view your post'),
                 ),
