@@ -37,7 +37,7 @@ class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which Nav
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => InboxView()
+                builder: (context) => const InboxView()
               ),
             );
           },
