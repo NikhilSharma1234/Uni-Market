@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
+import 'package:uni_market/data_store.dart';
 import 'package:uni_market/pages/chat_service.dart';
 import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/data_store.dart' as data_store;
@@ -29,6 +30,72 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
 
   @override
   Widget build(BuildContext context) {
+    Widget itemButton = ElevatedButton(
+      onPressed: () async {
+        ChatService chatService =
+            ChatService(); // Create an instance of ChatService
+        String? sessionId =
+            await chatService.createChatSession(widget.itemData.id);
+        if (sessionId != null) {
+          if (kDebugMode) {
+            print("Chat session ID: $sessionId");
+          }
+          // Navigate to the ChatPage with sessionId
+          // ignore: use_build_context_synchronously
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatPage(
+                  chatSessionId:
+                      sessionId), // Ensure this matches the ChatPage constructor parameter name
+            ),
+          );
+        } else {
+          if (kDebugMode) {
+            print("Failed to create chat session.");
+          }
+          // Optionally, show an error message to the user
+        }
+      },
+      style: ElevatedButton.styleFrom(shape: const BeveledRectangleBorder()),
+      child: const Text('Contact Seller'),
+    );
+    if (user.email == widget.itemData.sellerId) {
+      var db = FirebaseFirestore.instance;
+      itemButton = ElevatedButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Delete Post'),
+                  content:
+                      const Text('Are you sure you want to delete your post?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        // "delete" the post
+                        db
+                            .collection('items')
+                            .doc(widget.itemData.id)
+                            .update({"deletedAt": Timestamp.now()});
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Click here to delete your post'),
+                    ),
+                  ],
+                );
+              });
+        },
+        style: ElevatedButton.styleFrom(
+          shape: const BeveledRectangleBorder(),
+          backgroundColor: Colors.red,
+        ),
+        child: const Text('Delete Post'),
+      );
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -56,45 +123,45 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                       : Row(
                           children: [
                             ElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  loading = true;
-                                });
-                                ChatService chatService =
-                                    ChatService(); // Create an instance of ChatService
-                                String? sessionId =
-                                    await chatService.createChatSession(
-                                        widget.itemData.id, widget.itemData);
-                                if (sessionId != null) {
-                                  if (kDebugMode) {
-                                    print("Chat session ID: $sessionId");
+                                onPressed: () async {
+                                  setState(() {
+                                    loading = true;
+                                  });
+                                  ChatService chatService =
+                                      ChatService(); // Create an instance of ChatService
+                                  String? sessionId =
+                                      await chatService.createChatSession(
+                                          widget.itemData.id, widget.itemData);
+                                  if (sessionId != null) {
+                                    if (kDebugMode) {
+                                      print("Chat session ID: $sessionId");
+                                    }
+                                    // Navigate to the ChatPage with sessionId
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatPage(
+                                            chatSessionId: sessionId,
+                                            productId: widget.itemData.id,
+                                            sellerId: widget.itemData
+                                                .sellerId), // Ensure this matches the ChatPage constructor parameter name
+                                      ),
+                                    );
+                                  } else {
+                                    if (kDebugMode) {
+                                      print("Failed to create chat session.");
+                                    }
+                                    // Optionally, show an error message to the user
                                   }
-                                  // Navigate to the ChatPage with sessionId
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatPage(
-                                          chatSessionId: sessionId,
-                                          productId: widget.itemData.id,
-                                          sellerId: widget.itemData
-                                              .sellerId), // Ensure this matches the ChatPage constructor parameter name
-                                    ),
-                                  );
-                                } else {
-                                  if (kDebugMode) {
-                                    print("Failed to create chat session.");
-                                  }
-                                  // Optionally, show an error message to the user
-                                }
-                                setState(() {
-                                  loading = false;
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  shape: const BeveledRectangleBorder()),
-                              child: const Text('Contact Seller'),
-                            ),
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                },
+                                child: Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: itemButton)),
                             IconButton(
                               icon: const Icon(Icons.favorite),
                               selectedIcon:
