@@ -158,4 +158,19 @@ class ChatModel {
       return "Error";
     }
   }
+
+  Stream<bool> getDeletedByUsersStream(String chatSessionId) {
+    return firestore
+        .collection('chat_sessions')
+        .doc(chatSessionId)
+        .snapshots()
+        .map((snapshot) {
+      if (!snapshot.exists) {
+        return true; // Assume can't send messages if session doesn't exist
+      }
+      final data = snapshot.data();
+      final deletedByUsers = List.from(data?['deletedByUsers'] ?? []);
+      return deletedByUsers.isEmpty; // Can send messages if array is empty
+    });
+  }
 }

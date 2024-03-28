@@ -28,6 +28,11 @@ class ChatController {
   await _chatModel.sendLocationMessage(chatSessionId, locationName, schoolName, address);
 }
 
+Stream<bool> getDeletedByUsersStream(String chatSessionId) {
+  return _chatModel.getDeletedByUsersStream(chatSessionId);
+}
+
+
 
   // If you need to expose _chatModel, provide a public getter
   ChatModel get chatModel => _chatModel;
