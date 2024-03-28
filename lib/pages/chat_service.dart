@@ -100,8 +100,8 @@ class ChatService {
 
     // Generate composite key
     List<String> participantIds = [senderEmail, receiverEmail];
-    List<String> participantIdsSorted = participantIds..sort();
-    participantIdsSorted.sort();
+    List<String> participantIdsSorted = participantIds;
+    participantIdsSorted;
     String participantIdsKey = participantIds.join(':');
 
     // Check for existing session
