@@ -127,7 +127,7 @@ class _RegistirationState extends State<Registiration> {
         "verifiedAt": null,
         "assignable_profile_pic": null,
         "starting_profile_pic": chosenProfilePicPath,
-        "wishlist": null
+        "wishlist": []
       };
 
       // Add user to users database

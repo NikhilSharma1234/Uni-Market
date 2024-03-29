@@ -86,7 +86,8 @@ class CurrentUser {
     _user.verifiedUniStudent = false;
     _user.verifiedBy = null;
     _user.verifiedAt = null;
-    _user.wishlist = null;
+    _user.schoolsInMarketplace = [];
+    _user.wishlist = [];
   }
 
   CurrentUser._internal();
