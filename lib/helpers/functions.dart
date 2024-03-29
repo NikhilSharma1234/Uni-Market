@@ -81,7 +81,8 @@ Future<void> loadCurrentUser(email) async {
       verificationDocsUploaded: userData['verificationDocsUploaded'],
       verifiedUniStudent: userData['verifiedUniStudent'],
       verifiedBy: userData['verifiedBy'],
-      verifiedAt: userData['verifiedAt']);
+      verifiedAt: userData['verifiedAt'],
+      wishlist: userData['wishlist']);
 }
 
 searchSuggestions(String searchTerm, int number) async {

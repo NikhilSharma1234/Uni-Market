@@ -23,33 +23,34 @@ class CurrentUser {
   late bool verifiedUniStudent;
   String? verifiedBy;
   Timestamp? verifiedAt;
+  late List<dynamic>? wishlist;
 
-  factory CurrentUser({
-    required String? assignable_profile_pic,
-    String? assignable_profile_pic_url,
-    required Timestamp createdAt,
-    required int darkMode,
-    required Timestamp? deletedAt,
-    required String email,
-    required bool emailVerified,
-    required String institutionFullName,
-    required String marketplaceId,
-    required String name,
-    required String schoolId,
-    required List<dynamic> schoolsInMarketplace,
-    required String starting_profile_pic,
-    required String starting_profile_pic_url,
-    required Timestamp updatedAt,
-    required bool verificationDocsUploaded,
-    required bool verifiedUniStudent,
-    required String? verifiedBy,
-    required Timestamp? verifiedAt
-  }) {
+  factory CurrentUser(
+      {required String? assignable_profile_pic,
+      String? assignable_profile_pic_url,
+      required Timestamp createdAt,
+      required int darkMode,
+      required Timestamp? deletedAt,
+      required String email,
+      required bool emailVerified,
+      required String institutionFullName,
+      required String marketplaceId,
+      required String name,
+      required String schoolId,
+      required List<dynamic> schoolsInMarketplace,
+      required String starting_profile_pic,
+      required String starting_profile_pic_url,
+      required Timestamp updatedAt,
+      required bool verificationDocsUploaded,
+      required bool verifiedUniStudent,
+      required String? verifiedBy,
+      required Timestamp? verifiedAt,
+      required List<dynamic>? wishlist}) {
     _user.assignable_profile_pic = assignable_profile_pic;
     _user.assignable_profile_pic_url = assignable_profile_pic_url;
     _user.createdAt = createdAt;
     _user.darkMode = darkMode;
-    _user.deletedAt =deletedAt;
+    _user.deletedAt = deletedAt;
     _user.email = email;
     _user.emailVerified = emailVerified;
     _user.institutionFullName = institutionFullName;
@@ -64,6 +65,7 @@ class CurrentUser {
     _user.verifiedUniStudent = verifiedUniStudent;
     _user.verifiedBy = verifiedBy;
     _user.verifiedAt = verifiedAt;
+    _user.wishlist = wishlist;
     return _user;
   }
 
@@ -79,11 +81,12 @@ class CurrentUser {
     _user.schoolId = "";
     _user.starting_profile_pic = "";
     _user.starting_profile_pic_url = "";
-    _user.updatedAt  = Timestamp.now();
+    _user.updatedAt = Timestamp.now();
     _user.verificationDocsUploaded = false;
     _user.verifiedUniStudent = false;
     _user.verifiedBy = null;
     _user.verifiedAt = null;
+    _user.wishlist = null;
   }
 
   CurrentUser._internal();
