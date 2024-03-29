@@ -19,23 +19,14 @@ initialize_app()
 API_KEY = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr'
 base_url = "https://hawk-perfect-frog.ngrok-free.app"
 
-@functions_framework.http
-def make_request(request):
-  requests.post(request[0], headers=request[1], json=request[2]).raise_for_status()
+headers = {
+  "Content-Type": "application/json",
+  "x-typesense-api-key": API_KEY
+}
 
-
-@on_document_created(document="items/{itemId}")
-def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
-  item = event.data.to_dict()
-
-  url = f"{base_url}/collections/items/documents"
-
-  headers = {
-      "Content-Type": "application/json",
-      "x-typesense-api-key": API_KEY
-  }
-  data = {
-    'id': str(event.params['itemId']),
+def compile_data(id, item):
+  return {
+    'id': str(id),
     'buyerId': item['buyerId'],
     'condition': item['condition'],
     'deletedAt': str(item['deletedAt']),
@@ -52,6 +43,29 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
     'isFlagged': item['isFlagged'],
     'lastReviewedBy': item['lastReviewedBy']
   }
+
+@functions_framework.http
+def make_request(request):
+  requests.post(request[0], headers=request[1], json=request[2]).raise_for_status()
+
+@on_document_updated(document="items/{itemId}")
+def update_in_typesense(event: Event[Change[DocumentSnapshot]]) -> None:
+  item = event.data.after.to_dict()
+
+  url = f"{base_url}/collections/items/documents?action=upsert"
+
+  data = compile_data(event.params['itemId'], item)
+  
+  make_request([url, headers, data])
+
+@on_document_created(document="items/{itemId}")
+def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
+  item = event.data.to_dict()
+
+  url = f"{base_url}/collections/items/documents"
+
+  data = compile_data(event.params['itemId'], item)
+
   
   make_request([url, headers, data])
 
@@ -72,29 +86,7 @@ def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
       else:
         url = f"{base_url}/collections/items/documents"
 
-        headers = {
-            "Content-Type": "application/json",
-            "x-typesense-api-key": API_KEY
-        }
-
         # if doc doesnt exist, add it
-        data = {
-          'id': str(event.params['itemId']),
-          'buyerId': item['buyerId'],
-          'condition': item['condition'],
-          'deletedAt': str(item['deletedAt']),
-          'createdAt': str(item['createdAt']),
-          'dateUpdated': str(item['dateUpdated']),
-          'description': item['description'],
-          'images': item['images'],
-          'marketplaceId': item['marketplaceId'],
-          'name': item['name'],
-          'price': item['price'],
-          'schoolId': item['schoolId'],
-          'sellerId': item['sellerId'],
-          'tags': item['tags'],
-          'isFlagged': item['isFlagged'],
-          'lastReviewedBy': item['lastReviewedBy']
-        }
+        data = compile_data(event.params['itemId'], item)
 
         make_request([url, headers, data])

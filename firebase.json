@@ -1,7 +1,11 @@
 {
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "frameworksBackend": {
       "region": "us-west1"
     }
@@ -11,7 +15,12 @@
       "target": "main",
       "source": "functions",
       "codebase": "default",
-      "ignore": ["venv", ".git", "firebase-debug.log", "firebase-debug.*.log"]
+      "ignore": [
+        "venv",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
     }
   ],
   "predeploy": [
