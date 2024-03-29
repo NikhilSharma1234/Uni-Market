@@ -23,7 +23,7 @@ CurrentUser user = CurrentUser(
   verifiedAt: null,
   institutionFullName: '',
   schoolsInMarketplace: [],
-  wishlist: null
+  wishlist: []
 );
 
 List<Widget> itemBoxes = [];
