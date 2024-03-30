@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/helpers/functions.dart';
+import 'package:uni_market/helpers/is_mobile.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:uni_market/helpers/theme_provider.dart';
@@ -48,12 +49,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     if (loading) {
-      return const Scaffold(
+      return Scaffold(
           resizeToAvoidBottomInset: false,
-          bottomNavigationBar: !kIsWeb
-              ? UserBottomNavBar(activeIndex: 2)
+          bottomNavigationBar: isMobile(context)
+              ? const UserBottomNavBar(activeIndex: 2)
               : null, // Custom app bar here
-          body: Center(child: CircularProgressIndicator()));
+          body: const Center(child: CircularProgressIndicator()));
     }
     Future getImageFromCamera() async {
       XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
@@ -354,10 +355,10 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
-    if (kIsWeb) return child;
+    if (!isMobile(context)) return child;
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        bottomNavigationBar: !kIsWeb
+        bottomNavigationBar: isMobile(context)
             ? const UserBottomNavBar(activeIndex: 2)
             : null, // Custom app bar here
         body: child);

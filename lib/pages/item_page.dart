@@ -61,7 +61,7 @@ class _ItemPageState extends State<ItemPage> {
     return Scaffold(
         appBar: AppBar(title: const Text('Item Page')),
         resizeToAvoidBottomInset: false,
-        bottomNavigationBar: !kIsWeb
+        bottomNavigationBar: isMobile(context)
             ? const UserBottomNavBar(activeIndex: 1)
             : null, // Custom app bar here
         body: FutureBuilder(
