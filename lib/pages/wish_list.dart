@@ -182,13 +182,21 @@ class _WishListState extends State<WishList> {
                         child: Center(child: Wrap(children: items)),
                       );
                     }
-                    return const Expanded(
-                      child: Center(child: CircularProgressIndicator()),
+                    return const Row(
+                      children: [
+                        Expanded(
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                      ],
                     );
                   });
             }
-            return const Expanded(
-              child: Center(child: CircularProgressIndicator()),
+            return const Row(
+              children: [
+                Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ],
             );
           },
         ));
