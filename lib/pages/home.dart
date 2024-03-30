@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/search_bar.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';
-import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/pages/posting_page.dart';
 import 'package:web_smooth_scroll/web_smooth_scroll.dart';
 import 'package:uni_market/data_store.dart' as data_store;
@@ -139,21 +138,12 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: kIsWeb
-          ? UserNavBarDesktop(
+      appBar: UserNavBarDesktop(
               redrawItems: redrawItems,
               updateSearchText: updateSearchText,
-              filter: filter)
-          : PreferredSize(
-              preferredSize: const Size.fromHeight(60),
-              child: AppBar(
-                  title: Center(
-                      child: ItemSearchBar(
-                          setPageState: redrawItems,
-                          updateSearchText: updateSearchText,
-                          filter: filter)))),
+              filter: filter, mobile: isMobile(context)),
       bottomNavigationBar:
-          !kIsWeb ? const UserNavBarMobile(activeIndex: 0) : null,
+          !kIsWeb ? const UserBottomNavBar(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog<String>(
             context: context,
