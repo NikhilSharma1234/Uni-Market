@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_market/components/user_navbar_mobile.dart';
+import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'dart:convert';
@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return const Scaffold(
           resizeToAvoidBottomInset: false,
           bottomNavigationBar: !kIsWeb
-              ? UserNavBarMobile(activeIndex: 2)
+              ? UserBottomNavBar(activeIndex: 2)
               : null, // Custom app bar here
           body: Center(child: CircularProgressIndicator()));
     }
@@ -358,7 +358,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         bottomNavigationBar: !kIsWeb
-            ? const UserNavBarMobile(activeIndex: 2)
+            ? const UserBottomNavBar(activeIndex: 2)
             : null, // Custom app bar here
         body: child);
   }

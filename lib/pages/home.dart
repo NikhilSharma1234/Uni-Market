@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/search_bar.dart';
+import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:flutter/foundation.dart';

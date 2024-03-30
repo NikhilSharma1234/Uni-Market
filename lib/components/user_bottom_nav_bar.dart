@@ -3,18 +3,18 @@ import 'package:uni_market/pages/profile.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/pages/inbox_view.dart';
 
-class UserNavBarMobile extends StatefulWidget implements PreferredSizeWidget {
+class UserBottomNavBar extends StatefulWidget implements PreferredSizeWidget {
   final int activeIndex;
 
-  const UserNavBarMobile({super.key, required this.activeIndex});
+  const UserBottomNavBar({super.key, required this.activeIndex});
   @override
-  State<UserNavBarMobile> createState() => _UserNavBarMobileState();
+  State<UserBottomNavBar> createState() => _UserBottomNavBarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _UserNavBarMobileState extends State<UserNavBarMobile> {// Track which NavItem is currently hovered
+class _UserBottomNavBarState extends State<UserBottomNavBar> {// Track which NavItem is currently hovered
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
