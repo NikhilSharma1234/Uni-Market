@@ -32,8 +32,10 @@ void main() {
     await tester.pumpWidget(Builder(builder: (BuildContext context) {
       return MaterialApp(
           home: Scaffold(
-              body: itemPageInfo(
-                  itemData, sellerName, sellerProfilePic, context)));
+              body: ItemPageInfo(
+                  itemData: itemData,
+                  sellerName: sellerName,
+                  sellerProfilePic: sellerProfilePic)));
     }));
 
     // Verify that our counter starts at 0.

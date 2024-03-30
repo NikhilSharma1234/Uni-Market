@@ -23,7 +23,7 @@ class CurrentUser {
   late bool verifiedUniStudent;
   String? verifiedBy;
   Timestamp? verifiedAt;
-  late List<dynamic>? wishlist;
+  late List<dynamic> wishlist;
 
   factory CurrentUser(
       {required String? assignable_profile_pic,
@@ -45,7 +45,7 @@ class CurrentUser {
       required bool verifiedUniStudent,
       required String? verifiedBy,
       required Timestamp? verifiedAt,
-      required List<dynamic>? wishlist}) {
+      required List<dynamic> wishlist}) {
     _user.assignable_profile_pic = assignable_profile_pic;
     _user.assignable_profile_pic_url = assignable_profile_pic_url;
     _user.createdAt = createdAt;
