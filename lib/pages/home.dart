@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
               updateSearchText: updateSearchText,
               filter: filter, mobile: isMobile(context)),
       bottomNavigationBar:
-          !kIsWeb ? const UserBottomNavBar(activeIndex: 0) : null,
+          isMobile(context) ? const UserBottomNavBar(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog<String>(
             context: context,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:uni_market/helpers/is_mobile.dart';
 import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
@@ -131,7 +132,7 @@ class InboxViewState extends State<InboxView> {
         },
       ),
       bottomNavigationBar:
-          !kIsWeb ? const UserBottomNavBar(activeIndex: 1) : null,
+          isMobile(context) ? const UserBottomNavBar(activeIndex: 1) : null,
     );
   }
 
