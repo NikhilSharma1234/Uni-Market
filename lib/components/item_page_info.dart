@@ -172,7 +172,7 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                         image: NetworkImage(widget.sellerProfilePic),
                       ),
                     ),
-                    Text('Name: $widget.sellerName'),
+                    Text('Name: ${widget.sellerName}'),
                     const Text('Items Sold: 2'),
                     const Text('Items Bought: 2'),
                   ],
