@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
-import 'package:flutter/foundation.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/pages/posting_page.dart';
-import 'package:web_smooth_scroll/web_smooth_scroll.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/functions.dart';
 
@@ -21,17 +19,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
-
-  // Controllers
-  late ScrollController _scrollController;
-
-  @override
-  void initState() {
-    // initialize scroll controllers
-    _scrollController = ScrollController();
-
-    super.initState();
-  }
 
   // redraws the items on the page based on search results
   redrawItems(List<Widget> newItems, bool append) {
@@ -69,53 +56,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-
     Widget body;
 
-    if (kIsWeb) {
-      // to make the smooth scroll work for web, I need a column of rows instead of a gridview. This is essentially doing the gridview calculations and putting it in the needed format.
-      var itemSize = screenWidth / (screenWidth / 320).round();
-      for (final (index, item) in items.indexed) {
-        items[index] =
-            (SizedBox(width: itemSize, height: itemSize, child: item));
-      }
-      int rowSize = (screenWidth / 320).round();
-      int numRows = (items.length / rowSize).round();
-      if (numRows == 0) {
-        numRows = 1;
-      }
-
-      List<Widget> rows = [];
-      int currentItem = 0;
-      for (var row = 0; row < numRows; row++) {
-        int endIndex = currentItem + rowSize;
-        if (currentItem + rowSize > items.length) {
-          endIndex = items.length;
-        }
-        rows.add(Row(children: items.sublist(currentItem, endIndex)));
-        currentItem = endIndex;
-      }
-      body = WebSmoothScroll(
-        controller: _scrollController,
-        scrollOffset: 100,
-        animationDuration: 400,
-        // curve: Curves.easeInOutCirc,
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _scrollController,
-          child: Column(children: rows),
-        ),
-      );
-    } else {
-      body = GridView.count(
-        physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics()),
-        crossAxisCount: (screenWidth / 320).round(),
-        childAspectRatio: 2 / 2,
-        children: items,
-      );
-    }
+    body = SingleChildScrollView(child: Wrap(children: items));
 
     if (items.isEmpty) {
       body = const Center(
@@ -199,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            Text('-'),
+                            const Text('-'),
                             SizedBox(
                               width: 125,
                               child: TextField(

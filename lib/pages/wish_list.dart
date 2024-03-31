@@ -48,6 +48,12 @@ class _WishListState extends State<WishList> {
     return (screenWidth - (screenWidth * 0.06)) / 4;
   }
 
+  Map<String, Color> conditionBackground = {
+    "NEW": Colors.green,
+    "USED": Colors.orange,
+    "WORN": Colors.red
+  };
+
   Future<Widget> generateItemWidget(itemId, darkModeOn) async {
     var itemFromFirebase =
         await FirebaseFirestore.instance.collection("items").doc(itemId).get();
@@ -66,7 +72,7 @@ class _WishListState extends State<WishList> {
       try {
         // ignore: use_build_context_synchronously
         double itemWidth = itemsWidth(MediaQuery.of(context).size.width);
-        double itemHeight = itemWidth * 1.16;
+        double itemHeight = itemWidth * 1.15;
 
         return InkWell(
           onTap: () {
@@ -77,10 +83,9 @@ class _WishListState extends State<WishList> {
             );
           },
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(4.0),
             child: Container(
                 width: itemWidth,
-                height: itemHeight,
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                     color: darkModeOn ? Colors.black : Colors.white,
@@ -101,7 +106,7 @@ class _WishListState extends State<WishList> {
                       ),
                       Padding(
                         padding:
-                            const EdgeInsets.only(top: 8, left: 8, right: 8),
+                            const EdgeInsets.only(top: 4, left: 8, right: 8),
                         child: Text(item?['name'], maxLines: 1),
                       ),
                       Padding(
@@ -113,14 +118,23 @@ class _WishListState extends State<WishList> {
                             style: const TextStyle(color: Colors.grey),
                           )),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: 4, left: 8, right: 8),
+                        padding: const EdgeInsets.only(
+                            top: 4, left: 8, right: 8, bottom: 4),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('\$${item!['price'].toDouble().toString()}',
                                 maxLines: 1),
-                            Text(item['condition'])
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: conditionBackground[
+                                            item['condition']] ??
+                                        Colors.transparent,
+                                    borderRadius: BorderRadius.circular(3)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Text(item['condition']),
+                                ))
                           ],
                         ),
                       )
@@ -182,7 +196,7 @@ class _WishListState extends State<WishList> {
                     if (futureSnapshot.hasData) {
                       var items = futureSnapshot.data ?? [const SizedBox()];
                       return SingleChildScrollView(
-                        child: Center(child: Wrap(children: items)),
+                        child: Wrap(children: items),
                       );
                     }
                     return const Row(

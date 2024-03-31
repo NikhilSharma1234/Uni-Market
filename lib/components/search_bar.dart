@@ -67,6 +67,7 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
               }
             },
             child: SearchAnchor.bar(
+                barElevation: MaterialStateProperty.all(0),
                 barHintText: "Search items",
                 searchController: controller,
                 onSubmitted: (value) {
