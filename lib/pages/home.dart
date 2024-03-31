@@ -139,9 +139,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: UserNavBarDesktop(
-              redrawItems: redrawItems,
-              updateSearchText: updateSearchText,
-              filter: filter, mobile: isMobile(context)),
+          redrawItems: redrawItems,
+          updateSearchText: updateSearchText,
+          filter: filter,
+          mobile: isMobile(context)),
       bottomNavigationBar:
           isMobile(context) ? const UserBottomNavBar(activeIndex: 0) : null,
       floatingActionButton: FloatingActionButton(
@@ -154,28 +155,34 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
       drawer: Drawer(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child:
-                ListView(shrinkWrap: true, padding: EdgeInsets.zero, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 55),
-                child: Container(
-                    color: Theme.of(context).colorScheme.background,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Padding(
-                              padding: EdgeInsets.all(5),
-                              child: Text("Price Range")),
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: TextField(
+        backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        child: Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(8),
+                    bottomRight: Radius.circular(8))),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 100, bottom: 100, left: 8, right: 8),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Price Range",
+                                style: TextStyle(fontSize: 24))),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 125,
+                              child: TextField(
                                 keyboardType: TextInputType.number,
                                 controller: lowerPrice,
                                 onChanged: ((value) {
@@ -190,9 +197,12 @@ class _HomePageState extends State<HomePage> {
                                   border: OutlineInputBorder(),
                                   labelText: "Lower",
                                 ),
-                              )),
-                              Expanded(
-                                  child: TextField(
+                              ),
+                            ),
+                            Text('-'),
+                            SizedBox(
+                              width: 125,
+                              child: TextField(
                                 keyboardType: TextInputType.number,
                                 controller: upperPrice,
                                 onChanged: ((value) {
@@ -207,80 +217,96 @@ class _HomePageState extends State<HomePage> {
                                   border: OutlineInputBorder(),
                                   labelText: "Upper",
                                 ),
-                              ))
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: DropdownMenu(
-                                onSelected: (value) =>
-                                    filter.sort = value as Sort,
-                                initialSelection: filter.sort,
-                                dropdownMenuEntries: const [
-                                  DropdownMenuEntry(
-                                      value: Sort.highToLow,
-                                      label: 'High to Low'),
-                                  DropdownMenuEntry(
-                                      value: Sort.lowToHigh,
-                                      label: 'Low to High'),
-                                  DropdownMenuEntry(
-                                      value: Sort.newestToOldest,
-                                      label: 'Newest to Oldest'),
-                                  DropdownMenuEntry(
-                                      value: Sort.oldestToNewest,
-                                      label: 'Oldest to Newest'),
-                                  DropdownMenuEntry(
-                                      value: Sort.bestMatch,
-                                      label: 'Best Match')
-                                ]),
-                          ),
-                          ListTile(
-                              title: const Text("New"),
-                              leading: Radio<Condition>(
-                                  value: Condition.newItem,
-                                  groupValue: filter.condition,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      filter.condition = value!;
-                                    });
-                                  })),
-                          ListTile(
-                              title: const Text("Used"),
-                              leading: Radio<Condition>(
-                                  value: Condition.usedItem,
-                                  groupValue: filter.condition,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      filter.condition = value!;
-                                    });
-                                  })),
-                          ListTile(
-                              title: const Text("Worn"),
-                              leading: Radio<Condition>(
-                                  value: Condition.wornItem,
-                                  groupValue: filter.condition,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      filter.condition = value!;
-                                    });
-                                  })),
-                          Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: TextButton(
-                                  style: const ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStatePropertyAll<Color>(
-                                            Colors.green),
-                                  ),
-                                  onPressed: () {
-                                    applyFilters();
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Apply Filters')))
-                        ])),
-              ),
-            ]),
-          )),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Sort By",
+                                style: TextStyle(fontSize: 24))),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: DropdownMenu(
+                              onSelected: (value) =>
+                                  filter.sort = value as Sort,
+                              initialSelection: filter.sort,
+                              dropdownMenuEntries: const [
+                                DropdownMenuEntry(
+                                    value: Sort.highToLow,
+                                    label: 'High to Low'),
+                                DropdownMenuEntry(
+                                    value: Sort.lowToHigh,
+                                    label: 'Low to High'),
+                                DropdownMenuEntry(
+                                    value: Sort.newestToOldest,
+                                    label: 'Newest to Oldest'),
+                                DropdownMenuEntry(
+                                    value: Sort.oldestToNewest,
+                                    label: 'Oldest to Newest'),
+                                DropdownMenuEntry(
+                                    value: Sort.bestMatch, label: 'Best Match')
+                              ]),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text("Condition",
+                                style: TextStyle(fontSize: 24))),
+                        ListTile(
+                            title: const Text("New"),
+                            leading: Radio<Condition>(
+                                value: Condition.newItem,
+                                groupValue: filter.condition,
+                                onChanged: (value) {
+                                  setState(() {
+                                    filter.condition = value!;
+                                  });
+                                })),
+                        ListTile(
+                            title: const Text("Used"),
+                            leading: Radio<Condition>(
+                                value: Condition.usedItem,
+                                groupValue: filter.condition,
+                                onChanged: (value) {
+                                  setState(() {
+                                    filter.condition = value!;
+                                  });
+                                })),
+                        ListTile(
+                            title: const Text("Worn"),
+                            leading: Radio<Condition>(
+                                value: Condition.wornItem,
+                                groupValue: filter.condition,
+                                onChanged: (value) {
+                                  setState(() {
+                                    filter.condition = value!;
+                                  });
+                                })),
+                      ],
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: TextButton(
+                            style: const ButtonStyle(
+                              backgroundColor:
+                                  MaterialStatePropertyAll<Color>(Colors.green),
+                            ),
+                            onPressed: () {
+                              applyFilters();
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Apply Filters')))
+                  ]),
+            )),
+      ),
       body: body,
     );
   }
