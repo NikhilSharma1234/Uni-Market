@@ -62,8 +62,9 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                                 });
                                 ChatService chatService =
                                     ChatService(); // Create an instance of ChatService
-                                String? sessionId = await chatService
-                                    .createChatSession(widget.itemData.id);
+                                String? sessionId =
+                                    await chatService.createChatSession(
+                                        widget.itemData.id, widget.itemData);
                                 if (sessionId != null) {
                                   if (kDebugMode) {
                                     print("Chat session ID: $sessionId");
@@ -74,8 +75,10 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ChatPage(
-                                          chatSessionId:
-                                              sessionId), // Ensure this matches the ChatPage constructor parameter name
+                                          chatSessionId: sessionId,
+                                          productId: widget.itemData.id,
+                                          sellerId: widget.itemData
+                                              .sellerId), // Ensure this matches the ChatPage constructor parameter name
                                     ),
                                   );
                                 } else {

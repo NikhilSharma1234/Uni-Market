@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,11 +8,19 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
+  final String sellerId;
+  final String productId;
 
-  const ChatPage({Key? key, required this.chatSessionId}) : super(key: key);
+  const ChatPage(
+      {Key? key,
+      required this.chatSessionId,
+      required this.productId,
+      required this.sellerId})
+      : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -69,6 +80,14 @@ class _ChatPageState extends State<ChatPage> {
                           icon: const Icon(Icons.location_on),
                           onPressed: _showLocationsModal,
                         ),
+                        ...data_store.user.email == widget.sellerId
+                            ? [
+                                IconButton(
+                                  icon: const Icon(Icons.sell),
+                                  onPressed: _confirmSell,
+                                )
+                              ]
+                            : [],
                       ]
                     : [],
               ),
@@ -133,6 +152,8 @@ class _ChatPageState extends State<ChatPage> {
 
     bool isLocationMessage = messageData?.containsKey('type') == true &&
         messageData?['type'] == 'location';
+    bool isTransactionMessage = messageData?.containsKey('type') == true &&
+        messageData?['type'] == 'transaction';
 
     double screenWidth = MediaQuery.of(context).size.width;
     double bubbleMaxWidth = screenWidth * 0.6;
@@ -167,6 +188,30 @@ class _ChatPageState extends State<ChatPage> {
                       _showLocationInfo(
                           message.get('schoolName'), message.get('address'));
                     },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (isTransactionMessage) {
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          width: bubbleMaxWidth,
+          decoration: BoxDecoration(
+            color: locationBubbleColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: TextStyle(fontSize: 16, color: textColor),
+              children: [
+                TextSpan(
+                  text: "${message.get('content')}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -342,6 +387,73 @@ class _ChatPageState extends State<ChatPage> {
                   )
                 ]),
               )
+            ]);
+      },
+    );
+  }
+
+  void _confirmSell() async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('chat_sessions')
+        .doc(widget.chatSessionId)
+        .get();
+    List<dynamic> participants = snapshot.data()!['participantIds'];
+    String buyerId =
+        participants.where((email) => email != widget.sellerId).toList()[0];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Text(
+              "Confirm Transaction",
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              "Would you to mark this item as sold to $buyerId? Other chats for this item will be notified and deleted from your feed.",
+              textAlign: TextAlign.center,
+            ),
+            actions: [
+              ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseFirestore.instance
+                        .collection('items')
+                        .doc(widget.productId)
+                        .update({'buyerId': data_store.user.email});
+                    var snapshots = await FirebaseFirestore.instance
+                        .collection('chat_sessions')
+                        .where('productId', isEqualTo: widget.productId)
+                        .get();
+                    String messageContent = "This item has now been sold";
+                    for (var snapshot in snapshots.docs) {
+                      await FirebaseFirestore.instance
+                          .collection('chat_sessions')
+                          .doc(snapshot.id)
+                          .collection('messages')
+                          .add({
+                        'senderId': FirebaseAuth.instance.currentUser!.uid,
+                        'type': 'transaction',
+                        'content': messageContent,
+                        'timestamp': Timestamp.now(),
+                      });
+                      await FirebaseFirestore.instance
+                          .collection('chat_sessions')
+                          .doc(snapshot.id)
+                          .update({
+                        'lastMessage': messageContent,
+                        'lastMessageAt': Timestamp.now(),
+                        'deletedByUsers':
+                            FieldValue.arrayUnion([widget.sellerId])
+                      });
+                    }
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Yes')),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('No'))
             ]);
       },
     );
