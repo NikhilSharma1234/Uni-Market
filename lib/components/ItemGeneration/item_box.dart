@@ -44,8 +44,6 @@ class _ItemBoxState extends State<ItemBox> {
     if (!found) {
       theme = styleType["default"] ?? DefaultStyle(context: context);
     }
-
-    var style = theme.getThemeData();
     var item = widget.itemData;
 
     Image image;
@@ -58,14 +56,39 @@ class _ItemBoxState extends State<ItemBox> {
     } else {
       image = Image.network(
         item.imagePath[0],
-        fit: BoxFit.fitWidth,
+        fit: BoxFit.fill,
       );
     }
+    itemsWidth(double screenWidth) {
+      if (screenWidth < 500) {
+        return (screenWidth - (screenWidth * 0.06));
+      }
+      if (screenWidth < 650) {
+        return (screenWidth - (screenWidth * 0.06)) / 2;
+      }
+      if (screenWidth < 1000) {
+        return (screenWidth - (screenWidth * 0.06)) / 3;
+      }
+      if (screenWidth < 1300) {
+        return (screenWidth - (screenWidth * 0.06)) / 4;
+      }
+      if (screenWidth < 1600) {
+        return (screenWidth - (screenWidth * 0.06)) / 5;
+      }
+      if (screenWidth < 2000) {
+        return (screenWidth - (screenWidth * 0.06)) / 6;
+      }
+      if (screenWidth < 2400) {
+        return (screenWidth - (screenWidth * 0.06)) / 7;
+      }
+      return (screenWidth - (screenWidth * 0.06)) / 4;
+    }
 
+    double itemWidth = itemsWidth(MediaQuery.of(context).size.width);
+    double itemHeight = itemWidth * 1.15;
     Color conditionColor = conditionBackground[item.condition] ?? Colors.black;
-
     return Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.all(8),
         child: InkWell(
             // for future use to link each item to a unique page based on its id
             onTap: () {
@@ -75,102 +98,66 @@ class _ItemBoxState extends State<ItemBox> {
                 ),
               );
             },
-            child: Stack(children: <Widget>[
-              Container(
-                  decoration: BoxDecoration(
-                      // border: Border.all(color: style.colorScheme.onPrimary),
-                      color: style.colorScheme.background.withOpacity(0.25),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? Colors.grey.shade700.withOpacity(0.25)
-                                  : Colors.black.withOpacity(0.25),
-                          spreadRadius: 3,
-                          blurRadius: 4,
-                          offset:
-                              const Offset(0, 3), // changes position of shadow
-                        ),
-                      ],
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Center(
-                            child: ClipRRect(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(15)),
-                                child: AspectRatio(
-                                    aspectRatio: 30 / 26, child: image))),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
+            child: Container(
+                width: itemWidth,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.white
+                        : Colors.black,
+                    borderRadius: BorderRadius.circular(8)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8)),
+                        height: itemHeight * 0.75,
+                        width: itemWidth,
+                        child: image),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      child: Text(item.name,
+                          style: const TextStyle(
+                              fontSize: 20, overflow: TextOverflow.ellipsis)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      child: Text(item.description,
+                          style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 20,
+                              overflow: TextOverflow.ellipsis)),
+                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8, right: 8),
+                            child: Text('\$${item.price.toDouble().toString()}',
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    overflow: TextOverflow.ellipsis)),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8, right: 8, bottom: 4),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: conditionColor),
                                 child: Padding(
                                   padding:
-                                      const EdgeInsets.only(left: 5, right: 5),
-                                  child: Text(item.name,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          overflow: TextOverflow.ellipsis)),
+                                      const EdgeInsets.symmetric(horizontal: 3),
+                                  child: Text(
+                                      '${item.condition[0]}${item.condition.substring(1).toLowerCase()}',
+                                      style: const TextStyle(fontSize: 20)),
                                 ),
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, right: 5),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(10)),
-                                          color:
-                                              conditionColor.withOpacity(0.75)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 3),
-                                        child: Text(
-                                            '${item.condition[0]}${item.condition.substring(1).toLowerCase()}',
-                                            style:
-                                                const TextStyle(fontSize: 20)),
-                                      ),
-                                    )),
-                              )
-                            ]),
-                      ],
-                    ),
-                  )),
-              LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                return _buildPriceIndicatior(constraints.maxWidth * 0.25,
-                    constraints.maxHeight * 0.1, '\$${item.price}');
-              }),
-            ])));
-  }
-
-  Widget _buildPriceIndicatior(double width, double height, String itemPrice) {
-    return Align(
-        alignment: Alignment.topLeft,
-        child: SizedBox(
-            width: width,
-            height: height,
-            child: DecoratedBox(
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        bottomRight: Radius.circular(10)),
-                    color: Theme.of(context).colorScheme.background),
-                child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Padding(
-                        padding: const EdgeInsets.only(left: 5, right: 5),
-                        child: Text(
-                          itemPrice,
-                          textAlign: TextAlign.center,
-                        ))))));
+                              ))
+                        ]),
+                  ],
+                ))));
   }
 }
