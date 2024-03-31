@@ -49,7 +49,7 @@ class _WrapperState extends State<Wrapper> {
         return;
       }
       await loadCurrentUser(event.email);
-      await search("", 10, context, Filters.none());
+      await search("*", 10, context, Filters.none());
       int darkMode = data_store.user.darkMode;
       switch (darkMode) {
         case 1:

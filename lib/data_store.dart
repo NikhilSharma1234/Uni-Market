@@ -28,4 +28,4 @@ CurrentUser user = CurrentUser(
 List<Widget> itemBoxes = [];
 
 const missingImage =
-    "https://firebasestorage.googleapis.com/v0/b/uni-market-1698103346694.appspot.com/o/images%2Fmissing_image.jpg?alt=media&token=64d39513-4715-4339-9ea7-b122393007b5";
+    "https://firebasestorage.googleapis.com/v0/b/uni-market-1698103346694.appspot.com/o/images%2Fmissing_image.jpg?alt=media&token=a4a0c13e-5fb2-4ce8-be1e-5e3e7ee16cf3";

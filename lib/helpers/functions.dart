@@ -204,7 +204,7 @@ search(
   //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
 
   filterString +=
-      "&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
+      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
 
   final searchParameters = [
     searchTerm,
