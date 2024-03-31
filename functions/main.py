@@ -27,7 +27,7 @@ headers = {
 def compile_data(id, item):
   return {
     'id': str(id),
-    'buyerId': item['buyerId'],
+    'buyerId': str(item['buyerId']),
     'condition': item['condition'],
     'deletedAt': str(item['deletedAt']),
     'createdAt': str(item['createdAt']),
@@ -41,7 +41,7 @@ def compile_data(id, item):
     'sellerId': item['sellerId'],
     'tags': item['tags'],
     'isFlagged': item['isFlagged'],
-    'lastReviewedBy': item['lastReviewedBy']
+    'lastReviewedBy': str(item['lastReviewedBy'])
   }
 
 @functions_framework.http
