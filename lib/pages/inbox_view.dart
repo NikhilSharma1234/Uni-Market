@@ -93,7 +93,7 @@ class InboxViewState extends State<InboxView> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     onTap: () {
-                      _controller.onChatSelected(context, summary.sessionId);
+                      _controller.onChatSelected(context, summary.sessionId, summary.productId, summary.sellerId);
                       setState(() {
                         _selectedSessionIds.clear();
                       });

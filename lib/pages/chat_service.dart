@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 
@@ -89,7 +90,7 @@ class ChatService {
     }
   }
 
-  Future<String?> createChatSession(String productId) async {
+  Future<String?> createChatSession(String productId, Item itemData) async {
     if (currentUser.email == "") {
       if (kDebugMode) {
         print("Error: Current user is null or has no email");
@@ -167,6 +168,7 @@ class ChatService {
       "deletedByUsers": [],
       'unreadCountParticipant1': 0, // Initialize unread count for participant 1
       'unreadCountParticipant2': 0,
+      'sellerId': itemData.sellerId
     });
 
     return chatSessionRef.id;

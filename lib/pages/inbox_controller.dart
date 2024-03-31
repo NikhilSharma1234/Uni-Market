@@ -14,11 +14,11 @@ class InboxController {
     return _model.getChatSummaries(userEmail);
   }
 
-  void onChatSelected(BuildContext context, String sessionId) {
+  void onChatSelected(BuildContext context, String sessionId, String productId, String sellerId) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChatPage(chatSessionId: sessionId),
+        builder: (context) => ChatPage(chatSessionId: sessionId, productId: productId, sellerId: sellerId),
       ),
     );
   }
