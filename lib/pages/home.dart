@@ -243,6 +243,7 @@ class _HomePageState extends State<HomePage> {
                                   MaterialStatePropertyAll<Color>(Colors.green),
                             ),
                             onPressed: () {
+                              redrawItems([], false);
                               applyFilters();
                               Navigator.pop(context);
                             },
