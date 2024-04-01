@@ -59,49 +59,55 @@ class _PostFormState extends State<PostForm> {
     // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
     List<Widget> selected = List.generate(_tags.length, (int index) {
       final background = Theme.of(context).colorScheme.background;
-      return InkWell(
-        child: Container(
-            decoration: BoxDecoration(
-                color: background,
-                border: Border.all(
-                    color: background == Colors.white
-                        ? Colors.black
-                        : Colors.white),
-                borderRadius: const BorderRadius.all(Radius.circular(15))),
-            child: Row(
-              children: [
-                Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(_tags[index]!)),
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        String? temp = _tags.removeAt(index);
-                        _suggestedTags.add(temp);
-                      });
-                    },
-                    icon: const Icon(Icons.close))
-              ],
-            )),
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: InkWell(
+          child: Container(
+              decoration: BoxDecoration(
+                  color: background,
+                  border: Border.all(
+                      color: background == Colors.white
+                          ? Colors.black
+                          : Colors.white),
+                  borderRadius: const BorderRadius.all(Radius.circular(15))),
+              child: Row(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text(_tags[index]!)),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          String? temp = _tags.removeAt(index);
+                          _suggestedTags.add(temp);
+                        });
+                      },
+                      icon: const Icon(Icons.close))
+                ],
+              )),
+        ),
       );
     });
 
     List<Widget> suggested = List.generate(maxTags - _tags.length, (int index) {
-      return InkWell(
-          onTap: () => setState(() {
-                _tags.add(_suggestedTags[index]);
-                _suggestedTags.removeAt(index);
-                _tagsController.clear();
-              }),
-          child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: const BorderRadius.all(Radius.circular(15))),
-            child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 5, bottom: 5, left: 10, right: 10),
-                child: Text(_suggestedTags[index]!)),
-          ));
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: InkWell(
+            onTap: () => setState(() {
+                  _tags.add(_suggestedTags[index]);
+                  _suggestedTags.removeAt(index);
+                  _tagsController.clear();
+                }),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: const BorderRadius.all(Radius.circular(15))),
+              child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 5, bottom: 5, left: 10, right: 10),
+                  child: Text(_suggestedTags[index]!)),
+            )),
+      );
     });
 
     return selected + suggested;
