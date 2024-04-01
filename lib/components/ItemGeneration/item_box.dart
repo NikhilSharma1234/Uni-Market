@@ -88,7 +88,7 @@ class _ItemBoxState extends State<ItemBox> {
     double itemHeight = itemWidth * 1.15;
     Color conditionColor = conditionBackground[item.condition] ?? Colors.black;
     return Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(4),
         child: InkWell(
             // for future use to link each item to a unique page based on its id
             onTap: () {
