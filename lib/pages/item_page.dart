@@ -4,7 +4,6 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/item_page_info.dart';
-import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'dart:ui';
@@ -60,9 +59,6 @@ class _ItemPageState extends State<ItemPage> {
     return Scaffold(
         appBar: AppBar(title: const Text('Item Page')),
         resizeToAvoidBottomInset: false,
-        bottomNavigationBar: isMobile(context)
-            ? const UserBottomNavBar(activeIndex: 1)
-            : null, // Custom app bar here
         body: FutureBuilder(
             future:
                 loadImages(), // a previously-obtained Future<String> or null
