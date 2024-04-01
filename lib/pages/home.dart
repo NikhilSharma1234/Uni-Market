@@ -58,7 +58,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     Widget body;
 
-    body = SingleChildScrollView(child: Wrap(children: items));
+    body = Padding(
+      padding: const EdgeInsets.all(1),
+      child: SingleChildScrollView(child: Wrap(children: items)),
+    );
 
     if (items.isEmpty) {
       body = const Center(
