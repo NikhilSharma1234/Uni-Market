@@ -19,11 +19,30 @@ class ItemView extends StatefulWidget {
 
 class _ItemViewState extends State<ItemView> {
   // todo later: Make this page more generalized for whatever needs of items displays.
-  late List<Widget> items = [];
+  late List<Widget> items = [
+    const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(padding: EdgeInsets.only(top: 16)),
+          SizedBox(
+            width: 60,
+            height: 60,
+            child: CircularProgressIndicator(),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Text('Awaiting result...'),
+          ),
+        ],
+      ),
+    )
+  ];
   var db = FirebaseFirestore.instance;
   AbstractItemFactory factory = AbstractItemFactory();
 
   getItems() async {
+    // takes super long for some reason
     List<Widget> foundItemsArr = [];
     var foundItems = await db
         .collection("items")
@@ -54,29 +73,40 @@ class _ItemViewState extends State<ItemView> {
   @override
   void didChangeDependencies() {
     getItems().then((value) => setState((() {
-          items = value;
+          if (items.isEmpty) {
+            items = [const Text("No Items Listed")];
+          } else {
+            items = value;
+          }
         })));
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     if (widget.sellerID == null) {
       items = [const Text("Issue getting user")];
     }
 
     Widget body;
 
-    body = SingleChildScrollView(child: Wrap(children: items));
+    body = GridView.count(
+        physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics()),
+        crossAxisCount: (screenWidth / 320).round(),
+        childAspectRatio: 20 / 23,
+        children: items);
 
-    if (items.isEmpty) {
-      body = const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[Text('No Items Listed or still Loading items')],
-        ),
-      );
-    }
+    // if (items.isEmpty) {
+    //   body = const Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: <Widget>[Text('No Items Listed or still Loading items')],
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
         appBar: AppBar(
