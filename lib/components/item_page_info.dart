@@ -80,10 +80,12 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                   actions: [
                     TextButton(
                       onPressed: () async {
-                        loading = true;
+                        setState(() {
+                          loading = true;
+                        });
                         // "delete" the post
                         await deleteChats(widget.itemData.id);
-                        db
+                        await db
                             .collection('items')
                             .doc(widget.itemData.id)
                             .update({"deletedAt": Timestamp.now()});
@@ -91,6 +93,9 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                           Navigator.pop(context);
                           Navigator.pop(context);
                         }
+                        setState(() {
+                          loading = true;
+                        });
                       },
                       child: const Text('Click here to delete your post'),
                     ),
