@@ -23,36 +23,6 @@ class WishList extends StatefulWidget {
 class _WishListState extends State<WishList> {
   late Stream<List<Widget>> itemStream;
   AbstractItemFactory factory = AbstractItemFactory();
-  itemsWidth(double screenWidth) {
-    if (screenWidth < 500) {
-      return (screenWidth - (screenWidth * 0.06));
-    }
-    if (screenWidth < 650) {
-      return (screenWidth - (screenWidth * 0.06)) / 2;
-    }
-    if (screenWidth < 1000) {
-      return (screenWidth - (screenWidth * 0.06)) / 3;
-    }
-    if (screenWidth < 1300) {
-      return (screenWidth - (screenWidth * 0.06)) / 4;
-    }
-    if (screenWidth < 1600) {
-      return (screenWidth - (screenWidth * 0.06)) / 5;
-    }
-    if (screenWidth < 2000) {
-      return (screenWidth - (screenWidth * 0.06)) / 6;
-    }
-    if (screenWidth < 2400) {
-      return (screenWidth - (screenWidth * 0.06)) / 7;
-    }
-    return (screenWidth - (screenWidth * 0.06)) / 4;
-  }
-
-  Map<String, Color> conditionBackground = {
-    "NEW": Colors.green,
-    "USED": Colors.orange,
-    "WORN": Colors.red
-  };
 
   Future<Widget> generateItemWidget(itemId, darkModeOn) async {
     var itemFromFirebase =
