@@ -95,7 +95,7 @@ class _ItemViewState extends State<ItemView> {
     body = GridView.count(
         physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics()),
-        crossAxisCount: (screenWidth / 320).round(),
+        crossAxisCount: (screenWidth / 320).floor(),
         childAspectRatio: 20 / 23,
         children: items);
 

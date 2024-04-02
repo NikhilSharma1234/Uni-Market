@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _scrollController,
                 physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics()),
-                crossAxisCount: (screenWidth / 320).round(),
+                crossAxisCount: (screenWidth / 320).floor(),
                 childAspectRatio: 20 / 23,
                 children: items)));
 
