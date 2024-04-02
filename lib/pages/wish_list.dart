@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
-import 'package:uni_market/pages/item_page.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 
 class WishList extends StatefulWidget {
