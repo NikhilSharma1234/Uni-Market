@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -285,4 +286,32 @@ Future<String> getURL(
     image = "Missing Image";
   }
   return image;
+}
+
+deleteChats(String itemId) async {
+  var snapshots = await FirebaseFirestore.instance
+      .collection('chat_sessions')
+      .where('productId', isEqualTo: itemId)
+      .get();
+  String messageContent = "This item was deleted by the seller.";
+  for (var snapshot in snapshots.docs) {
+    await FirebaseFirestore.instance
+        .collection('chat_sessions')
+        .doc(snapshot.id)
+        .collection('messages')
+        .add({
+      'senderId': FirebaseAuth.instance.currentUser!.uid,
+      'type': 'transaction',
+      'content': messageContent,
+      'timestamp': Timestamp.now(),
+    });
+    await FirebaseFirestore.instance
+        .collection('chat_sessions')
+        .doc(snapshot.id)
+        .update({
+      'lastMessage': messageContent,
+      'lastMessageAt': Timestamp.now(),
+      'deletedByUsers': FieldValue.arrayUnion([data_store.user.email])
+    });
+  }
 }

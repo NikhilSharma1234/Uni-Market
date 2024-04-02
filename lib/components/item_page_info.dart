@@ -5,6 +5,7 @@ import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/data_store.dart';
+import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/chat_service.dart';
 import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/data_store.dart' as data_store;
@@ -74,12 +75,13 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Delete Post'),
-                  content:
-                      const Text('Are you sure you want to delete your post?'),
+                  content: const Text(
+                      'Are you sure you want to delete your post. This will notify chat sessions associated with this item and will delete them from your inbox as well.'),
                   actions: [
                     TextButton(
                       onPressed: () {
                         // "delete" the post
+                        deleteChats(widget.itemData.id);
                         db
                             .collection('items')
                             .doc(widget.itemData.id)
