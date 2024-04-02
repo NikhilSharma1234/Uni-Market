@@ -19,8 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
-  bool endOfItems = false;
   int page = 1;
+  bool loadingNewItems = false;
 
   // Controllers
   late ScrollController _scrollController;
@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
         if (append) {
           items = items + newItems;
         } else {
-          endOfItems = false;
           items = newItems;
         }
       }
@@ -86,65 +85,83 @@ class _HomePageState extends State<HomePage> {
 
     body = Padding(
         padding: const EdgeInsets.all(1),
-        child: NotificationListener(
-            onNotification: (notif) {
-              if (notif is ScrollUpdateNotification && !endOfItems) {
-                if (_scrollController.offset >
-                    _scrollController.position.maxScrollExtent * 0.5) {
-                  search(searchVal, 30, context, filter, pageNum: page += 1)
-                      .then((value) {
-                    if (value.isEmpty) {
-                      endOfItems = true;
-                    } else {
-                      items.removeLast();
-                      redrawItems(value, true);
-                    }
-                  });
-                }
-              }
-              return true;
-            },
-            child: GridView.count(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                crossAxisCount: (screenWidth / 320).floor(),
-                childAspectRatio: 20 / 23,
-                children: items)));
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              page = 1;
+              loadingNewItems = true;
+            });
+            await search(searchVal, 30, context, filter, pageNum: page)
+                .then((value) {
+              redrawItems(value, false);
+            });
+            setState(() {
+              loadingNewItems = false;
+            });
+          },
+          child: GridView.count(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              crossAxisCount: (screenWidth / 320).floor(),
+              childAspectRatio: 20 / 23,
+              children: items.length == 30 || page > 1
+                  ? items +
+                      [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            page > 1
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        setState(() {
+                                          page -= 1;
+                                          loadingNewItems = true;
+                                        });
+                                        await search(
+                                                searchVal, 30, context, filter,
+                                                pageNum: page)
+                                            .then((value) {
+                                          redrawItems(value, false);
+                                        });
+                                        setState(() {
+                                          loadingNewItems = false;
+                                        });
+                                      },
+                                      child: const Text('Previous Page'),
+                                    ),
+                                  )
+                                : const SizedBox(width: 0),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    page += 1;
+                                    loadingNewItems = true;
+                                  });
+                                  await search(searchVal, 30, context, filter,
+                                          pageNum: page)
+                                      .then((value) {
+                                    redrawItems(value, false);
+                                  });
+                                  setState(() {
+                                    loadingNewItems = false;
+                                  });
+                                },
+                                child: const Text('Next Page'),
+                              ),
+                            )
+                          ],
+                        )
+                      ]
+                  : items),
+        ));
 
-    if (!endOfItems) {
-      items.add(const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(padding: EdgeInsets.only(top: 16)),
-            SizedBox(
-              width: 60,
-              height: 60,
-              child: CircularProgressIndicator(),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Text('Awaiting result...'),
-            ),
-          ],
-        ),
-      ));
-    } else {
-      items.add(const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Text('End of Items'),
-            ),
-          ],
-        ),
-      ));
-    }
-
-    if (items.isEmpty) {
+    if (loadingNewItems) {
       body = const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -157,6 +174,51 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.only(top: 16),
               child: Text('Awaiting result...'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (items.isEmpty && page > 1) {
+      body = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('No More Items'),
+            Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    setState(() {
+                      page -= 1;
+                      loadingNewItems = true;
+                    });
+                    await search(searchVal, 30, context, filter, pageNum: page)
+                        .then((value) {
+                      redrawItems(value, false);
+                    });
+                    setState(() {
+                      loadingNewItems = false;
+                    });
+                  },
+                  child: const Text('Previous Page'),
+                )),
+          ],
+        ),
+      );
+    } else if (items.isEmpty) {
+      body = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text('Awaiting result or no items exist...'),
             ),
           ],
         ),
