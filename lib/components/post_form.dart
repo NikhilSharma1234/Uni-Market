@@ -537,8 +537,25 @@ class _PostFormState extends State<PostForm> {
 
       await FirebaseFirestore.instance.collection("items").doc().set(userPost);
 
+      userPost['id'] = "placeHolder";
+      userPost['tags'] = _tags;
+      if (userPost['images'].length == 0) {
+        userPost['images'] = [data_store.missingImage];
+      } else {
+        for (int i = 0; i < userPost['images'].length; i++) {
+          userPost['images'][i] = await getURL(userPost['images'][i]);
+        }
+      }
+
       // show see post dialog upon successful creation
       if (context.mounted) {
+        // create item and add
+        AbstractItemFactory factory = AbstractItemFactory();
+        widget.setHomeState(
+            [factory.buildItemBox(Item.fromFirebase(userPost), context)],
+            false,
+            true);
+        Navigator.of(context).pop();
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -548,19 +565,7 @@ class _PostFormState extends State<PostForm> {
               actions: [
                 TextButton(
                   onPressed: () async {
-                    _flag(false);
-                    userPost['id'] = "placeHolder";
-                    userPost['tags'] = _tags;
-                    if (userPost['images'].length == 0) {
-                      userPost['images'] = [data_store.missingImage];
-                    } else {
-                      for (int i = 0; i < userPost['images'].length; i++) {
-                        userPost['images'][i] =
-                            await getURL(userPost['images'][i]);
-                      }
-                    }
                     if (context.mounted) {
-                      Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -568,15 +573,6 @@ class _PostFormState extends State<PostForm> {
                             return ItemPage(data: Item.fromFirebase(userPost));
                           },
                         ),
-                      ).then(
-                        (value) {
-                          // create item and add
-                          AbstractItemFactory factory = AbstractItemFactory();
-                          widget.setHomeState([
-                            factory.buildItemBox(
-                                Item.fromFirebase(userPost), context)
-                          ], false, true);
-                        },
                       );
                     }
                   },
