@@ -79,15 +79,18 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                       'Are you sure you want to delete your post. This will notify chat sessions associated with this item and will delete them from your inbox as well.'),
                   actions: [
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        loading = true;
                         // "delete" the post
-                        deleteChats(widget.itemData.id);
+                        await deleteChats(widget.itemData.id);
                         db
                             .collection('items')
                             .doc(widget.itemData.id)
                             .update({"deletedAt": Timestamp.now()});
-                        Navigator.pop(context);
-                        Navigator.pop(context);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        }
                       },
                       child: const Text('Click here to delete your post'),
                     ),
