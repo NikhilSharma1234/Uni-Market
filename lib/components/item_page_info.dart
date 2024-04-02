@@ -32,10 +32,13 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
   Widget build(BuildContext context) {
     Widget itemButton = ElevatedButton(
       onPressed: () async {
+        setState(() {
+          loading = true;
+        });
         ChatService chatService =
             ChatService(); // Create an instance of ChatService
-        String? sessionId =
-            await chatService.createChatSession(widget.itemData.id);
+        String? sessionId = await chatService.createChatSession(
+            widget.itemData.id, widget.itemData);
         if (sessionId != null) {
           if (kDebugMode) {
             print("Chat session ID: $sessionId");
@@ -46,8 +49,10 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
             context,
             MaterialPageRoute(
               builder: (context) => ChatPage(
-                  chatSessionId:
-                      sessionId), // Ensure this matches the ChatPage constructor parameter name
+                  chatSessionId: sessionId,
+                  productId: widget.itemData.id,
+                  sellerId: widget.itemData
+                      .sellerId), // Ensure this matches the ChatPage constructor parameter name
             ),
           );
         } else {
@@ -122,46 +127,7 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                       ? const CircularProgressIndicator()
                       : Row(
                           children: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    loading = true;
-                                  });
-                                  ChatService chatService =
-                                      ChatService(); // Create an instance of ChatService
-                                  String? sessionId =
-                                      await chatService.createChatSession(
-                                          widget.itemData.id, widget.itemData);
-                                  if (sessionId != null) {
-                                    if (kDebugMode) {
-                                      print("Chat session ID: $sessionId");
-                                    }
-                                    // Navigate to the ChatPage with sessionId
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatPage(
-                                            chatSessionId: sessionId,
-                                            productId: widget.itemData.id,
-                                            sellerId: widget.itemData
-                                                .sellerId), // Ensure this matches the ChatPage constructor parameter name
-                                      ),
-                                    );
-                                  } else {
-                                    if (kDebugMode) {
-                                      print("Failed to create chat session.");
-                                    }
-                                    // Optionally, show an error message to the user
-                                  }
-                                  setState(() {
-                                    loading = false;
-                                  });
-                                },
-                                child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: itemButton)),
+                            itemButton,
                             IconButton(
                               icon: const Icon(Icons.favorite),
                               selectedIcon:

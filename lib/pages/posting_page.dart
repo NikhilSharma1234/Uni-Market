@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/post_form.dart';
 
 class PostingPage extends StatefulWidget {
-  const PostingPage({Key? key}) : super(key: key);
+  final Function(List<Widget> newItems, bool append, [bool? start])
+      setHomeState;
+  const PostingPage({Key? key, required this.setHomeState}) : super(key: key);
 
   @override
   State<PostingPage> createState() => _PostingPageState();
@@ -39,7 +41,9 @@ class _PostingPageState extends State<PostingPage> {
                   children: <Widget>[
                     SizedBox(
                       width: widthScreen(screenWidth) * 0.95,
-                      child: const PostForm(),
+                      child: PostForm(
+                        setHomeState: widget.setHomeState,
+                      ),
                     ),
                   ],
                 )

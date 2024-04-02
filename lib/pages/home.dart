@@ -19,11 +19,31 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
+  int page = 1;
+  double offset = 0;
+  bool endOfItems = false;
+
+  // Controllers
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    // initialize scroll controllers
+    _scrollController = ScrollController();
+
+    super.initState();
+  }
 
   // redraws the items on the page based on search results
-  redrawItems(List<Widget> newItems, bool append) {
+  redrawItems(List<Widget> newItems, bool append, [bool? start]) {
     setState(() {
-      append ? items = items + newItems : items = newItems;
+      if (start ?? false) {
+        // bad fix for loading thing at the end but I DO NOT CARE LITERALLY F OFF BRO
+        items.removeLast();
+        items = newItems + items;
+      } else {
+        append ? items = items + newItems : items = newItems;
+      }
     });
   }
 
@@ -56,12 +76,69 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     Widget body;
 
     body = Padding(
-      padding: const EdgeInsets.all(1),
-      child: SingleChildScrollView(child: Wrap(children: items)),
-    );
+        padding: const EdgeInsets.all(1),
+        child: NotificationListener(
+            onNotification: (notif) {
+              if (notif is ScrollUpdateNotification && !endOfItems) {
+                if (_scrollController.offset >
+                    _scrollController.position.maxScrollExtent * 0.5) {
+                  search(searchVal, 30, context, filter, pageNum: page += 1)
+                      .then((value) {
+                    if (value.isEmpty) {
+                      endOfItems = true;
+                    } else {
+                      items.removeLast();
+                      redrawItems(value, true);
+                    }
+                  });
+                }
+              }
+              return true;
+            },
+            child: GridView.count(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics()),
+                crossAxisCount: (screenWidth / 320).round(),
+                childAspectRatio: 20 / 23,
+                children: items)));
+
+    if (!endOfItems) {
+      items.add(const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(padding: EdgeInsets.only(top: 16)),
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text('Awaiting result...'),
+            ),
+          ],
+        ),
+      ));
+    } else {
+      items.add(const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text('End of Items'),
+            ),
+          ],
+        ),
+      ));
+    }
 
     if (items.isEmpty) {
       body = const Center(
@@ -94,9 +171,11 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog<String>(
             context: context,
-            builder: (BuildContext context) => const Dialog(
-                  insetPadding: EdgeInsets.all(0),
-                  child: PostingPage(),
+            builder: (BuildContext context) => Dialog(
+                  insetPadding: const EdgeInsets.all(0),
+                  child: PostingPage(
+                    setHomeState: redrawItems,
+                  ),
                 )),
         child: const Icon(Icons.add),
       ),

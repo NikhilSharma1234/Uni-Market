@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/components/image_carousel.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,9 @@ import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 
 class PostForm extends StatefulWidget {
-  const PostForm({Key? key}) : super(key: key);
+  final Function(List<Widget> newItems, bool append, [bool? start])
+      setHomeState;
+  const PostForm({Key? key, required this.setHomeState}) : super(key: key);
 
   @override
   State<PostForm> createState() => _PostFormState();
@@ -538,6 +541,15 @@ class _PostFormState extends State<PostForm> {
                             return ItemPage(data: Item.fromFirebase(userPost));
                           },
                         ),
+                      ).then(
+                        (value) {
+                          // create item and add
+                          AbstractItemFactory factory = AbstractItemFactory();
+                          widget.setHomeState([
+                            factory.buildItemBox(
+                                Item.fromFirebase(userPost), context)
+                          ], false, true);
+                        },
                       );
                     }
                   },
