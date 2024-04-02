@@ -19,9 +19,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
-  int page = 1;
-  double offset = 0;
-  bool endOfItems = false;
 
   // Controllers
   late ScrollController _scrollController;
@@ -76,6 +73,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    int page = 1;
+    bool endOfItems = false;
+
     double screenWidth = MediaQuery.of(context).size.width;
 
     Widget body;
