@@ -207,6 +207,10 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
   filterString +=
       "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
 
+  if (searchTerm == "") {
+    searchTerm = "*";
+  }
+
   final searchParameters = [
     searchTerm,
     "name,embedding,description,tags",

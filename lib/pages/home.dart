@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<Widget> items = data_store.itemBoxes;
   String searchVal = "";
+  bool endOfItems = false;
+  int page = 1;
 
   // Controllers
   late ScrollController _scrollController;
@@ -39,7 +41,12 @@ class _HomePageState extends State<HomePage> {
         items.removeLast();
         items = newItems + items;
       } else {
-        append ? items = items + newItems : items = newItems;
+        if (append) {
+          items = items + newItems;
+        } else {
+          endOfItems = false;
+          items = newItems;
+        }
       }
     });
   }
@@ -73,9 +80,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int page = 1;
-    bool endOfItems = false;
-
     double screenWidth = MediaQuery.of(context).size.width;
 
     Widget body;
@@ -267,12 +271,13 @@ class _HomePageState extends State<HomePage> {
                                 DropdownMenuEntry(
                                     value: Sort.lowToHigh,
                                     label: 'Low to High'),
-                                DropdownMenuEntry(
-                                    value: Sort.newestToOldest,
-                                    label: 'Newest to Oldest'),
-                                DropdownMenuEntry(
-                                    value: Sort.oldestToNewest,
-                                    label: 'Oldest to Newest'),
+                                // TODO: change datetime in typesense to an int so these work
+                                // DropdownMenuEntry(
+                                //     value: Sort.newestToOldest,
+                                //     label: 'Newest to Oldest'),
+                                // DropdownMenuEntry(
+                                //     value: Sort.oldestToNewest,
+                                //     label: 'Oldest to Newest'),
                                 DropdownMenuEntry(
                                     value: Sort.bestMatch, label: 'Best Match')
                               ]),
