@@ -16,6 +16,7 @@ import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import 'package:http/http.dart' as http;
 
 class PostForm extends StatefulWidget {
   final Function(List<Widget> newItems, bool append, [bool? start])
@@ -119,7 +120,7 @@ class _PostFormState extends State<PostForm> {
   }
 
   void _flag(bool flag) {
-    setState(() => isFlagged = !isFlagged);
+    setState(() => isFlagged = (isFlagged || flag));
   }
 
   @override
@@ -257,11 +258,15 @@ class _PostFormState extends State<PostForm> {
                         },
                       );
 
-                      // Check if the user confirmed the selection
+                      // Check if the user confirmed selected images
                       if (confirmSelection == 'yes') {
                         setState(() {
                           _imageDataUrls = dataUrls;
                         });
+
+                        if (await moderateSelectedImages(dataUrls) == true) {
+                          _flag(true);
+                        }
                       }
                     }
                   }
@@ -294,11 +299,14 @@ class _PostFormState extends State<PostForm> {
                 String inputText =
                     formData["title"] + " " + formData["description"];
 
-                try {
-                  checkProfanity(inputText).then((value) => _flag(value));
-                } catch (e) {
-                  if (kDebugMode) {
-                    print("Failed to perform profanity checking: $e");
+                if (isFlagged != true) {
+                  try {
+                    checkProfanity(inputText, checkStrength: false)
+                        .then((value) => _flag(value));
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print("Failed to perform profanity checking: $e");
+                    }
                   }
                 }
 
@@ -372,6 +380,10 @@ class _PostFormState extends State<PostForm> {
           setState(() {
             _imageDataUrls = dataUrls;
           });
+
+          if (await moderateSelectedImages(dataUrls) == true) {
+            _flag(true);
+          }
         }
       }
     }
@@ -398,6 +410,9 @@ class _PostFormState extends State<PostForm> {
           setState(() {
             _imageDataUrls = dataUrls;
           });
+          if (await moderateSelectedImages(dataUrls) == true) {
+            _flag(true);
+          }
         }
         if (confirmSelection == 'more') {
           XFile? secondImage =
@@ -405,7 +420,6 @@ class _PostFormState extends State<PostForm> {
           if (secondImage != null) {
             List<String> secondDataUrls =
                 await convertXFilesToDataUrls([image, secondImage]);
-
             // Show the pop-up dialog for image confirmation
             if (context.mounted) {
               String confirmSelection = await showDialog(
@@ -416,12 +430,18 @@ class _PostFormState extends State<PostForm> {
                       imageDataUrls: secondDataUrls, cameraBasedImage: true);
                 },
               );
-
               // Check if the user confirmed the selection
               if (confirmSelection == 'yes') {
                 setState(() {
                   _imageDataUrls = secondDataUrls;
                 });
+                if (isFlagged != true) {
+                  List<String> tempUrl = [];
+                  tempUrl.add(secondDataUrls[1]);
+                  if (await moderateSelectedImages(tempUrl) == true) {
+                    _flag(true);
+                  }
+                }
               }
               if (confirmSelection == 'more') {
                 XFile? thirdImage =
@@ -446,6 +466,13 @@ class _PostFormState extends State<PostForm> {
                       setState(() {
                         _imageDataUrls = secondDataUrls;
                       });
+                      if (isFlagged != true) {
+                        List<String> tempUrl = [];
+                        tempUrl.add(secondDataUrls[2]);
+                        if (await moderateSelectedImages(tempUrl) == true) {
+                          _flag(true);
+                        }
+                      }
                     }
                   }
                 }
@@ -615,7 +642,6 @@ Future uploadImages(
       }
     }
   });
-
   completer.complete(imageNames);
 }
 
@@ -623,13 +649,10 @@ Future<List<XFile>> multiImagePicker(context) async {
   List<XFile>? images = await ImagePicker().pickMultiImage();
   if (images.isNotEmpty && images.length <= 3) {
     return images;
-  } else {
-    if (kDebugMode) {
-      print("Error: No images selected or more than 3 images selected!");
-    }
+  } else if (images.isNotEmpty && images.length > 3) {
     showDialog<String>(
         context: context,
-        builder: (BuildContext context) => appDialog(context, 'Too many Images',
+        builder: (BuildContext context) => appDialog(context, 'Too many images',
             'Please select only three images to upload with your post.', 'Ok'));
   }
   return [];
@@ -642,6 +665,40 @@ Future<List<String>> convertXFilesToDataUrls(List<XFile> xFiles) async {
     String dataUrl = await convertImageToDataUrl(xFile);
     dataUrls.add(dataUrl);
   }
-
   return dataUrls;
+}
+
+Future<bool> moderateSelectedImages(List<String> imageUrls) async {
+  bool containsIllicitContent = false;
+
+  String apiKey = '2Pv9xBw29ZaqthAphAIcM2Ke4Ey1kbbO'; // Your PicPurify API key
+  String task = 'porn_moderation,drug_moderation,gore_moderation';
+  String apiUrl =
+      'https://my-cors-proxy-ed823d7eefa2.herokuapp.com/https://www.picpurify.com/analyse/1.1';
+
+  for (var url in imageUrls) {
+    try {
+      var response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          'API_KEY': apiKey,
+          'task': task,
+          'url_image': url,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonModerationResponse = jsonDecode(response.body);
+        if (jsonModerationResponse["final_decision"] == "KO") {
+          containsIllicitContent = true;
+          break;
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error, failed http post: $e");
+      }
+    }
+  }
+  return containsIllicitContent;
 }
