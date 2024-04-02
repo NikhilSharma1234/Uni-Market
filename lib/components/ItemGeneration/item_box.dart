@@ -21,6 +21,9 @@ class _ItemBoxState extends State<ItemBox> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     Map<String, Style> styleType = {
       "book": BookStyle(context: context),
       "default": DefaultStyle(context: context),
@@ -60,6 +63,9 @@ class _ItemBoxState extends State<ItemBox> {
       );
     }
 
+    // var imageSize = screenWidth < 500 ? 0.78 : 0.74;
+    var imageSize = screenWidth < 500 ? 0.76 : 0.74;
+
     Color conditionColor = conditionBackground[item.condition] ?? Colors.black;
     return Padding(
         padding: const EdgeInsets.all(4),
@@ -87,7 +93,7 @@ class _ItemBoxState extends State<ItemBox> {
                   Container(
                       decoration:
                           BoxDecoration(borderRadius: BorderRadius.circular(8)),
-                      height: constraints.maxHeight * 0.74,
+                      height: constraints.maxHeight * imageSize,
                       width: constraints.maxWidth,
                       child: image),
                   Padding(
@@ -130,7 +136,7 @@ class _ItemBoxState extends State<ItemBox> {
                                     style: const TextStyle(fontSize: 20)),
                               ),
                             ))
-                      ]),
+                      ])
                 ],
               ));
         })));
