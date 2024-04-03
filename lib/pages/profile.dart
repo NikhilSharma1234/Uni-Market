@@ -334,6 +334,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () async {
                         Navigator.pop(context);
                         data_store.user.delete();
+                        data_store.itemBoxes = [];
                         await FirebaseAuth.instance.signOut();
                         // ignore: use_build_context_synchronously
                         Provider.of<ThemeProvider>(context, listen: false)
