@@ -56,6 +56,9 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                       .sellerId), // Ensure this matches the ChatPage constructor parameter name
             ),
           );
+          setState(() {
+            loading = false;
+          });
         } else {
           if (kDebugMode) {
             print("Failed to create chat session.");
