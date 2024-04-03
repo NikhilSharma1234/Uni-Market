@@ -27,18 +27,18 @@ class _WishListState extends State<WishList> {
     var itemFromFirebase =
         await FirebaseFirestore.instance.collection("items").doc(itemId).get();
     if (itemFromFirebase.data() != null) {
-      var item = itemFromFirebase.data();
-      item?['id'] = itemFromFirebase.id; // adding id to data
-      if (item?['images'].length == 0) {
-        item?['images'].add(await FirebaseStorage.instance
-            .ref("images/missing_image.jpg")
-            .getDownloadURL());
-      } else {
-        for (int i = 0; i < item?['images'].length; i++) {
-          item?['images'][i] = await getURL(item['images'][i]);
-        }
-      }
       try {
+        var item = itemFromFirebase.data();
+        item?['id'] = itemFromFirebase.id; // adding id to data
+        if (item?['images'].length == 0) {
+          item?['images'].add(await FirebaseStorage.instance
+              .ref("images/missing_image.jpg")
+              .getDownloadURL());
+        } else {
+          for (int i = 0; i < item?['images'].length; i++) {
+            item?['images'][i] = await getURL(item['images'][i]);
+          }
+        }
         // ignore: use_build_context_synchronously
         return factory.buildItemBox(Item.fromFirebase(item!), context);
       } catch (e) {
@@ -47,10 +47,7 @@ class _WishListState extends State<WishList> {
         }
       }
     }
-    return const SizedBox(
-      width: 30,
-      child: Text('Abasad'),
-    );
+    return const SizedBox(width: 0);
   }
 
   Future<String> getURL(String imageURL) async {
