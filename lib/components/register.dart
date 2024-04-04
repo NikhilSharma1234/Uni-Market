@@ -102,7 +102,7 @@ class _RegistirationState extends State<Registiration> {
 
   _launchURL(link) async {
     Uri url = Uri.parse(link);
-    if (await launchUrl(url)) {
+    if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
       throw 'Could not launch $url';
