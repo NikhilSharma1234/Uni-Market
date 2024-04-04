@@ -91,6 +91,7 @@ class _HomePageState extends State<HomePage> {
               page = 1;
               loadingNewItems = true;
             });
+            clearFilters();
             await search(searchVal, 30, context, filter, pageNum: page)
                 .then((value) {
               redrawItems(value, false);
@@ -256,8 +257,8 @@ class _HomePageState extends State<HomePage> {
                     topRight: Radius.circular(8),
                     bottomRight: Radius.circular(8))),
             child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 100, bottom: 100, left: 8, right: 8),
+              padding:
+                  const EdgeInsets.only(top: 50, bottom: 50, left: 8, right: 8),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -344,6 +345,20 @@ class _HomePageState extends State<HomePage> {
                                     value: Sort.bestMatch, label: 'Best Match')
                               ]),
                         ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Show Flagged Items:',
+                            style: TextStyle(fontSize: 24)),
+                        Checkbox(
+                            value: filter.showFlagged,
+                            onChanged: (value) {
+                              setState(() {
+                                filter.showFlagged = value!;
+                              });
+                            })
                       ],
                     ),
                     Column(
