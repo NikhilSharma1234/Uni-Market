@@ -66,6 +66,7 @@ Future<void> loadCurrentUser(email) async {
   data_store.user = CurrentUser(
       assignable_profile_pic: userData['assignable_profile_pic'],
       assignable_profile_pic_url: assignable_profile_pic_url,
+      blockedUsers: userData['blockedUsers'],
       createdAt: userData['createdAt'],
       darkMode: userData['darkMode'],
       deletedAt: userData['deletedAt'],
@@ -204,7 +205,7 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
   // filterString +=
   //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
   filterString +=
-      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}";
+      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=[${data_store.user.blockedUsers}]";
 
   if (searchTerm == "") {
     searchTerm = "*";

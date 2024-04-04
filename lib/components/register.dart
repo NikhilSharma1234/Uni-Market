@@ -144,6 +144,7 @@ class _RegistirationState extends State<Registiration> {
           "profile_pics/${const ProfilePicShuffler().reveal()}";
 
       final user = <String, dynamic>{
+        "blockedUsers": [],
         "createdAt": Timestamp.now(),
         "updatedAt": Timestamp.now(),
         "deletedAt": null,

@@ -6,6 +6,7 @@ class CurrentUser {
   static final CurrentUser _user = CurrentUser._internal();
   String? assignable_profile_pic;
   String? assignable_profile_pic_url;
+  late List<dynamic> blockedUsers;
   late Timestamp createdAt;
   late int darkMode;
   Timestamp? deletedAt;
@@ -28,6 +29,7 @@ class CurrentUser {
   factory CurrentUser(
       {required String? assignable_profile_pic,
       String? assignable_profile_pic_url,
+      required List<dynamic> blockedUsers,
       required Timestamp createdAt,
       required int darkMode,
       required Timestamp? deletedAt,
@@ -48,6 +50,7 @@ class CurrentUser {
       required List<dynamic> wishlist}) {
     _user.assignable_profile_pic = assignable_profile_pic;
     _user.assignable_profile_pic_url = assignable_profile_pic_url;
+    _user.blockedUsers = blockedUsers;
     _user.createdAt = createdAt;
     _user.darkMode = darkMode;
     _user.deletedAt = deletedAt;
@@ -71,6 +74,7 @@ class CurrentUser {
 
   delete() {
     _user.assignable_profile_pic = null;
+    _user.blockedUsers = [];
     _user.createdAt = Timestamp.now();
     _user.darkMode = 0;
     _user.deletedAt = null;
