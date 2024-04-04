@@ -19,7 +19,8 @@ void main() {
         DateTime(0, 0),
         ["NOIMAGE"],
         "TestSellerId",
-        ["TestTags"]);
+        ["TestTags"],
+        false);
 
     await tester.pumpWidget(Builder(builder: (BuildContext context) {
       var itemBox = fac.buildItemBox(item, context);

@@ -9,8 +9,9 @@ class Item {
   List<String> imagePath;
   String sellerId;
   List<dynamic> tags;
+  bool isFlagged;
   Item(this.name, this.id, this.description, this.condition, this.schoolId,
-      this.price, this.createdAt, this.imagePath, this.sellerId, this.tags);
+      this.price, this.createdAt, this.imagePath, this.sellerId, this.tags, this.isFlagged);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
@@ -23,7 +24,8 @@ class Item {
         createdAt = DateTime(0, 0),
         sellerId = "missing",
         imagePath = [],
-        tags = [] {
+        tags = [],
+        isFlagged = false {
     name = map['name'];
     id = map['id'];
     description = map['description'];
@@ -36,6 +38,7 @@ class Item {
       imagePath.add(path);
     }
     tags = map['tags'];
+    isFlagged = map['isFlagged'];
   }
 
   Item.fromFirebase(Map map)
@@ -49,7 +52,8 @@ class Item {
         createdAt = DateTime(0, 0),
         sellerId = "missing",
         imagePath = [],
-        tags = [] {
+        tags = [],
+        isFlagged = false {
     name = map['name'];
     id = map['id'];
     description = map['description'];
@@ -62,6 +66,7 @@ class Item {
       imagePath.add(path);
     }
     tags = map['tags'];
+    isFlagged = map['isFlagged'];
   }
 
   @override
