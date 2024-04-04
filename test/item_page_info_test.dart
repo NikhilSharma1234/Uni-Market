@@ -25,6 +25,7 @@ void main() {
       ['image1path', 'secondImagePath'],
       "selleremailid@gmail.com",
       ['tag1', 'tag2'],
+      false
     );
     String sellerName = 'Nikhil Sharma';
     String sellerProfilePic = 'somelink';

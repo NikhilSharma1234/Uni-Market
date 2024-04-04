@@ -203,7 +203,6 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
 
   // filterString +=
   //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
-  print(filter.showFlagged);
   filterString +=
       "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}";
 
