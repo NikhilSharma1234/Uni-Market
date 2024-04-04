@@ -257,6 +257,87 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                     Text('Name: ${widget.sellerName}'),
                     const Text('Items Sold: 2'),
                     const Text('Items Bought: 2'),
+                    widget.itemData.sellerId != data_store.user.email
+                        ? !loading
+                            ? ElevatedButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    loading = true;
+                                  });
+                                  if (data_store.user.blockedUsers
+                                      .contains(widget.itemData.sellerId)) {
+                                    return;
+                                  }
+                                  data_store.user.blockedUsers
+                                      .add(widget.itemData.sellerId);
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(data_store.user.email)
+                                      .update({
+                                    'blockedUsers': data_store.user.blockedUsers
+                                  });
+                                  var sellerUserObject = await FirebaseFirestore
+                                      .instance
+                                      .collection('users')
+                                      .doc(widget.itemData.sellerId)
+                                      .get();
+                                  if (!sellerUserObject['blockedUsers']
+                                      .contains(data_store.user.email)) {
+                                    var blockedBySeller =
+                                        sellerUserObject['blockedUsers'];
+                                    blockedBySeller.add(data_store.user.email);
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(sellerUserObject['email'])
+                                        .update(
+                                            {'blockedUsers': blockedBySeller});
+                                  }
+                                  var snapshots = await FirebaseFirestore
+                                      .instance
+                                      .collection('chat_sessions')
+                                      .where('participantIds', whereIn: [
+                                    [
+                                      data_store.user.email,
+                                      widget.itemData.sellerId
+                                    ],
+                                    [
+                                      widget.itemData.sellerId,
+                                      data_store.user.email
+                                    ],
+                                  ]).get();
+                                  for (var snapshot in snapshots.docs) {
+                                    await FirebaseFirestore.instance
+                                        .collection('chat_sessions')
+                                        .doc(snapshot.id)
+                                        .update({
+                                      'deletedByUsers': FieldValue.arrayUnion(
+                                          [data_store.user.email])
+                                    });
+                                  }
+                                  await loadCurrentUser(data_store.user.email);
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  if (context.mounted) {
+                                    Navigator.of(context).pop();
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return const AlertDialog(
+                                            title: Text("User Blocked"),
+                                            content: Text(
+                                                "You have blocked the user. Please reload the app to no longer view this user's content."),
+                                          );
+                                        });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape: const BeveledRectangleBorder()),
+                                child: const Text('Block this user'),
+                              )
+                            : const CircularProgressIndicator()
+                        : const SizedBox(width: 0)
                   ],
                 ),
               ),
