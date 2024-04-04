@@ -201,13 +201,17 @@ class _AboutUsPageState extends State<AboutUsPage> {
                     ),
                     const SizedBox(height: 10),
                     RichText(
-                      text: TextSpan(
-                        recognizer: TapGestureRecognizer()
-                        ..onTap = () { _launchURL('https://docs.flutter.dev/');},
-                        text:
-                          'https://docs.flutter.dev/',
-                          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)
-                        )),
+                        text: TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                _launchURL('https://docs.flutter.dev/');
+                              },
+                            text: 'https://docs.flutter.dev/',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color))),
                     const SizedBox(height: 10),
                     const Text(
                       'This link is pointed to the official Flutter documents. It is single-handedly the most helpful resource for Uni-Market. It goes over tutorials to accomplish various parts of a Flutter project as well as common fixes to common problems. It has examples of various development practices when developing in the programming language Dart.',
@@ -216,13 +220,19 @@ class _AboutUsPageState extends State<AboutUsPage> {
                     ),
                     const SizedBox(height: 10),
                     RichText(
-                      text: TextSpan(
-                        recognizer: TapGestureRecognizer()
-                        ..onTap = () {_launchURL(
-                            'https://altar.io/eight-steps-follow-build-successful-marketplace/');},
-                        text: 'https://altar.io/eight-steps-follow-build-successful-marketplace/',
-                        style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)
-                        )),
+                        text: TextSpan(
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                _launchURL(
+                                    'https://altar.io/eight-steps-follow-build-successful-marketplace/');
+                              },
+                            text:
+                                'https://altar.io/eight-steps-follow-build-successful-marketplace/',
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color))),
                     const SizedBox(height: 10),
                     const Text(
                       'This website link is to an article that explains how to build a successful marketplace. It goes over attributes of how to choose a viable industry, a unique value proposition, market size, and marketing strategies. Overall, a good article that guides the process for solving the problem that Uni-Market seeks to solve.',
@@ -272,9 +282,11 @@ class TeamMemberCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Semantics(
-            label: imageDescription, // Use the dynamically generated description
+            label:
+                imageDescription, // Use the dynamically generated description
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(15)),
               child: Image.asset(
                 image,
                 height: 150,
@@ -284,14 +296,15 @@ class TeamMemberCard extends StatelessWidget {
                   return Container(
                     height: 150,
                     width: 150,
-                    color: Colors.grey[200], // Optional: Provide a placeholder color
+                    color: Colors
+                        .grey[200], // Optional: Provide a placeholder color
                     alignment: Alignment.center,
                     child: Text(
                       imageDescription, // Display the alt text
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Colors.black54, 
+                        color: Colors.black54,
                       ),
                     ),
                   );

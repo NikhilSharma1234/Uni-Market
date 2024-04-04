@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uni_market/helpers/profile_pic_shuffler.dart';
 import 'package:uni_market/components/input_containers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Step register(index, tapped, [focusNode]) {
   focusNode = focusNode ?? focusNode;
@@ -58,6 +60,27 @@ class _RegistirationState extends State<Registiration> {
             isSignIn: false,
           ),
           const SizedBox(height: 10),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text:
+                      'By continuing, you acknowledge that you have read, understood, and agree with our ',
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color),
+                ),
+                TextSpan(
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        _launchURL(
+                            'https://sites.google.com/view/uni-market-privacy-policy/eula');
+                      },
+                    text: 'End User License Agreement.',
+                    style: const TextStyle(color: Colors.blue)),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 24),
             child: submitting
@@ -75,6 +98,15 @@ class _RegistirationState extends State<Registiration> {
                   ),
           ),
         ]));
+  }
+
+  _launchURL(link) async {
+    Uri url = Uri.parse(link);
+    if (await launchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   // Function to reate Firebase User with Email and Password (Pass in Register Form Controllers)
