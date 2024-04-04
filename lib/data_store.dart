@@ -6,6 +6,7 @@ import 'package:uni_market/data_models/current_user.dart';
 
 CurrentUser user = CurrentUser(
     assignable_profile_pic: null,
+    blockedUsers: [],
     createdAt: Timestamp.now(),
     darkMode: 0,
     deletedAt: null,
