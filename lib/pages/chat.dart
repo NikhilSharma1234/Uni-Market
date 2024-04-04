@@ -413,7 +413,7 @@ class _ChatPageState extends State<ChatPage> {
               textAlign: TextAlign.center,
             ),
             content: Text(
-              "Would you to mark this item as sold to $buyerId? Other chats for this item will be notified and deleted from your feed.",
+              "Would you like to mark this item as sold to $buyerId? Other chats for this item will be notified and deleted from your feed.",
               textAlign: TextAlign.center,
             ),
             actions: [
