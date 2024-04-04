@@ -22,7 +22,6 @@ class _ItemBoxState extends State<ItemBox> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
 
     Map<String, Style> styleType = {
       "book": BookStyle(context: context),

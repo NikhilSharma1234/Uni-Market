@@ -171,6 +171,42 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                                 });
                               },
                             ),
+                            IconButton(
+                              icon: const Icon(Icons.flag),
+                              selectedIcon:
+                                  const Icon(Icons.flag, color: Colors.orange),
+                              iconSize: 36,
+                              tooltip: widget.itemData.isFlagged
+                                  ? 'Item is under review'
+                                  : 'Report Item',
+                              isSelected: widget.itemData.isFlagged,
+                              onPressed: () async {
+                                if (widget.itemData.isFlagged) return;
+                                setState(() {
+                                  loading = true;
+                                });
+                                await FirebaseFirestore.instance
+                                    .collection('items')
+                                    .doc(widget.itemData.id)
+                                    .update({'isFlagged': true});
+                                widget.itemData.isFlagged = true;
+                                setState(() {
+                                  loading = false;
+                                });
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return const AlertDialog(
+                                          title: Text("Item has been reported"),
+                                          content: Text(
+                                              "The team will review the item to see if it contains questionable data. Please refresh the page to see new items."),
+                                        );
+                                      });
+                                }
+                              },
+                            ),
                           ],
                         )),
               const Divider(),
