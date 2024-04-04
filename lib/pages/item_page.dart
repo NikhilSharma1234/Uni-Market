@@ -64,7 +64,8 @@ class _ItemPageState extends State<ItemPage> {
                 loadImages(), // a previously-obtained Future<String> or null
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               Widget child;
-              if (snapshot.hasData && isMobile(context)) {
+              if (snapshot.hasData &&
+                  (screenWidth < 875 || isMobile(context))) {
                 child = SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
