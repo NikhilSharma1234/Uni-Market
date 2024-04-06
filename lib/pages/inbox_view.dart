@@ -5,6 +5,7 @@ import 'inbox_controller.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:uni_market/image_data_store.dart';
 
 class InboxView extends StatefulWidget {
   const InboxView({Key? key}) : super(key: key);
@@ -82,50 +83,65 @@ class InboxViewState extends State<InboxView> {
             itemCount: summaries.length,
             itemBuilder: (context, index) {
               var summary = summaries[index];
-              String titleText =
-                  '${summary.buyerName} | ${summary.productName}';
-              return Column(
-                children: [
-                  ListTile(
-                    title: Text(titleText),
-                    subtitle: Text(
-                      '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: () {
-                      _controller.onChatSelected(context, summary.sessionId, summary.productId, summary.sellerId);
-                      setState(() {
-                        _selectedSessionIds.clear();
-                      });
-                    },
-                    onLongPress: () {
-                      setState(() {
-                        if (_selectedSessionIds.contains(summary.sessionId)) {
-                          _selectedSessionIds.remove(summary.sessionId);
-                        } else {
-                          _selectedSessionIds.add(summary.sessionId);
-                        }
-                      });
-                    },
-                    trailing: IconButton(
-                      icon: Icon(
-                        _selectedSessionIds.contains(summary.sessionId)
-                            ? Icons.check_circle
-                            : Icons.check_circle_outline,
+              String titleText = '${summary.buyerName} | ${summary.productName}';
+              // Asynchronously fetch the image URL
+              Future<String?> imageUrlFuture = ImageDataStore().getImageUrl(summary.productImageUrl);
+
+              return FutureBuilder<String?>(
+                future: imageUrlFuture,
+                builder: (context, snapshot) {
+                  Widget leadingWidget;
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    leadingWidget = const CircleAvatar(backgroundColor: Colors.grey, child: Icon(Icons.image, color: Colors.white));
+                  } else if (snapshot.hasData) {
+                    leadingWidget = CircleAvatar(backgroundImage: NetworkImage(snapshot.data!));
+                  } else {
+                    leadingWidget = const CircleAvatar(backgroundColor: Colors.grey, child: Icon(Icons.error, color: Colors.white));
+                  }
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        leading: leadingWidget, // Display the image or placeholder here
+                        title: Text(titleText),
+                        subtitle: Text(
+                          '${summary.lastMessage}\n${DateFormat('dd/MM/yy hh:mm a').format(summary.lastMessageAt)}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onTap: () {
+                          _controller.onChatSelected(context, summary.sessionId, summary.productId, summary.sellerId);
+                          setState(() {
+                            _selectedSessionIds.clear();
+                          });
+                        },
+                        onLongPress: () {
+                          setState(() {
+                            if (_selectedSessionIds.contains(summary.sessionId)) {
+                              _selectedSessionIds.remove(summary.sessionId);
+                            } else {
+                              _selectedSessionIds.add(summary.sessionId);
+                            }
+                          });
+                        },
+                        trailing: IconButton(
+                          icon: Icon(
+                            _selectedSessionIds.contains(summary.sessionId) ? Icons.check_circle : Icons.check_circle_outline,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (_selectedSessionIds.contains(summary.sessionId)) {
+                                _selectedSessionIds.remove(summary.sessionId);
+                              } else {
+                                _selectedSessionIds.add(summary.sessionId);
+                              }
+                            });
+                          },
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          if (_selectedSessionIds.contains(summary.sessionId)) {
-                            _selectedSessionIds.remove(summary.sessionId);
-                          } else {
-                            _selectedSessionIds.add(summary.sessionId);
-                          }
-                        });
-                      },
-                    ),
-                  ),
-                  const Divider(),
-                ],
+                      const Divider(),
+                    ],
+                  );
+                },
               );
             },
           );
