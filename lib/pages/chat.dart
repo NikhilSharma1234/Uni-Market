@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import "appBarTitleWithImage.dart";
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -66,15 +67,20 @@ class _ChatPageState extends State<ChatPage> {
           future: _sessionDetailsFuture,
           builder: (context, sessionSnapshot) {
             String title = "Chat";
+            String imagePath = "";
             if (sessionSnapshot.connectionState == ConnectionState.done &&
                 sessionSnapshot.hasData) {
               final data = sessionSnapshot.data!;
               title = "${data['buyerName']} - ${data['productName']}";
+              imagePath = data['productImageUrl'] ?? "";
             }
 
             return Scaffold(
               appBar: AppBar(
-                title: Text(title),
+                title: AppBarTitleWithImage(
+                  title: title,
+                  imagePath: imagePath,
+                ),
                 actions: canCurrentUserSendMessages
                     ? [
                         IconButton(
