@@ -1,4 +1,5 @@
 from firebase_admin import firestore, initialize_app
+from firebase_functions import https_fn
 import google.cloud.firestore
 import requests
 import datetime
@@ -88,3 +89,13 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
         data = compile_data(doc.id, item)
 
         make_request([url, headers, data])
+
+@https_fn.on_call()
+def search_typesense(req: https_fn.CallableRequest) -> any:
+  headersSearch = {
+    "Access-Control-Allow-Origin": "*",
+    'Access-Control-Allow-Methods': 'true',
+    "X-TYPESENSE-API-KEY": 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
+  }
+  response = requests.get('https://hawk-perfect-frog.ngrok-free.app/collections/items/documents/search{fullQuery}'.format(fullQuery=req.data['fullQuery']), headers=headersSearch)
+  return response.text
