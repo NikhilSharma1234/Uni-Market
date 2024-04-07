@@ -347,20 +347,20 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Show Flagged Items:',
-                            style: TextStyle(fontSize: 24)),
-                        Checkbox(
-                            value: filter.showFlagged,
-                            onChanged: (value) {
-                              setState(() {
-                                filter.showFlagged = value!;
-                              });
-                            })
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text('Show Flagged Items:',
+                    //         style: TextStyle(fontSize: 24)),
+                    //     Checkbox(
+                    //         value: filter.showFlagged,
+                    //         onChanged: (value) {
+                    //           setState(() {
+                    //             filter.showFlagged = value!;
+                    //           });
+                    //         })
+                    //   ],
+                    // ),
                     Column(
                       children: [
                         const Padding(
