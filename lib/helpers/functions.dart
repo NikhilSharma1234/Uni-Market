@@ -12,6 +12,7 @@ import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/filters.dart';
 import 'package:http/http.dart' as http;
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 final Map<String, String> headers = {
   "Access-Control-Allow-Origin": "*",
@@ -205,8 +206,7 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
   // filterString +=
   //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
   filterString +=
-      "&&buyerId:=None&&deletedAt:=0&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=[${data_store.user.blockedUsers}]";
-
+      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=${data_store.user.blockedUsers}";
   if (searchTerm == "") {
     searchTerm = "*";
   }
@@ -219,42 +219,38 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
     30
   ];
 
-  String url = "https://hawk-perfect-frog.ngrok-free.app";
-
   String query_weights = "5,4,2,1";
 
-  Uri searchUrl = Uri.parse(
-      "$url/collections/items/documents/search?q=${searchParameters[0]}&query_by_weights$query_weights&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}&page=$pageNum");
+  String fullQuery =
+      "?q=${searchParameters[0]}&query_by_weights$query_weights&query_by=${searchParameters[1]}&sort_by=${searchParameters[2]}&filter_by=${searchParameters[3]}&per_page=${searchParameters[4]}&page=$pageNum";
   Map<String, dynamic> data = {};
 
+  // search typesense
   try {
-    // search typesense
-    final response = await http.get(searchUrl, headers: headers);
+    final response = await FirebaseFunctions.instance
+        .httpsCallable("search_typesense")
+        .call({"fullQuery": fullQuery});
+    // Decode the JSON response
+    data = json.decode(response.data) as Map<String, dynamic>;
 
-    if (response.statusCode == 200) {
-      // Decode the JSON response
-      data = json.decode(response.body) as Map<String, dynamic>;
+    if (context.mounted) {
+      widgets = await generateItems(data, context);
     } else {
-      // Handle error
-      throw Exception('Failed to fetch items: ${response.statusCode}');
+      if (kDebugMode) {
+        print("no clue as to whats going on, buildcontext wasnt mounded");
+      }
     }
-  } catch (e) {
+
+    data_store.itemBoxes = widgets;
+
+    return widgets;
+  } on FirebaseFunctionsException catch (error) {
     if (kDebugMode) {
-      print(e);
+      print(error.code);
+      print(error.details);
+      print(error.message);
     }
   }
-
-  if (context.mounted) {
-    widgets = await generateItems(data, context);
-  } else {
-    if (kDebugMode) {
-      print("no clue as to whats going on, buildcontext wasnt mounded");
-    }
-  }
-
-  data_store.itemBoxes = widgets;
-
-  return widgets;
 }
 
 generateItems(Map<String, dynamic> data, BuildContext context) async {
