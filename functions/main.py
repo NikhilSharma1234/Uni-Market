@@ -95,7 +95,7 @@ def search_typesense(req: https_fn.CallableRequest) -> any:
   headersSearch = {
     "Access-Control-Allow-Origin": "*",
     'Access-Control-Allow-Methods': 'true',
-    "X-TYPESENSE-API-KEY": 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
+    "X-TYPESENSE-API-KEY": API_KEY,
   }
   response = requests.get('https://hawk-perfect-frog.ngrok-free.app/collections/items/documents/search{fullQuery}'.format(fullQuery=req.data['fullQuery']), headers=headersSearch)
   return response.text
