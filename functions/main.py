@@ -109,3 +109,13 @@ def search_tags_typesense(req: https_fn.CallableRequest) -> any:
   }
   response = requests.get('https://hawk-perfect-frog.ngrok-free.app/collections/tags/documents/search{fullQuery}'.format(fullQuery=req.data['fullQuery']), headers=headersSearch)
   return response.text
+
+@https_fn.on_call()
+def search_suggestions_typesense(req: https_fn.CallableRequest) -> any:
+  headersSearch = {
+    "Access-Control-Allow-Origin": "*",
+    'Access-Control-Allow-Methods': 'true',
+    "X-TYPESENSE-API-KEY": API_KEY,
+  }
+  response = requests.get('https://hawk-perfect-frog.ngrok-free.app/collections/suggestions/documents/search{fullQuery}'.format(fullQuery=req.data['fullQuery']), headers=headersSearch)
+  return response.text
