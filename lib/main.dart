@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_market/helpers/web_horizontal_scroll.dart';
 import 'wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior:
+          WebHorizontalScroll(), // just allows web users to scroll horizontally via dragging when available
       home: const Wrapper(),
       title: 'Uni-Market',
       theme: lightTheme,
