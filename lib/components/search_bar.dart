@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
@@ -25,23 +26,27 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
   late String searchVal;
   final SearchController controller = SearchController();
   List<ListTile> suggestions = [];
+  Timer? _debounce;
 
   void updateSuggestions(String typedText) {
-    searchSuggestions(typedText, 5).then((value) {
-      setState(() {
-        suggestions = List<ListTile>.generate(5, (int index) {
-          final String item = value[index];
-          return ListTile(
-            title: Text(item),
-            onTap: () {
-              setState(() {
-                search(item, 30, context, widget.filter).then((value) {
-                  widget.setPageState(value, false);
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      searchSuggestions(typedText, 5).then((value) {
+        setState(() {
+          suggestions = List<ListTile>.generate(5, (int index) {
+            final String item = value[index];
+            return ListTile(
+              title: Text(item),
+              onTap: () {
+                setState(() {
+                  search(item, 30, context, widget.filter).then((value) {
+                    widget.setPageState(value, false);
+                  });
+                  controller.closeView(item);
                 });
-                controller.closeView(item);
-              });
-            },
-          );
+              },
+            );
+          });
         });
       });
     });
