@@ -319,3 +319,27 @@ deleteChats(String itemId) async {
     });
   }
 }
+
+getBookbyName(String searchName) async {
+  Uri searchUrl = Uri.parse(
+      "https://openlibrary.org/search.json?q=$searchName&fields=title,author_name,isbn,cover_i&page=1&limit=5");
+
+  Map<String, dynamic> data = {};
+
+  try {
+    // search typesense
+    final response = await http.get(searchUrl);
+
+    if (response.statusCode == 200) {
+      // Decode the JSON response
+      data = json.decode(response.body) as Map<String, dynamic>;
+    } else {
+      // Handle error
+      throw Exception('Failed to fetch items: ${response.statusCode}');
+    }
+  } catch (e) {
+    // error snackbar
+  }
+
+  return data;
+}
