@@ -91,28 +91,25 @@ Future<void> loadCurrentUser(email) async {
 searchSuggestions(String searchTerm, int number) async {
   List<String> suggestions = [];
 
-  String url = "https://hawk-perfect-frog.ngrok-free.app";
-
   String query_weights = "1,2";
 
-  Uri searchUrl = Uri.parse(
-      "$url/collections/suggestions/documents/search?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,suggestion&per_page=$number");
+  String fullQuery =
+      "?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,suggestion&per_page=$number";
 
   Map<String, dynamic> data = {};
 
   try {
     // search typesense
-    final response = await http.get(searchUrl, headers: headers);
+    final response = await FirebaseFunctions.instance
+        .httpsCallable("search_suggestions_typesense")
+        .call({"fullQuery": fullQuery});
 
-    if (response.statusCode == 200) {
-      // Decode the JSON response
-      data = json.decode(response.body) as Map<String, dynamic>;
-    } else {
-      // Handle error
-      throw Exception('Failed to fetch items: ${response.statusCode}');
-    }
+    // Decode the JSON response
+    data = json.decode(response.data) as Map<String, dynamic>;
   } catch (e) {
-    // error snackbar
+    if (kDebugMode) {
+      print(e);
+    }
   }
 
   for (var item in data['hits']) {
