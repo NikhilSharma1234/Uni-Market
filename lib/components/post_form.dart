@@ -120,6 +120,8 @@ class _PostFormState extends State<PostForm> {
     setState(() => isFlagged = (isFlagged || flag));
   }
 
+  Timer? _debounce;
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -308,8 +310,11 @@ class _PostFormState extends State<PostForm> {
                   maxLines: 1,
                   maxLength: 30,
                   onChanged: (value) {
-                    searchTags(value!, maxTags, _tags).then((value) {
-                      setState(() => _suggestedTags = value);
+                    if (_debounce?.isActive ?? false) _debounce?.cancel();
+                    _debounce = Timer(const Duration(milliseconds: 500), () {
+                      searchTags(value!, maxTags, _tags).then((value) {
+                        setState(() => _suggestedTags = value);
+                      });
                     });
                   },
                   onSubmitted: (value) {
