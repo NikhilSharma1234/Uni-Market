@@ -41,7 +41,6 @@ class _PostingPageState extends State<PostingPage> {
                   children: <Widget>[
                     SizedBox(
                       width: widthScreen(screenWidth) * 0.95,
-                      height: MediaQuery.of(context).size.height,
                       child: PostForm(
                         setHomeState: widget.setHomeState,
                       ),
