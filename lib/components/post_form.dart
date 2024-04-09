@@ -17,6 +17,7 @@ import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:http/http.dart' as http;
+import 'package:image_network/image_network.dart';
 
 class PostForm extends StatefulWidget {
   final Function(List<Widget> newItems, bool append, [bool? start])
@@ -190,7 +191,7 @@ class _PostFormState extends State<PostForm> {
                                                         padding:
                                                             const EdgeInsets
                                                                 .only(
-                                                                right: 10),
+                                                                right: 20),
                                                         child: InkWell(
                                                           onTap: () {
                                                             setState(() {
@@ -240,13 +241,26 @@ class _PostFormState extends State<PostForm> {
                                                                   .pop();
                                                             });
                                                           },
-                                                          child:
-                                                              Transform.scale(
-                                                            scale: 0.75,
-                                                            child:
-                                                                Image.network(
-                                                              'https://covers.openlibrary.org/b/ID/${book['cover_i']}-L.jpg',
-                                                              fit: BoxFit.cover,
+                                                          child: ImageNetwork(
+                                                            height: 500,
+                                                            width: 316,
+                                                            image:
+                                                                'https://covers.openlibrary.org/b/ID/${book['cover_i']}-L.jpg',
+                                                            fitAndroidIos:
+                                                                BoxFit.cover,
+                                                            fitWeb:
+                                                                BoxFitWeb.cover,
+                                                            onLoading: Center(
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                      "book loading: ${book['title']}"),
+                                                                  const CircularProgressIndicator(
+                                                                    color: Colors
+                                                                        .indigoAccent,
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
