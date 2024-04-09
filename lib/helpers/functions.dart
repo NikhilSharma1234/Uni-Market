@@ -124,7 +124,6 @@ searchSuggestions(String searchTerm, int number) async {
 searchTags(String searchTerm, int number, List<String?> currentTags) async {
   List<String> tags = [];
 
-  String url = "https://hawk-perfect-frog.ngrok-free.app";
   String items = "";
   if (currentTags.isNotEmpty) {
     items = "tag:!=[";
@@ -138,24 +137,22 @@ searchTags(String searchTerm, int number, List<String?> currentTags) async {
 
   String query_weights = "1,2";
 
-  Uri searchUrl = Uri.parse(
-      "$url/collections/tags/documents/search?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,tag&per_page=$number&filter_by=$items");
+  String fullQuery =
+      "?q=$searchTerm&query_by_weights$query_weights&query_by=embedding,tag&per_page=$number&filter_by=$items";
 
   Map<String, dynamic> data = {};
 
   try {
     // search typesense
-    final response = await http.get(searchUrl, headers: headers);
-
-    if (response.statusCode == 200) {
-      // Decode the JSON response
-      data = json.decode(response.body) as Map<String, dynamic>;
-    } else {
-      // Handle error
-      throw Exception('Failed to fetch items: ${response.statusCode}');
-    }
+    final response = await FirebaseFunctions.instance
+        .httpsCallable("search_tags_typesense")
+        .call({"fullQuery": fullQuery});
+    // Decode the JSON response
+    data = json.decode(response.data) as Map<String, dynamic>;
   } catch (e) {
-    // error snackbar
+    if (kDebugMode) {
+      print(e);
+    }
   }
 
   for (var item in data['hits']) {
