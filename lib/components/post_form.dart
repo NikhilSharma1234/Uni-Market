@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
@@ -16,8 +17,6 @@ import 'dart:convert';
 import 'dialog.dart';
 import 'package:uni_market/helpers/profanity_checker.dart';
 import 'package:uni_market/data_store.dart' as data_store;
-import 'package:http/http.dart' as http;
-import 'package:image_network/image_network.dart';
 
 class PostForm extends StatefulWidget {
   final Function(List<Widget> newItems, bool append, [bool? start])
@@ -779,29 +778,16 @@ Future<List<String>> convertXFilesToDataUrls(List<XFile> xFiles) async {
 
 Future<bool> moderateSelectedImages(List<String> imageUrls) async {
   bool containsIllicitContent = false;
-
-  String apiKey = '2Pv9xBw29ZaqthAphAIcM2Ke4Ey1kbbO'; // Your PicPurify API key
-  String task = 'porn_moderation,drug_moderation,gore_moderation';
-  String apiUrl =
-      'https://my-cors-proxy-ed823d7eefa2.herokuapp.com/https://www.picpurify.com/analyse/1.1';
-
   for (var url in imageUrls) {
     try {
-      var response = await http.post(
-        Uri.parse(apiUrl),
-        body: {
-          'API_KEY': apiKey,
-          'task': task,
-          'url_image': url,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> jsonModerationResponse = jsonDecode(response.body);
-        if (jsonModerationResponse["final_decision"] == "KO") {
-          containsIllicitContent = true;
-          break;
-        }
+      var response = await FirebaseFunctions.instance
+          .httpsCallable("image_moderation")
+          .call({"imageUrl": url});
+      Map<String, dynamic> jsonModerationResponse = jsonDecode(response.data);
+      if (jsonModerationResponse["final_decision"] == "KO" &&
+          jsonModerationResponse["confidence_score_decision"] > 0.8) {
+        containsIllicitContent = true;
+        break;
       }
     } catch (e) {
       if (kDebugMode) {
