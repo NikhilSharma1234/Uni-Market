@@ -10,15 +10,8 @@ import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/filters.dart';
-import 'package:http/http.dart' as http;
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-
-final Map<String, String> headers = {
-  "Access-Control-Allow-Origin": "*",
-  'Access-Control-Allow-Methods': 'true',
-  "X-TYPESENSE-API-KEY": 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr',
-}; // TODO: generate search api keys for each collection (waiting until formats are finalized so keys dont get nuked)
 
 Future<void> loadCurrentUser(email) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;

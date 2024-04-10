@@ -119,3 +119,13 @@ def search_suggestions_typesense(req: https_fn.CallableRequest) -> any:
   }
   response = requests.get('https://hawk-perfect-frog.ngrok-free.app/collections/suggestions/documents/search{fullQuery}'.format(fullQuery=req.data['fullQuery']), headers=headersSearch)
   return response.text
+
+@https_fn.on_call()
+def image_moderation(req: https_fn.CallableRequest) -> any:
+  data = {
+    'API_KEY': '2Pv9xBw29ZaqthAphAIcM2Ke4Ey1kbbO',
+    'task': 'porn_moderation,drug_moderation,gore_moderation',
+    'url_image': req.data['imageUrl'],
+  }
+  response = requests.post("https://www.picpurify.com/analyse/1.1", data=data)
+  return response.text
