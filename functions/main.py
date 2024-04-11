@@ -3,6 +3,7 @@ from firebase_functions import https_fn
 import google.cloud.firestore
 import requests
 import datetime
+from openai import OpenAI
 
 import functions_framework
 
@@ -129,3 +130,11 @@ def image_moderation(req: https_fn.CallableRequest) -> any:
   }
   response = requests.post("https://www.picpurify.com/analyse/1.1", data=data)
   return response.text
+
+@https_fn.on_call()
+def llm_moderation(req: https_fn.CallableRequest) -> any:
+  client = OpenAI(
+    api_key='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',
+  )
+  response = client.moderations.create(input=req.data['input'])
+  return response.results[0].flagged

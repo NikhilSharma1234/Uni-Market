@@ -1,16 +1,15 @@
-import 'package:dart_openai/dart_openai.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
 class Moderator {
   const Moderator({Key? key});
 
   Future<bool> checkForProfanity(String userInput) async {
-    OpenAI.apiKey = "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";
     try {
-      OpenAIModerationModel moderation =
-          await OpenAI.instance.moderation.create(input: userInput);
-
-      return moderation.results.first.flagged;
+      final response = await FirebaseFunctions.instance
+        .httpsCallable("llm_moderation")
+        .call({"input": userInput});
+      return response.data;
     } catch (e) {
       if (kDebugMode) {
         print("Failed to acquire LLM Moderation Results: $e");
