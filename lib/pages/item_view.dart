@@ -44,11 +44,9 @@ class _ItemViewState extends State<ItemView> {
   getItems() async {
     // takes super long for some reason
     List<Widget> foundItemsArr = [];
-    // TODO: remove this and allow users to see deleted items (greyed out or marked somehow)
     var foundItems = await db
         .collection("items")
         .where("sellerId", isEqualTo: widget.sellerID)
-        .where("deletedAt", isNull: true)
         .get();
 
     for (var docSnap in foundItems.docs) {
