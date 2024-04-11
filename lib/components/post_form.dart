@@ -409,7 +409,7 @@ class _PostFormState extends State<PostForm> {
 
                       if (isFlagged != true) {
                         try {
-                          checkProfanity(inputText, checkStrength: false)
+                          await checkProfanity(inputText, checkStrength: false)
                               .then((value) => _flag(value));
                         } catch (e) {
                           if (kDebugMode) {
@@ -417,7 +417,7 @@ class _PostFormState extends State<PostForm> {
                           }
                         }
                       }
-
+                      // ignore: use_build_context_synchronously
                       _createPost(context, formData, _imageDataUrls);
                     }
                   },
