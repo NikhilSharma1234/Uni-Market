@@ -121,6 +121,23 @@ class _ItemBoxState extends State<ItemBox> {
                                   fontSize: 20,
                                   overflow: TextOverflow.ellipsis)),
                         ),
+                        item.deletedAt != null
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8, right: 8, bottom: 7),
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(7)),
+                                      color: Colors.red),
+                                  child: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 3),
+                                    child: Text('DELETED',
+                                        style: TextStyle(fontSize: 20)),
+                                  ),
+                                ))
+                            : const SizedBox(),
                         Padding(
                             padding: const EdgeInsets.only(
                                 left: 8, right: 8, bottom: 7),

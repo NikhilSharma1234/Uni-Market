@@ -139,75 +139,87 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                   child: loading
                       ? const CircularProgressIndicator()
                       : Row(
-                          children: [
-                            itemButton,
-                            IconButton(
-                              icon: const Icon(Icons.favorite),
-                              selectedIcon:
-                                  const Icon(Icons.favorite, color: Colors.red),
-                              iconSize: 36,
-                              tooltip: 'Add to wishlist',
-                              isSelected: data_store.user.wishlist
-                                  .contains(widget.itemData.id),
-                              onPressed: () async {
-                                setState(() {
-                                  loading = true;
-                                });
-                                if (data_store.user.wishlist
-                                    .contains(widget.itemData.id)) {
-                                  data_store.user.wishlist
-                                      .remove(widget.itemData.id);
-                                } else {
-                                  data_store.user.wishlist
-                                      .add(widget.itemData.id);
-                                }
-                                await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(data_store.user.email)
-                                    .update(
-                                        {'wishlist': data_store.user.wishlist});
-                                setState(() {
-                                  loading = false;
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.flag),
-                              selectedIcon:
-                                  const Icon(Icons.flag, color: Colors.orange),
-                              iconSize: 36,
-                              tooltip: widget.itemData.isFlagged
-                                  ? 'Item is under review'
-                                  : 'Report Item',
-                              isSelected: widget.itemData.isFlagged,
-                              onPressed: () async {
-                                if (widget.itemData.isFlagged) return;
-                                setState(() {
-                                  loading = true;
-                                });
-                                await FirebaseFirestore.instance
-                                    .collection('items')
-                                    .doc(widget.itemData.id)
-                                    .update({'isFlagged': true});
-                                widget.itemData.isFlagged = true;
-                                setState(() {
-                                  loading = false;
-                                });
-                                if (context.mounted) {
-                                  Navigator.of(context).pop();
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return const AlertDialog(
-                                          title: Text("Item has been reported"),
-                                          content: Text(
-                                              "The team will review the item to see if it contains questionable data. Please refresh the page to see new items."),
-                                        );
+                          children: widget.itemData.deletedAt != null &&
+                                  widget.itemData.sellerId ==
+                                      data_store.user.email
+                              ? [
+                                  const Text(
+                                    'This item was deleted.',
+                                    style: TextStyle(
+                                        fontSize: 24, color: Colors.red),
+                                  )
+                                ]
+                              : [
+                                  itemButton,
+                                  IconButton(
+                                    icon: const Icon(Icons.favorite),
+                                    selectedIcon: const Icon(Icons.favorite,
+                                        color: Colors.red),
+                                    iconSize: 36,
+                                    tooltip: 'Add to wishlist',
+                                    isSelected: data_store.user.wishlist
+                                        .contains(widget.itemData.id),
+                                    onPressed: () async {
+                                      setState(() {
+                                        loading = true;
                                       });
-                                }
-                              },
-                            ),
-                          ],
+                                      if (data_store.user.wishlist
+                                          .contains(widget.itemData.id)) {
+                                        data_store.user.wishlist
+                                            .remove(widget.itemData.id);
+                                      } else {
+                                        data_store.user.wishlist
+                                            .add(widget.itemData.id);
+                                      }
+                                      await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(data_store.user.email)
+                                          .update({
+                                        'wishlist': data_store.user.wishlist
+                                      });
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.flag),
+                                    selectedIcon: const Icon(Icons.flag,
+                                        color: Colors.orange),
+                                    iconSize: 36,
+                                    tooltip: widget.itemData.isFlagged
+                                        ? 'Item is under review'
+                                        : 'Report Item',
+                                    isSelected: widget.itemData.isFlagged,
+                                    onPressed: () async {
+                                      if (widget.itemData.isFlagged) return;
+                                      setState(() {
+                                        loading = true;
+                                      });
+                                      await FirebaseFirestore.instance
+                                          .collection('items')
+                                          .doc(widget.itemData.id)
+                                          .update({'isFlagged': true});
+                                      widget.itemData.isFlagged = true;
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop();
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return const AlertDialog(
+                                                title: Text(
+                                                    "Item has been reported"),
+                                                content: Text(
+                                                    "The team will review the item to see if it contains questionable data. Please refresh the page to see new items."),
+                                              );
+                                            });
+                                      }
+                                    },
+                                  ),
+                                ],
                         )),
               const Divider(),
               const Padding(
