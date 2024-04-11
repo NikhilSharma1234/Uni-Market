@@ -98,12 +98,14 @@ class _ItemBoxState extends State<ItemBox> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8, right: 8),
                     child: Text(item.name,
+                        maxLines: 1,
                         style: const TextStyle(
                             fontSize: 20, overflow: TextOverflow.ellipsis)),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8, right: 8),
                     child: Text(item.description,
+                        maxLines: 1,
                         style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 20,
