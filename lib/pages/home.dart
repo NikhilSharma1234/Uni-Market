@@ -335,12 +335,12 @@ class _HomePageState extends State<HomePage> {
                                     value: Sort.lowToHigh,
                                     label: 'Low to High'),
                                 // TODO: change datetime in typesense to an int so these work
-                                // DropdownMenuEntry(
-                                //     value: Sort.newestToOldest,
-                                //     label: 'Newest to Oldest'),
-                                // DropdownMenuEntry(
-                                //     value: Sort.oldestToNewest,
-                                //     label: 'Oldest to Newest'),
+                                DropdownMenuEntry(
+                                    value: Sort.newestToOldest,
+                                    label: 'Newest to Oldest'),
+                                DropdownMenuEntry(
+                                    value: Sort.oldestToNewest,
+                                    label: 'Oldest to Newest'),
                                 DropdownMenuEntry(
                                     value: Sort.bestMatch, label: 'Best Match')
                               ]),
