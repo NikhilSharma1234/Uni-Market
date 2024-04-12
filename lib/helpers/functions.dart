@@ -173,10 +173,10 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
 
   switch (filter.sort) {
     case Sort.newestToOldest:
-      sort = 'dateListed:desc';
+      sort = 'createdAt:desc';
       break;
     case Sort.oldestToNewest:
-      sort = 'dateListed:asc';
+      sort = 'createdAt:asc';
       break;
     case Sort.highToLow:
       sort = 'price:desc';
@@ -205,7 +205,7 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
   // filterString +=
   //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
   filterString +=
-      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=[${data_store.user.blockedUsers}]";
+      "&&buyerId:=None&&deletedAt:=0&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=[${data_store.user.blockedUsers}]";
 
   if (searchTerm == "") {
     searchTerm = "*";

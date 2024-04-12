@@ -1,6 +1,7 @@
 from firebase_admin import firestore, initialize_app
 import google.cloud.firestore
 import requests
+import datetime
 
 import functions_framework
 
@@ -29,9 +30,9 @@ def compile_data(id, item):
     'id': str(id),
     'buyerId': str(item['buyerId']),
     'condition': item['condition'],
-    'deletedAt': str(item['deletedAt']),
-    'createdAt': str(item['createdAt']),
-    'dateUpdated': str(item['dateUpdated']),
+    'deletedAt': item['deletedAt'].timestamp() if item['deletedAt'] != None else 0.0,
+    'createdAt': item['createdAt'].timestamp() if item['createdAt'] != None else 0.0,
+    'dateUpdated': item['dateUpdated'].timestamp() if item['dateUpdated'] != None else 0.0,
     'description': item['description'],
     'images': item['images'],
     'marketplaceId': item['marketplaceId'],
@@ -66,11 +67,10 @@ def index_in_typesense(event: Event[DocumentSnapshot]) -> None:
 
   data = compile_data(event.params['itemId'], item)
 
-  
   make_request([url, headers, data])
 
 @on_document_created(document="typesense_sync/{backfillId}")
-def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
+def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
   backfill_dict = event.data.to_dict()
   if event.params['backfillId'] == 'backfill' and backfill_dict['trigger'] == True:
     firestore_client: google.cloud.firestore.Client = firestore.client()
@@ -81,12 +81,10 @@ def backfill_in_typesense(event: Event[DocumentSnapshot], request) -> None:
       url = f"{base_url}/collections/items/documents/{str(doc.id)}"
 
       req = requests.get(url, headers={"X-TYPESENSE-API-KEY": API_KEY})
-      if req.status_code == 200:
-        break
-      else:
+      if req.status_code != 200:
         url = f"{base_url}/collections/items/documents"
 
         # if doc doesnt exist, add it
-        data = compile_data(event.params['itemId'], item)
+        data = compile_data(doc.id, item)
 
         make_request([url, headers, data])

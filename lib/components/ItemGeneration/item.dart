@@ -10,8 +10,18 @@ class Item {
   String sellerId;
   List<dynamic> tags;
   bool isFlagged;
-  Item(this.name, this.id, this.description, this.condition, this.schoolId,
-      this.price, this.createdAt, this.imagePath, this.sellerId, this.tags, this.isFlagged);
+  Item(
+      this.name,
+      this.id,
+      this.description,
+      this.condition,
+      this.schoolId,
+      this.price,
+      this.createdAt,
+      this.imagePath,
+      this.sellerId,
+      this.tags,
+      this.isFlagged);
 
   Item.fromJSON(Map map)
       // all of these need to be initialized
@@ -32,7 +42,8 @@ class Item {
     condition = map['condition'];
     schoolId = map['schoolId'].toString();
     price = map['price'].toDouble();
-    createdAt = DateTime.parse(map['createdAt']);
+    createdAt =
+        DateTime.fromMicrosecondsSinceEpoch((map['createdAt'] * 1000000));
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
