@@ -125,6 +125,70 @@ class _PostFormState extends State<PostForm> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
+    // shows the books dialog and handles logic
+    AlertDialog showBooks(value) {
+      return AlertDialog(
+          insetPadding: EdgeInsets.all(screenWidth * 0.05),
+          title: const Center(
+            child: Text(
+                'Here are the books we found, please scroll through and select the correct one'),
+          ),
+          content: SizedBox(
+            width: screenWidth * 0.9,
+            height: screenHeight * 0.7,
+            child: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var book in value['docs'])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            // update form info with book autofill
+                            _titleController.text =
+                                book['title'] ?? 'Not Found';
+                            if (book['isbn'] != null && book['isbn'] != []) {
+                              _descriptionController.text =
+                                  "Isbn: ${book['isbn'][0] ?? 'Not Found'}\nAuthor: ${book['author_name'][0] ?? 'Not Found'}";
+                            } else {
+                              _descriptionController.text =
+                                  "Info on book not found";
+                            }
+
+                            _tags.add('book');
+                            if (_suggestedTags.contains('book')) {
+                              _suggestedTags.remove('book');
+                            } else {
+                              _suggestedTags.removeLast();
+                            }
+                            // update tags with book related ones
+                            searchTags('book', maxTags, _tags).then((value) {
+                              setState(() => _suggestedTags = value);
+                            });
+                            // maybe also add book cover to images
+                            Navigator.of(context).pop();
+                          });
+                        },
+                        child: book['cover_i'] != null
+                            ? makeBookImage(book['cover_i'], book['title'])
+                            : Align(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  height: 500,
+                                  width: 316,
+                                  child: Text(
+                                    "No image found for ${book['title']} \n\nAuthor: ${book['author_name'][0]} \n\nISBN: ${book['isbn'] ?? 'Not Found'}",
+                                  ),
+                                ),
+                              ),
+                      ),
+                    )
+                ]),
+          ));
+    }
+
     return submitting
         ? const Center(
             child: Row(
@@ -168,105 +232,7 @@ class _PostFormState extends State<PostForm> {
                                   showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
-                                        return AlertDialog(
-                                            insetPadding: EdgeInsets.all(
-                                                screenWidth * 0.05),
-                                            title: const Center(
-                                              child: Text(
-                                                  'Here are the books we found, please scroll through and select the correct one'),
-                                            ),
-                                            content: SizedBox(
-                                              width: screenWidth * 0.9,
-                                              height: screenHeight * 0.7,
-                                              child: ListView(
-                                                  shrinkWrap: true,
-                                                  // mainAxisAlignment:
-                                                  //     MainAxisAlignment.spaceEvenly,
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  children: [
-                                                    for (var book
-                                                        in value['docs'])
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                right: 20),
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            setState(() {
-                                                              // update form info with book autofill
-                                                              _titleController
-                                                                  .text = book[
-                                                                      'title'] ??
-                                                                  'Not Found';
-                                                              if (book['isbn'] !=
-                                                                      null &&
-                                                                  book['isbn'] !=
-                                                                      []) {
-                                                                _descriptionController
-                                                                        .text =
-                                                                    "Isbn: ${book['isbn'][0] ?? 'Not Found'}\nAuthor: ${book['author_name'][0] ?? 'Not Found'}";
-                                                              } else {
-                                                                _descriptionController
-                                                                        .text =
-                                                                    "Info on book not found";
-                                                              }
-
-                                                              _tags.add('book');
-                                                              if (_suggestedTags
-                                                                  .contains(
-                                                                      'book')) {
-                                                                _suggestedTags
-                                                                    .remove(
-                                                                        'book');
-                                                              } else {
-                                                                _suggestedTags
-                                                                    .removeLast();
-                                                              }
-                                                              // update tags with book related ones
-                                                              searchTags(
-                                                                      'book',
-                                                                      maxTags,
-                                                                      _tags)
-                                                                  .then(
-                                                                      (value) {
-                                                                setState(() =>
-                                                                    _suggestedTags =
-                                                                        value);
-                                                              });
-                                                              // maybe also add book cover to images
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop();
-                                                            });
-                                                          },
-                                                          child: ImageNetwork(
-                                                            height: 500,
-                                                            width: 316,
-                                                            image:
-                                                                'https://covers.openlibrary.org/b/ID/${book['cover_i']}-L.jpg',
-                                                            fitAndroidIos:
-                                                                BoxFit.cover,
-                                                            fitWeb:
-                                                                BoxFitWeb.cover,
-                                                            onLoading: Center(
-                                                              child: Column(
-                                                                children: [
-                                                                  Text(
-                                                                      "book loading: ${book['title']}"),
-                                                                  const CircularProgressIndicator(
-                                                                    color: Colors
-                                                                        .indigoAccent,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                  ]),
-                                            ));
+                                        return showBooks(value);
                                       });
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -837,4 +803,24 @@ Future<bool> moderateSelectedImages(List<String> imageUrls) async {
     }
   }
   return containsIllicitContent;
+}
+
+ImageNetwork makeBookImage(cover, title) {
+  return ImageNetwork(
+    height: 500,
+    width: 316,
+    image: 'https://covers.openlibrary.org/b/ID/$cover-L.jpg',
+    fitAndroidIos: BoxFit.cover,
+    fitWeb: BoxFitWeb.cover,
+    onLoading: Center(
+      child: Column(
+        children: [
+          Text("book loading: $title"),
+          const CircularProgressIndicator(
+            color: Colors.indigoAccent,
+          ),
+        ],
+      ),
+    ),
+  );
 }
