@@ -149,6 +149,9 @@ class _PostFormState extends State<PostForm> {
                             // update form info with book autofill
                             _titleController.text =
                                 book['title'] ?? 'Not Found';
+                            if (_titleController.text.length > 50) {
+                              _titleController.text.substring(0, 50);
+                            }
                             if (book['isbn'] != null && book['isbn'] != []) {
                               _descriptionController.text =
                                   "Isbn: ${book['isbn'][0] ?? 'Not Found'}\nAuthor: ${book['author_name'][0] ?? 'Not Found'}";
@@ -167,9 +170,8 @@ class _PostFormState extends State<PostForm> {
                             searchTags('book', maxTags, _tags).then((value) {
                               setState(() => _suggestedTags = value);
                             });
-                            // maybe also add book cover to images
-                            Navigator.of(context).pop();
                           });
+                          Navigator.of(context).pop();
                         },
                         child: book['cover_i'] != null
                             ? makeBookImage(book['cover_i'], book['title'])
@@ -658,6 +660,9 @@ class _PostFormState extends State<PostForm> {
             [factory.buildItemBox(Item.fromFirebase(userPost), context)],
             false,
             true);
+        setState(() {
+          submitting = false;
+        });
         Navigator.of(context).pop();
         showDialog(
           context: context,
@@ -686,9 +691,6 @@ class _PostFormState extends State<PostForm> {
           },
         );
       }
-      setState(() {
-        submitting = false;
-      });
     } catch (e) {
       // Show failure snackbar
       if (context.mounted) {
@@ -805,22 +807,24 @@ Future<bool> moderateSelectedImages(List<String> imageUrls) async {
   return containsIllicitContent;
 }
 
-ImageNetwork makeBookImage(cover, title) {
-  return ImageNetwork(
-    height: 500,
-    width: 316,
-    image: 'https://covers.openlibrary.org/b/ID/$cover-L.jpg',
-    fitAndroidIos: BoxFit.cover,
-    fitWeb: BoxFitWeb.cover,
-    onLoading: Center(
-      child: Column(
-        children: [
-          Text("book loading: $title"),
-          const CircularProgressIndicator(
-            color: Colors.indigoAccent,
-          ),
-        ],
+makeBookImage(cover, title) {
+  return Image.network('https://covers.openlibrary.org/b/ID/$cover-L.jpg',
+      height: 500, width: 316, loadingBuilder: (BuildContext context,
+          Widget child, ImageChunkEvent? loadingProgress) {
+    if (loadingProgress == null) return child;
+    return SizedBox(
+      height: 500,
+      width: 316,
+      child: Center(
+        child: Column(
+          children: [
+            Text("book loading: $title"),
+            const CircularProgressIndicator(
+              color: Colors.indigoAccent,
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  });
 }
