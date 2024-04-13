@@ -12,6 +12,7 @@ import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:http/http.dart' as http;
 
 Future<void> loadCurrentUser(email) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
