@@ -96,7 +96,7 @@ class InboxViewState extends State<InboxView> {
                   } else if (snapshot.hasData) {
                     leadingWidget = CircleAvatar(backgroundImage: NetworkImage(snapshot.data!));
                   } else {
-                    leadingWidget = const CircleAvatar(backgroundColor: Colors.grey, child: Icon(Icons.error, color: Colors.white));
+                    leadingWidget = const CircleAvatar(backgroundColor: Colors.grey, child: Icon(Icons.person, color: Colors.white));
                   }
 
                   return Column(
