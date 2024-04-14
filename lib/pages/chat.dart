@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/data_store.dart' as data_store;
-import "appBarTitleWithImage.dart";
+import 'package:uni_market/image_data_store.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -569,6 +569,58 @@ class _ChatPageState extends State<ChatPage> {
                   },
                   child: const Text('No'))
             ]);
+      },
+    );
+  }
+}
+
+class AppBarTitleWithImage extends StatelessWidget {
+  final String title;
+  final String? imagePath; // Make this nullable
+
+  const AppBarTitleWithImage({
+    Key? key,
+    required this.title,
+    this.imagePath, // Now nullable
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // If no imagePath is provided, just return the title
+    if (imagePath == null) {
+      return Text(title);
+    }
+
+    // Proceed with fetching the image if imagePath is provided
+    return FutureBuilder<String?>(
+      future: ImageDataStore().getImageUrl(imagePath!),
+      builder: (context, snapshot) {
+        Widget leadingWidget = const CircleAvatar(
+          backgroundColor: Colors.grey,
+          child: Icon(Icons.person, color: Colors.white),
+        );
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          leadingWidget = const CircleAvatar(
+            backgroundColor: Colors.grey,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          leadingWidget = CircleAvatar(
+            backgroundImage: NetworkImage(snapshot.data!),
+          );
+        }
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            leadingWidget,
+            const SizedBox(width: 8),
+            Expanded(child: Text(title, overflow: TextOverflow.ellipsis)),
+          ],
+        );
       },
     );
   }

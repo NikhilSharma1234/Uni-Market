@@ -61,6 +61,12 @@ class ChatService {
         }
         return null;
       }
+      if (productSnapshot['images'].isEmpty) {
+        if (kDebugMode) {
+          print("Error: No images found for product ID: $productId");
+        }
+        return null;
+      }
       return productSnapshot['images'][0];
     } catch (e) {
       if (kDebugMode) {
