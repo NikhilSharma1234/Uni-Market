@@ -191,10 +191,8 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
       break;
   }
 
-  // filterString +=
-  //     "&&sellerId:!=${data_store.user.email}&&isFlagged:=false&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}";
   filterString +=
-      "&&buyerId:=None&&deletedAt:=None&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=${data_store.user.blockedUsers}";
+      "&&buyerId:=None&&deletedAt:=0.0&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=${data_store.user.blockedUsers}";
   if (searchTerm == "") {
     searchTerm = "*";
   }
