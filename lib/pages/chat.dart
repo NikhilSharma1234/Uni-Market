@@ -11,6 +11,8 @@ import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/image_data_store.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
 class ChatPage extends StatefulWidget {
   final String chatSessionId;
@@ -99,6 +101,9 @@ class _ChatPageState extends State<ChatPage> {
                           icon: const Icon(Icons.block),
                           onPressed: _confirmBlock,
                         ),
+                        IconButton(
+                            onPressed: _showVenmoLink,
+                            icon: Image.asset('../assets/venmo_logo.png')),
                       ]
                     : [],
               ),
@@ -165,10 +170,11 @@ class _ChatPageState extends State<ChatPage> {
         messageData?['type'] == 'location';
     bool isTransactionMessage = messageData?.containsKey('type') == true &&
         messageData?['type'] == 'transaction';
+    bool isVenmoLink = messageData?.containsKey('type') == true &&
+        messageData?['type'] == 'venmo';
 
     double screenWidth = MediaQuery.of(context).size.width;
     double bubbleMaxWidth = screenWidth * 0.6;
-
     if (isLocationMessage) {
       return Center(
         child: Container(
@@ -225,6 +231,36 @@ class _ChatPageState extends State<ChatPage> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
+            ),
+          ),
+        ),
+      );
+    } else if (isVenmoLink) {
+      return Center(
+        child: SizedBox(
+          width: screenWidth < 1500 ? 125 : bubbleMaxWidth * .15,
+          child: WidgetAnimator(
+            atRestEffect: WidgetRestingEffects.wave(effectStrength: 0.4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              width: screenWidth < 1500 ? 125 : bubbleMaxWidth * .15,
+              decoration: BoxDecoration(
+                color: locationBubbleColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  InkWell(
+                      onTap: () async {
+                        final venmoUrl = Uri.parse(message.get('url'));
+                        if (!await launchUrl(venmoUrl)) {
+                          throw (Exception('Could not launch $venmoUrl'));
+                        }
+                      },
+                      child: Image.asset("../assets/venmo_logo_+_title.webp")),
+                ],
+              ),
             ),
           ),
         ),
@@ -339,6 +375,10 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+
+  void _showVenmoLink() async {
+    _chatController.sendVenmoLink(widget.chatSessionId);
   }
 
   void _showLocationsModal() async {

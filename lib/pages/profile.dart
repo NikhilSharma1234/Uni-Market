@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,9 +29,17 @@ class _ProfilePageState extends State<ProfilePage> {
   late GlobalKey<_ProfilePageState> key = GlobalKey<_ProfilePageState>();
   XFile? newProfilePic;
   bool loading = false;
+  bool venmoIdLoading = false;
+  bool editingVenmoId = false;
   CurrentUser user = data_store.user;
 
   Set<int> themeMode = {data_store.user.darkMode};
+
+  void flipVenmoEditingState() {
+    setState(() {
+      editingVenmoId = !editingVenmoId;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +65,29 @@ class _ProfilePageState extends State<ProfilePage> {
               : null, // Custom app bar here
           body: const Center(child: CircularProgressIndicator()));
     }
+
+    Future updateVenmoId(String venmoId) async {
+      try {
+        if (data_store.user.email != "") {
+          setState(() {
+            venmoIdLoading = true;
+          });
+          await FirebaseFirestore.instance
+              .collection("users")
+              .doc(data_store.user.email)
+              .update({"venmoId": venmoId});
+          await loadCurrentUser(data_store.user.email);
+          setState(() {
+            venmoIdLoading = false;
+          });
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error: $e");
+        }
+      }
+    }
+
     Future getImageFromCamera() async {
       XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
 
@@ -129,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Profile',
+                const Text('P R O F I L E',
                     textAlign: TextAlign.start, style: TextStyle(fontSize: 24)),
                 Padding(
                   padding: const EdgeInsets.only(top: 12, bottom: 12),
@@ -187,14 +219,30 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                const Text("Name",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(user.name, style: const TextStyle(fontSize: 12)),
-                const Text("Email",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(user.email, style: const TextStyle(fontSize: 12)),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Name",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(user.name, style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Email",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(user.email, style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 4),
                   child: Row(
@@ -247,18 +295,128 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                const Text("Institution",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(user.institutionFullName,
-                    style: const TextStyle(fontSize: 12)),
-                const Text("Other Schools in Marketplace",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(schoolsInMarketplace.join(', '),
-                    style: const TextStyle(fontSize: 12)),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Institution",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(user.institutionFullName,
+                            style: const TextStyle(fontSize: 12)),
+                      ]),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Other Schools in Marketplace",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(schoolsInMarketplace.join(', '),
+                          style: const TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Padding(
+                    // TODO: validate user input with valid genreratable venmo user names
+                    padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Builder(builder: (context) {
+                          if (editingVenmoId) {
+                            TextEditingController editingController =
+                                TextEditingController();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Enter Venmo ID"),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: editingController,
+                                        textAlign: TextAlign.start,
+                                        maxLength: 30,
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        updateVenmoId(
+                                            editingController.text.toString());
+                                        flipVenmoEditingState();
+                                      },
+                                      child: const Text("Confirm"),
+                                    ),
+                                    TextButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.red)),
+                                      onPressed: () {
+                                        flipVenmoEditingState();
+                                      },
+                                      child: const Text(
+                                        "Cancel",
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            );
+                          } else if (!venmoIdLoading) {
+                            return ListTile(
+                              hoverColor: data_store.user.darkMode == 1
+                                  ? Colors.white24
+                                  : Colors.black12,
+                              contentPadding: const EdgeInsets.only(left: 2.0),
+                              leading: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Venmo ID",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                  Text(data_store.user.venmoId ?? "")
+                                ],
+                              ),
+                              trailing: const Icon(Icons.edit),
+                              onTap: () {
+                                flipVenmoEditingState();
+                              },
+                            );
+                          } else {
+                            return AnimatedTextKit(
+                              repeatForever: true,
+                              animatedTexts: [
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . ."),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                                TyperAnimatedText(
+                                    "Damn this load is long af sorry"),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                                TyperAnimatedText(
+                                    ". . . . . . . . . . . . . . .  "),
+                              ],
+                            );
+                          }
+                        }),
+                      ],
+                    )),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 32.0, right: 8.0, bottom: 8.0, left: 8.0),
                   child: Center(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
