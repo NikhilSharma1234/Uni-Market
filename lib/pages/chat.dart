@@ -105,8 +105,7 @@ class _ChatPageState extends State<ChatPage> {
                             ? [
                                 IconButton(
                                     onPressed: () => _showVenmoLink(context),
-                                    icon:
-                                        Image.asset('../assets/venmo_logo.png'))
+                                    icon: Image.asset('assets/venmo_logo.png'))
                               ]
                             : []
                       ]
@@ -265,7 +264,7 @@ class _ChatPageState extends State<ChatPage> {
                           throw 'Could not launch $venmoUrl';
                         }
                       },
-                      child: Image.asset("../assets/venmo_logo_+_title.webp")),
+                      child: Image.asset("assets/venmo_logo_title.png")),
                 ],
               ),
             ),

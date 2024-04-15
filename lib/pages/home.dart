@@ -334,7 +334,6 @@ class _HomePageState extends State<HomePage> {
                                 DropdownMenuEntry(
                                     value: Sort.lowToHigh,
                                     label: 'Low to High'),
-                                // TODO: change datetime in typesense to an int so these work
                                 DropdownMenuEntry(
                                     value: Sort.newestToOldest,
                                     label: 'Newest to Oldest'),
