@@ -45,8 +45,8 @@ class Item {
     condition = map['condition'];
     schoolId = map['schoolId'].toString();
     price = map['price'].toDouble();
-    createdAt =
-        DateTime.fromMicrosecondsSinceEpoch((map['createdAt'] * 1000000));
+    createdAt = DateTime.fromMicrosecondsSinceEpoch(
+        (map['createdAt'].toInt() * 1000000));
     sellerId = map['sellerId'];
     for (String path in map['images']) {
       imagePath.add(path);
@@ -55,7 +55,7 @@ class Item {
     isFlagged = map['isFlagged'];
     deletedAt = map['deletedAt'] == 0
         ? null
-        : DateTime.fromMicrosecondsSinceEpoch(map['deletedAt'] * 1000000);
+        : DateTime.fromMicrosecondsSinceEpoch(map['deletedAt'].toInt() * 1000000);
   }
 
   Item.fromFirebase(Map map)

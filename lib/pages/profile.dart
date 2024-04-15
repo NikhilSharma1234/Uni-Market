@@ -321,7 +321,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 Padding(
-                    // TODO: validate user input with valid genreratable venmo user names
                     padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
