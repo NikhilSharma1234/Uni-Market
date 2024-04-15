@@ -101,9 +101,14 @@ class _ChatPageState extends State<ChatPage> {
                           icon: const Icon(Icons.block),
                           onPressed: _confirmBlock,
                         ),
-                        IconButton(
-                            onPressed: _showVenmoLink,
-                            icon: Image.asset('../assets/venmo_logo.png')),
+                        ...data_store.user.email == widget.sellerId
+                            ? [
+                                IconButton(
+                                    onPressed: () => _showVenmoLink(context),
+                                    icon:
+                                        Image.asset('../assets/venmo_logo.png'))
+                              ]
+                            : []
                       ]
                     : [],
               ),
@@ -254,8 +259,10 @@ class _ChatPageState extends State<ChatPage> {
                   InkWell(
                       onTap: () async {
                         final venmoUrl = Uri.parse(message.get('url'));
-                        if (!await launchUrl(venmoUrl)) {
-                          throw (Exception('Could not launch $venmoUrl'));
+                        if (await canLaunchUrl(venmoUrl)) {
+                          await launchUrl(venmoUrl);
+                        } else {
+                          throw 'Could not launch $venmoUrl';
                         }
                       },
                       child: Image.asset("../assets/venmo_logo_+_title.webp")),
@@ -377,8 +384,8 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void _showVenmoLink() async {
-    _chatController.sendVenmoLink(widget.chatSessionId);
+  void _showVenmoLink(context) async {
+    _chatController.sendVenmoLink(context, widget.chatSessionId);
   }
 
   void _showLocationsModal() async {

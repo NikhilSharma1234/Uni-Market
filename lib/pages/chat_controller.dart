@@ -28,8 +28,8 @@ class ChatController {
   await _chatModel.sendLocationMessage(chatSessionId, locationName, schoolName, address);
 }
 
-  Future<void> sendVenmoLink(String chatSessionId) async {
-    await _chatModel.sendVenmoLink(chatSessionId);
+  Future<void> sendVenmoLink(BuildContext context, String chatSessionId) async {
+    await _chatModel.sendVenmoLink(context, chatSessionId);
   }
 
 
