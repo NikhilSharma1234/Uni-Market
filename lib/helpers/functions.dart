@@ -79,6 +79,7 @@ Future<void> loadCurrentUser(email) async {
       verifiedUniStudent: userData['verifiedUniStudent'],
       verifiedBy: userData['verifiedBy'],
       verifiedAt: userData['verifiedAt'],
+      venmoId: userData['venmoId'],
       wishlist: userData['wishlist']);
 }
 

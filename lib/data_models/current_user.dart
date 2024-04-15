@@ -20,6 +20,7 @@ class CurrentUser {
   late String starting_profile_pic;
   late String starting_profile_pic_url;
   late Timestamp updatedAt;
+  late String? venmoId;
   late bool verificationDocsUploaded;
   late bool verifiedUniStudent;
   String? verifiedBy;
@@ -47,6 +48,7 @@ class CurrentUser {
       required bool verifiedUniStudent,
       required String? verifiedBy,
       required Timestamp? verifiedAt,
+      required String? venmoId,
       required List<dynamic> wishlist}) {
     _user.assignable_profile_pic = assignable_profile_pic;
     _user.assignable_profile_pic_url = assignable_profile_pic_url;
@@ -68,6 +70,7 @@ class CurrentUser {
     _user.verifiedUniStudent = verifiedUniStudent;
     _user.verifiedBy = verifiedBy;
     _user.verifiedAt = verifiedAt;
+    _user.venmoId = venmoId;
     _user.wishlist = wishlist;
     return _user;
   }
@@ -90,6 +93,7 @@ class CurrentUser {
     _user.verifiedUniStudent = false;
     _user.verifiedBy = null;
     _user.verifiedAt = null;
+    _user.venmoId = null;
     _user.schoolsInMarketplace = [];
     _user.wishlist = [];
   }

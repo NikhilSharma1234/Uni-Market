@@ -135,6 +135,60 @@ class ChatModel {
     }
   }
 
+  Future<void> sendVenmoLink(String chatSessionId) async {
+    try {
+      String userName = await getCurrentUserName();
+      String venmoId = await getVenmoId();
+
+      String messageContent = "$userName SHARED -- Venmo Id: $venmoId";
+
+      await firestore
+          .collection('chat_sessions')
+          .doc(chatSessionId)
+          .collection('messages')
+          .add({
+        'senderId': currentUser!.uid,
+        'type': 'venmo',
+        'content': messageContent,
+        'url': 'https://www.venmo.com/$venmoId',
+        'timestamp': Timestamp.now(),
+      });
+
+      await firestore.collection('chat_sessions').doc(chatSessionId).update({
+        'lastMessage': messageContent,
+        'lastMessageAt': Timestamp.now(),
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error in sendLocationMessage: $e");
+      }
+    }
+  }
+
+  Future<String> getVenmoId() async {
+    String userEmail = currentUser?.email ?? "";
+    if (userEmail.isEmpty) {
+      return "Unknown User";
+    }
+
+    try {
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(userEmail).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> userData =
+            userDoc.data() as Map<String, dynamic>? ?? {};
+        return userData['venmoId'] ?? "Venmo Id not set by user";
+      } else {
+        return "User Not Found";
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching user name: $e");
+      }
+      return "Error";
+    }
+  }
+
   Future<String> getCurrentUserName() async {
     String userEmail = currentUser?.email ?? "";
     if (userEmail.isEmpty) {

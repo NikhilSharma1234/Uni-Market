@@ -22,6 +22,7 @@ CurrentUser user = CurrentUser(
     verifiedUniStudent: false,
     verifiedBy: null,
     verifiedAt: null,
+    venmoId: null,
     institutionFullName: '',
     schoolsInMarketplace: [],
     wishlist: []);
