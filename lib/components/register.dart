@@ -158,6 +158,7 @@ class _RegistirationState extends State<Registiration> {
         "verifiedUniStudent": false,
         "verifiedBy": null,
         "verifiedAt": null,
+        "venmoId": null,
         "assignable_profile_pic": null,
         "starting_profile_pic": chosenProfilePicPath,
         "wishlist": []
