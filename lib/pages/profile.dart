@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
           await FirebaseFirestore.instance
               .collection("users")
               .doc(data_store.user.email)
-              .update({"venmoId": venmoId});
+              .update({"venmoId": venmoId == "" ? null : venmoId});
           await loadCurrentUser(data_store.user.email);
           setState(() {
             venmoIdLoading = false;
