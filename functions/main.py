@@ -51,6 +51,10 @@ def compile_data(id, item):
 def make_request(request):
   requests.post(request[0], headers=request[1], json=request[2]).raise_for_status()
 
+@functions_framework.http
+def delete_item(request):
+  requests.delete(request[0], headers=request[1]).raise_for_status()
+
 @on_document_updated(document="items/{itemId}")
 def update_in_typesense(event: Event[Change[DocumentSnapshot]]) -> None:
   item = event.data.after.to_dict()
@@ -90,6 +94,12 @@ def backfill_in_typesense(event: Event[DocumentSnapshot]) -> None:
         data = compile_data(doc.id, item)
 
         make_request([url, headers, data])
+
+@on_document_deleted(document="items/{itemId}")
+def delete_from_typesense(event: Event[DocumentSnapshot|None]) -> None:
+  url = f"{base_url}/collections/items/documents/{event.params['itemId']}"
+
+  delete_item([url, headers])
 
 @https_fn.on_call()
 def search_typesense(req: https_fn.CallableRequest) -> any:
