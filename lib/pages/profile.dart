@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uni_market/components/input_containers.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/data_models/current_user.dart';
 import 'package:uni_market/helpers/functions.dart';
@@ -32,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool venmoIdLoading = false;
   bool editingVenmoId = false;
   CurrentUser user = data_store.user;
+  final TextEditingController passwordController = TextEditingController();
 
   Set<int> themeMode = {data_store.user.darkMode};
 
@@ -509,7 +511,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Delete Account Button, NO LOGIC
                 Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      deleteAccount();
+                    },
                     child: const Text("Delete Account",
                         style: TextStyle(color: Colors.red)),
                   ),
@@ -525,6 +529,149 @@ class _ProfilePageState extends State<ProfilePage> {
             ? const UserBottomNavBar(activeIndex: 2)
             : null, // Custom app bar here
         body: child);
+  }
+
+  deleteAccount() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Delete Account'),
+            content: SizedBox(
+              width: isMobile(context)
+                  ? MediaQuery.of(context).size.width * 0.8
+                  : MediaQuery.of(context).size.width * 0.6,
+              height: MediaQuery.of(context).size.height * 0.4,
+              child: Column(
+                children: [
+                  const Text(
+                      'Are you sure you want to delete your account? All profile data, chat messages and items will also be deleted without the chance for recovery.'),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: PasswordContainer(
+                      passwordController: passwordController,
+                      isSignIn: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  String password = passwordController.text.trim();
+                  // Reauthenticate user (needs to have recently logged in to delete user)
+                  try {
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: data_store.user.email, password: password);
+                    // ignore: use_build_context_synchronously
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return const AlertDialog(
+                              title: Text('Account being deleted'),
+                              content: LinearProgressIndicator());
+                        });
+                    // Delete user verifications docs
+                    await FirebaseStorage.instance
+                        .ref('verification/${data_store.user.email}')
+                        .listAll()
+                        .then((value) async {
+                      for (var item in value.items) {
+                        await FirebaseStorage.instance
+                            .ref(item.fullPath)
+                            .delete();
+                      }
+                    });
+                    // Get items to be deleted
+                    var userItemsToBeDeleted = await FirebaseFirestore.instance
+                        .collection('items')
+                        .where('sellerId', isEqualTo: data_store.user.email)
+                        .get();
+
+                    // Get chat sessions to be deleted
+                    var chatSessionsToBeDeleted = await FirebaseFirestore
+                        .instance
+                        .collection('chat_sessions')
+                        .where('sellerId', isEqualTo: data_store.user.email)
+                        .get();
+                    // Get chat sessions to be deleted where this user is the buyer
+                    var chatSessionsAsBuyerToBeDeleted = await FirebaseFirestore
+                        .instance
+                        .collection('chat_sessions')
+                        .where('participantIds',
+                            arrayContains: data_store.user.email)
+                        .get();
+                    // Go through items with sellerid equal to current user
+                    for (var doc in userItemsToBeDeleted.docs) {
+                      // Delete image associated with item
+                      for (var imagePath in doc.data()['images']) {
+                        await FirebaseStorage.instance.ref(imagePath).delete();
+                      }
+                      // Delete the item
+                      await FirebaseFirestore.instance
+                          .collection('items')
+                          .doc(doc.id)
+                          .delete();
+                    }
+                    // Delete the chat session where this user is the buyer
+                    for (var doc in chatSessionsAsBuyerToBeDeleted.docs) {
+                      var deletedBy = doc.data()['deletedByUsers'];
+                      if (!deletedBy.contains(data_store.user.email)) {
+                        deletedBy.add(data_store.user.email);
+                      }
+                      await FirebaseFirestore.instance
+                          .collection('chat_sessions')
+                          .doc(doc.id)
+                          .update({'deletedByUsers': deletedBy});
+                    }
+                    // Delete chat session associated where this user is the seller
+                    for (var doc in chatSessionsToBeDeleted.docs) {
+                      await FirebaseFirestore.instance
+                          .collection('chat_sessions')
+                          .doc(doc.id)
+                          .delete();
+                    }
+                    // If assignable profile pic exists, delete that
+                    if (data_store.user.assignable_profile_pic != null &&
+                        data_store.user.assignable_profile_pic!.isNotEmpty) {
+                      await FirebaseStorage.instance
+                          .ref(data_store.user.assignable_profile_pic)
+                          .delete();
+                    }
+                    // Delete user from firestore
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(data_store.user.email)
+                        .delete();
+                    // Delete user from firebase auth
+                    await FirebaseAuth.instance.currentUser?.delete();
+                  } catch (e) {
+                    print(e);
+                    // ignore: use_build_context_synchronously
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AlertDialog(
+                              title: Text('Error'),
+                              content: Text(
+                                  'Invalid password or something went wrong, please contact team'));
+                        });
+                    return;
+                  }
+                },
+                child: const Text('Yes, delete my account'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('No, I want to keep my account.'),
+              ),
+            ],
+          );
+        });
   }
 
 // Helper function for selecting new profile picture
