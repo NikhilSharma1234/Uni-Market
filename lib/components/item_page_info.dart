@@ -207,8 +207,9 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                                     onPressed: widget.noAction
                                         ? null
                                         : () async {
-                                            if (widget.itemData.isFlagged)
+                                            if (widget.itemData.isFlagged) {
                                               return;
+                                            }
                                             setState(() {
                                               loading = true;
                                             });

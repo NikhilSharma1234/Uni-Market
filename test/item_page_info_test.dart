@@ -38,7 +38,7 @@ void main() {
                   sellerName: sellerName,
                   sellerProfilePic: sellerProfilePic,
                   sellerItemsBought: 1,
-                  sellerItemsSold: 1)));
+                  sellerItemsSold: 1, noAction: false)));
     }));
 
     // Verify that our counter starts at 0.
