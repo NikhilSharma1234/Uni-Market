@@ -9,8 +9,13 @@ import 'package:uni_market/helpers/Styles/kit_style.dart';
 class ItemBox extends StatefulWidget {
   final Item itemData;
   final BuildContext context;
+  final bool noAction;
 
-  const ItemBox({super.key, required this.itemData, required this.context});
+  const ItemBox(
+      {super.key,
+      required this.itemData,
+      required this.context,
+      this.noAction = false});
 
   @override
   State<ItemBox> createState() => _ItemBoxState();
@@ -73,7 +78,8 @@ class _ItemBoxState extends State<ItemBox> {
             onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => ItemPage(data: item),
+              builder: (context) =>
+                  ItemPage(data: item, noAction: widget.noAction),
             ),
           );
         }, child: LayoutBuilder(

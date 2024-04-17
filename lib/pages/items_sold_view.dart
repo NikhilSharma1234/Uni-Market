@@ -4,20 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/helpers/functions.dart';
+import 'package:uni_market/data_store.dart' as data_store;
 
-class ItemView extends StatefulWidget {
-  final String? sellerID;
-
-  const ItemView({
-    Key? key,
-    required this.sellerID,
-  }) : super(key: key);
+class ItemsSoldView extends StatefulWidget {
+  const ItemsSoldView({Key? key}) : super(key: key);
 
   @override
-  State<ItemView> createState() => _ItemViewState();
+  State<ItemsSoldView> createState() => _ItemsSoldViewState();
 }
 
-class _ItemViewState extends State<ItemView> {
+class _ItemsSoldViewState extends State<ItemsSoldView> {
   // todo later: Make this page more generalized for whatever needs of items displays.
   late List<Widget> items = [
     const Center(
@@ -46,8 +42,8 @@ class _ItemViewState extends State<ItemView> {
     List<Widget> foundItemsArr = [];
     var foundItems = await db
         .collection("items")
-        .where("sellerId", isEqualTo: widget.sellerID)
-        .where("buyerId", isNull: true)
+        .where('sellerId', isEqualTo: data_store.user.email)
+        .where('buyerId', isNull: false)
         .get();
 
     for (var docSnap in foundItems.docs) {
@@ -65,7 +61,7 @@ class _ItemViewState extends State<ItemView> {
       }
       if (context.mounted) {
         foundItemsArr
-            .add(factory.buildItemBox(Item.fromFirebase(item), context));
+            .add(factory.buildItemBox(Item.fromFirebase(item), context, true));
       }
     }
     return foundItemsArr;
@@ -87,10 +83,6 @@ class _ItemViewState extends State<ItemView> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    if (widget.sellerID == null) {
-      items = [const Text("Issue getting user")];
-    }
-
     Widget body;
 
     body = GridView.count(
@@ -100,10 +92,9 @@ class _ItemViewState extends State<ItemView> {
         childAspectRatio: 20 / 23,
         children: items);
 
-
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Your Items"),
+          title: const Text("Items you've sold"),
         ),
         body: body);
   }

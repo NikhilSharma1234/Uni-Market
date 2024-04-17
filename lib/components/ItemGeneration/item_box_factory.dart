@@ -4,7 +4,8 @@ import 'item_box.dart';
 
 class ItemBoxFactory {
   late ItemBox item;
-  makeItemBox(Item data, BuildContext context) {
-    return ItemBox(itemData: data, context: context);
+  makeItemBox(Item data, BuildContext context, [noAction]) {
+    return ItemBox(
+        itemData: data, context: context, noAction: noAction ?? false);
   }
 }

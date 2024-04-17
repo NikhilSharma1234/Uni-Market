@@ -5,7 +5,7 @@ import 'item.dart';
 class AbstractItemFactory {
   ItemBoxFactory itemFactory = ItemBoxFactory();
 
-  buildItemBox(Item data, BuildContext context) {
-    return itemFactory.makeItemBox(data, context);
+  buildItemBox(Item data, BuildContext context, [noAction]) {
+    return itemFactory.makeItemBox(data, context, noAction);
   }
 }
