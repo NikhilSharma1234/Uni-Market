@@ -648,7 +648,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     // Delete user from firebase auth
                     await FirebaseAuth.instance.currentUser?.delete();
                   } catch (e) {
-                    print(e);
+                    if (kDebugMode) {
+                      print(e);
+                    }
                     // ignore: use_build_context_synchronously
                     showDialog(
                         context: context,
