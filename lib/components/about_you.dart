@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_market/components/dialog.dart';
+import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/home.dart';
@@ -399,6 +400,7 @@ class _AboutYouContentState extends State<AboutYouContent> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Upload successful!')),
           );
+          await search("*", 10, context, Filters.none());
           isSubmitting.value = false;
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
