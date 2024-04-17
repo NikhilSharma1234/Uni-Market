@@ -18,6 +18,8 @@ import 'dart:async';
 import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/item_view.dart';
 import 'package:uni_market/data_store.dart' as data_store;
+import 'package:uni_market/pages/items_bought_view.dart';
+import 'package:uni_market/pages/items_sold_view.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -459,7 +461,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ItemsBoughtView(),
+                          ),
+                        );
+                      },
                       child: const Text("Items Bought"),
                     ),
                   ),
@@ -477,7 +485,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ItemsSoldView(),
+                          ),
+                        );
+                      },
                       child: const Text("Items Sold"),
                     ),
                   ),

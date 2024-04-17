@@ -10,8 +10,10 @@ import 'dart:ui';
 
 class ItemPage extends StatefulWidget {
   final Item data;
+  final bool noAction;
 
-  const ItemPage({Key? key, required this.data}) : super(key: key);
+  const ItemPage({Key? key, required this.data, this.noAction = false})
+      : super(key: key);
 
   @override
   State<ItemPage> createState() => _ItemPageState();
@@ -150,7 +152,8 @@ class _ItemPageState extends State<ItemPage> {
                               sellerName: sellerName,
                               sellerProfilePic: sellerProfilePic,
                               sellerItemsBought: sellerItemsBought,
-                              sellerItemsSold: sellerItemsSold)),
+                              sellerItemsSold: sellerItemsSold,
+                              noAction: widget.noAction)),
                     ],
                   ),
                 );
@@ -222,7 +225,8 @@ class _ItemPageState extends State<ItemPage> {
                             sellerName: sellerName,
                             sellerProfilePic: sellerProfilePic,
                             sellerItemsBought: sellerItemsBought,
-                            sellerItemsSold: sellerItemsSold)),
+                            sellerItemsSold: sellerItemsSold,
+                            noAction: widget.noAction)),
                   ],
                 );
               } else if (snapshot.hasError) {
