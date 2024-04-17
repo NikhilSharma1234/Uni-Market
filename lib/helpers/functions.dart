@@ -159,20 +159,20 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
 
   String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
 
-  String sort = '';
+  String sort = '_text_match:desc';
 
   switch (filter.sort) {
     case Sort.newestToOldest:
-      sort = 'createdAt:desc';
+      sort += ',createdAt:desc';
       break;
     case Sort.oldestToNewest:
-      sort = 'createdAt:asc';
+      sort += ',createdAt:asc';
       break;
     case Sort.highToLow:
-      sort = 'price:desc';
+      sort += ',price:desc';
       break;
     case Sort.lowToHigh:
-      sort = 'price:asc';
+      sort += ',price:asc';
       break;
     default:
       break;
