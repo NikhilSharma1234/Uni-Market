@@ -337,9 +337,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                   children: [
                                     Expanded(
                                       child: TextFormField(
+                                        autofocus: true,
                                         controller: editingController,
                                         textAlign: TextAlign.start,
                                         maxLength: 30,
+                                        onFieldSubmitted: (value) async {
+                                          updateVenmoId(value);
+                                          flipVenmoEditingState();
+                                        },
                                       ),
                                     ),
                                     TextButton(

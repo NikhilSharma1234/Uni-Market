@@ -34,6 +34,7 @@ class _PostFormState extends State<PostForm> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
   final double _maxPrice = 10000.0;
+  bool submitActive = true;
 
   bool submitting = false;
   bool isFlagged = false;
@@ -398,29 +399,43 @@ class _PostFormState extends State<PostForm> {
                       shadowColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6.0))),
-                  onPressed: () async {
-                    // Check form data validitiy
-                    if (_fbKey.currentState!.saveAndValidate()) {
-                      // Store form data in Map for db upload
-                      Map<String, dynamic> formData =
-                          Map.from(_fbKey.currentState!.value);
-                      String inputText =
-                          formData["title"] + " " + formData["description"];
+                  onPressed: submitActive ==
+                          false // disables button while waiting for response from API
+                      ? null
+                      : () async {
+                          // Check form data validitiy
+                          setState(() {
+                            submitActive = false;
+                          });
+                          if (_fbKey.currentState!.saveAndValidate()) {
+                            // Store form data in Map for db upload\
+                            setState(() {});
+                            Map<String, dynamic> formData =
+                                Map.from(_fbKey.currentState!.value);
+                            String inputText = formData["title"] +
+                                " " +
+                                formData["description"];
 
-                      if (isFlagged != true) {
-                        try {
-                          await checkProfanity(inputText, checkStrength: false)
-                              .then((value) => _flag(value));
-                        } catch (e) {
-                          if (kDebugMode) {
-                            print("Failed to perform profanity checking: $e");
+                            if (isFlagged != true) {
+                              try {
+                                await checkProfanity(inputText,
+                                        checkStrength: false)
+                                    .then((value) => _flag(value));
+                              } catch (e) {
+                                if (kDebugMode) {
+                                  print(
+                                      "Failed to perform profanity checking: $e");
+                                }
+                              }
+                            }
+
+                            // ignore: use_build_context_synchronously
+                            _createPost(context, formData, _imageDataUrls);
+                            setState(() {
+                              submitActive = true;
+                            });
                           }
-                        }
-                      }
-                      // ignore: use_build_context_synchronously
-                      _createPost(context, formData, _imageDataUrls);
-                    }
-                  },
+                        },
                   child: const Text('Submit'),
                 ),
                 const SizedBox(height: 8),
