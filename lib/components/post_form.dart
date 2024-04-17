@@ -434,6 +434,8 @@ class _PostFormState extends State<PostForm> {
                             setState(() {
                               submitActive = true;
                             });
+                          } else {
+                            setState(() => submitActive = true);
                           }
                         },
                   child: const Text('Submit'),
