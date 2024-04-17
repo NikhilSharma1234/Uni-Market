@@ -15,19 +15,18 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
 
     Item itemData = Item(
-      "Test Item 1",
-      "12345",
-      "This a test item for a test.",
-      "NEW",
-      "University of Nevada, Reno",
-      12.00,
-      DateTime(0, 0),
-      ['image1path', 'secondImagePath'],
-      "selleremailid@gmail.com",
-      ['tag1', 'tag2'],
-      false,
-      null
-    );
+        "Test Item 1",
+        "12345",
+        "This a test item for a test.",
+        "NEW",
+        "University of Nevada, Reno",
+        12.00,
+        DateTime(0, 0),
+        ['image1path', 'secondImagePath'],
+        "selleremailid@gmail.com",
+        ['tag1', 'tag2'],
+        false,
+        null);
     String sellerName = 'Nikhil Sharma';
     String sellerProfilePic = 'somelink';
     // Build our app and trigger a frame.
@@ -37,7 +36,9 @@ void main() {
               body: ItemPageInfo(
                   itemData: itemData,
                   sellerName: sellerName,
-                  sellerProfilePic: sellerProfilePic)));
+                  sellerProfilePic: sellerProfilePic,
+                  sellerItemsBought: 1,
+                  sellerItemsSold: 1)));
     }));
 
     // Verify that our counter starts at 0.

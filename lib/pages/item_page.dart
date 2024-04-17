@@ -23,6 +23,8 @@ class _ItemPageState extends State<ItemPage> {
   late List<String> productImages;
   late String sellerName;
   late String sellerProfilePic;
+  late int? sellerItemsSold;
+  late int? sellerItemsBought;
 
   @override
   void initState() {
@@ -33,6 +35,19 @@ class _ItemPageState extends State<ItemPage> {
   Future<String> loadImages() {
     return Future.delayed(const Duration(seconds: 1), () async {
       productImages = itemData.imagePath;
+      await FirebaseFirestore.instance
+          .collection('items')
+          .where('sellerId', isEqualTo: itemData.sellerId)
+          .where('buyerId', isNull: false)
+          .count()
+          .get()
+          .then((response) => sellerItemsSold = response.count);
+      await FirebaseFirestore.instance
+          .collection('items')
+          .where('buyerId', isEqualTo: itemData.sellerId)
+          .count()
+          .get()
+          .then((response) => sellerItemsBought = response.count);
       await FirebaseFirestore.instance
           .collection('users')
           .doc(itemData.sellerId)
@@ -133,7 +148,9 @@ class _ItemPageState extends State<ItemPage> {
                           child: ItemPageInfo(
                               itemData: itemData,
                               sellerName: sellerName,
-                              sellerProfilePic: sellerProfilePic)),
+                              sellerProfilePic: sellerProfilePic,
+                              sellerItemsBought: sellerItemsBought,
+                              sellerItemsSold: sellerItemsSold)),
                     ],
                   ),
                 );
@@ -203,7 +220,9 @@ class _ItemPageState extends State<ItemPage> {
                         child: ItemPageInfo(
                             itemData: itemData,
                             sellerName: sellerName,
-                            sellerProfilePic: sellerProfilePic)),
+                            sellerProfilePic: sellerProfilePic,
+                            sellerItemsBought: sellerItemsBought,
+                            sellerItemsSold: sellerItemsSold)),
                   ],
                 );
               } else if (snapshot.hasError) {

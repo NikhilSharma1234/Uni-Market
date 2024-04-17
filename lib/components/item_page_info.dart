@@ -14,12 +14,16 @@ class ItemPageInfo extends StatefulWidget {
   final Item itemData;
   final String sellerName;
   final String sellerProfilePic;
+  final int? sellerItemsBought;
+  final int? sellerItemsSold;
 
   const ItemPageInfo(
       {Key? key,
       required this.itemData,
       required this.sellerName,
-      required this.sellerProfilePic})
+      required this.sellerProfilePic,
+      required this.sellerItemsBought,
+      required this.sellerItemsSold})
       : super(key: key);
 
   @override
@@ -267,8 +271,8 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                       ),
                     ),
                     Text('Name: ${widget.sellerName}'),
-                    const Text('Items Sold: 2'),
-                    const Text('Items Bought: 2'),
+                    Text('Items Sold: ${widget.sellerItemsSold ?? 0}'),
+                    Text('Items Bought: ${widget.sellerItemsBought ?? 0}'),
                     widget.itemData.sellerId != data_store.user.email
                         ? !loading
                             ? ElevatedButton(

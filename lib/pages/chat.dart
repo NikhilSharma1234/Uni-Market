@@ -474,7 +474,7 @@ class _ChatPageState extends State<ChatPage> {
                     await FirebaseFirestore.instance
                         .collection('items')
                         .doc(widget.productId)
-                        .update({'buyerId': data_store.user.email});
+                        .update({'buyerId': buyerId});
                     var snapshots = await FirebaseFirestore.instance
                         .collection('chat_sessions')
                         .where('productId', isEqualTo: widget.productId)
