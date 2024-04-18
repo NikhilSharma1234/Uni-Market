@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/image_data_store.dart';
+import 'package:uni_market/pages/item_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
@@ -52,6 +54,24 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    showItemPage(BuildContext context, String productId) {
+      if (context.mounted) {
+        var db = FirebaseFirestore.instance;
+        db.collection('items').doc(widget.productId).get().then((value) async {
+          var data = value.data()!;
+          data['id'] = widget.productId;
+          for (int i = 0; i < data['images'].length; i++) {
+            data['images'][i] = await getURL(data['images'][i]);
+          }
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) {
+              return ItemPage(data: Item.fromFirebase(data));
+            },
+          ));
+        });
+      }
+    }
+
     return StreamBuilder<bool>(
       stream: _chatController.getDeletedByUsersStream(widget.chatSessionId),
       builder: (context, canSendSnapshot) {
@@ -79,9 +99,14 @@ class _ChatPageState extends State<ChatPage> {
 
             return Scaffold(
               appBar: AppBar(
-                title: AppBarTitleWithImage(
-                  title: title,
-                  imagePath: imagePath,
+                title: InkWell(
+                  onTap: () {
+                    showItemPage(context, widget.productId);
+                  },
+                  child: AppBarTitleWithImage(
+                    title: title,
+                    imagePath: imagePath,
+                  ),
                 ),
                 actions: canCurrentUserSendMessages
                     ? [
