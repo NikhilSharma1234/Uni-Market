@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/pages/profile.dart';
-import 'package:uni_market/components/search_bar.dart';
+import 'package:uni_market/components/home_page/search_bar.dart';
 import 'package:uni_market/pages/inbox_view.dart';
 import 'package:uni_market/pages/wish_list.dart';
 import 'package:uni_market/data_store.dart' as data_store;

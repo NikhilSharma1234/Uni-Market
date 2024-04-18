@@ -11,7 +11,7 @@ enum Condition { newItem, usedItem, wornItem, none }
 class Filters {
   int lowerPrice;
   int upperPrice;
-  List<bool?> tags;
+  List<String?> tags;
   Sort sort;
   bool showFlagged = false;
   Condition condition;
@@ -20,7 +20,7 @@ class Filters {
   Filters.none()
       : lowerPrice = 0,
         upperPrice = 100000,
-        tags = [false, false, false, false],
+        tags = [],
         sort = Sort.bestMatch,
         showFlagged = false,
         condition = Condition.none;

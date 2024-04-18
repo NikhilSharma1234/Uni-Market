@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:uni_market/components/home_page/drawer.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
@@ -21,6 +24,17 @@ class _HomePageState extends State<HomePage> {
   String searchVal = "";
   int page = 1;
   bool loadingNewItems = false;
+  final TextEditingController _tagsController = TextEditingController();
+  static int maxTags = 6;
+  final List<String?> _tags = [];
+  List<String?> _suggestedTags = [
+    "desk",
+    "chair",
+    "lamp",
+    "bed",
+    "rug",
+    "phone",
+  ];
 
   // Controllers
   late ScrollController _scrollController;
@@ -29,8 +43,79 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // initialize scroll controllers
     _scrollController = ScrollController();
+    searchTags("", maxTags, [])
+        .then((value) => setState(() => _suggestedTags = value));
 
     super.initState();
+  }
+
+  List<Widget> tagSuggestionsBuilder(String input) {
+    // update _suggestedTags with tags from typesense
+    // leave selected tags in place as the first couple in _suggestedTags, give an x button for those to de-select them
+    List<Widget> selected = List.generate(_tags.length, (int index) {
+      final background = Theme.of(context).colorScheme.background;
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: InkWell(
+          child: Container(
+              decoration: BoxDecoration(
+                  color: background,
+                  border: Border.all(
+                      color: background == Colors.white
+                          ? Colors.black
+                          : Colors.white),
+                  borderRadius: const BorderRadius.all(Radius.circular(15))),
+              child: Row(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text(_tags[index]!)),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          String? temp = _tags.removeAt(index);
+                          _suggestedTags.add(temp);
+                        });
+                      },
+                      icon: const Icon(Icons.close))
+                ],
+              )),
+        ),
+      );
+    });
+
+    List<Widget> suggested = List.generate(maxTags - _tags.length, (int index) {
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: InkWell(
+            onTap: () => setState(() {
+                  _tags.add(_suggestedTags[index]);
+                  filter.tags = _tags;
+                  _suggestedTags.removeAt(index);
+                  _tagsController.clear();
+                }),
+            child: Container(
+              decoration: BoxDecoration(
+                  color:
+                      Theme.of(context).colorScheme.background == Colors.white
+                          ? Colors.white70
+                          : Colors.black,
+                  borderRadius: const BorderRadius.all(Radius.circular(15))),
+              child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 5, bottom: 5, left: 10, right: 10),
+                  child: Text(_suggestedTags[index]!)),
+            )),
+      );
+    });
+
+    return selected + suggested;
+  }
+
+  setTags(List<String?> tags) {
+    setState(() {
+      _suggestedTags = tags;
+    });
   }
 
   // redraws the items on the page based on search results
@@ -47,6 +132,12 @@ class _HomePageState extends State<HomePage> {
           items = newItems;
         }
       }
+    });
+  }
+
+  setCondition(Condition newCondition) {
+    setState(() {
+      filter.condition = newCondition;
     });
   }
 
@@ -77,11 +168,35 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Timer? _debounce;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     Widget body;
+
+    Widget tagsWidget = Column(children: [
+      const Text("Click Tags to select them, type to search",
+          style: TextStyle(fontSize: 24), textAlign: TextAlign.center),
+      TextField(
+        controller: _tagsController,
+        onChanged: ((value) {
+          if (_debounce?.isActive ?? false) _debounce?.cancel();
+          _debounce = Timer(const Duration(milliseconds: 200), () {
+            searchTags(value, maxTags, _tags).then((value) {
+              setTags(value);
+            });
+          });
+        }),
+      ),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: tagSuggestionsBuilder(_tagsController.text),
+        ),
+      )
+    ]);
 
     body = Padding(
         padding: const EdgeInsets.all(1),
@@ -246,174 +361,8 @@ class _HomePageState extends State<HomePage> {
                 )),
         child: const Icon(Icons.add),
       ),
-      drawer: Drawer(
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(8),
-                    bottomRight: Radius.circular(8))),
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 50, bottom: 50, left: 8, right: 8),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Text("Price Range",
-                                style: TextStyle(fontSize: 24))),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 125,
-                              child: TextField(
-                                keyboardType: TextInputType.number,
-                                controller: lowerPrice,
-                                onChanged: ((value) {
-                                  if (value != "") {
-                                    filter.lowerPrice =
-                                        int.parse(lowerPrice.text);
-                                  } else {
-                                    filter.lowerPrice = 0;
-                                  }
-                                }),
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Lower",
-                                ),
-                              ),
-                            ),
-                            const Text('-'),
-                            SizedBox(
-                              width: 125,
-                              child: TextField(
-                                keyboardType: TextInputType.number,
-                                controller: upperPrice,
-                                onChanged: ((value) {
-                                  if (value != "") {
-                                    filter.upperPrice =
-                                        int.parse(upperPrice.text);
-                                  } else {
-                                    filter.upperPrice = 100000;
-                                  }
-                                }),
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  labelText: "Upper",
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Text("Sort By",
-                                style: TextStyle(fontSize: 24))),
-                        Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: DropdownMenu(
-                              onSelected: (value) =>
-                                  filter.sort = value as Sort,
-                              initialSelection: filter.sort,
-                              dropdownMenuEntries: const [
-                                DropdownMenuEntry(
-                                    value: Sort.highToLow,
-                                    label: 'High to Low'),
-                                DropdownMenuEntry(
-                                    value: Sort.lowToHigh,
-                                    label: 'Low to High'),
-                                DropdownMenuEntry(
-                                    value: Sort.newestToOldest,
-                                    label: 'Newest to Oldest'),
-                                DropdownMenuEntry(
-                                    value: Sort.oldestToNewest,
-                                    label: 'Oldest to Newest'),
-                                DropdownMenuEntry(
-                                    value: Sort.bestMatch, label: 'Best Match')
-                              ]),
-                        ),
-                      ],
-                    ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //   children: [
-                    //     const Text('Show Flagged Items:',
-                    //         style: TextStyle(fontSize: 24)),
-                    //     Checkbox(
-                    //         value: filter.showFlagged,
-                    //         onChanged: (value) {
-                    //           setState(() {
-                    //             filter.showFlagged = value!;
-                    //           });
-                    //         })
-                    //   ],
-                    // ),
-                    Column(
-                      children: [
-                        const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Text("Condition",
-                                style: TextStyle(fontSize: 24))),
-                        ListTile(
-                            title: const Text("New"),
-                            leading: Radio<Condition>(
-                                value: Condition.newItem,
-                                groupValue: filter.condition,
-                                onChanged: (value) {
-                                  setState(() {
-                                    filter.condition = value!;
-                                  });
-                                })),
-                        ListTile(
-                            title: const Text("Used"),
-                            leading: Radio<Condition>(
-                                value: Condition.usedItem,
-                                groupValue: filter.condition,
-                                onChanged: (value) {
-                                  setState(() {
-                                    filter.condition = value!;
-                                  });
-                                })),
-                        ListTile(
-                            title: const Text("Worn"),
-                            leading: Radio<Condition>(
-                                value: Condition.wornItem,
-                                groupValue: filter.condition,
-                                onChanged: (value) {
-                                  setState(() {
-                                    filter.condition = value!;
-                                  });
-                                })),
-                      ],
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: TextButton(
-                            style: const ButtonStyle(
-                              backgroundColor:
-                                  MaterialStatePropertyAll<Color>(Colors.green),
-                            ),
-                            onPressed: () {
-                              redrawItems([], false);
-                              applyFilters();
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Apply Filters')))
-                  ]),
-            )),
-      ),
+      drawer: getDrawer(context, lowerPrice, upperPrice, filter, applyFilters,
+          setCondition, redrawItems, tagsWidget),
       body: body,
     );
   }
