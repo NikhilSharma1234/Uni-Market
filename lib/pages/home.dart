@@ -162,8 +162,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
-  void applyFilters() {
-    search(searchVal, 30, context, filter).then((value) {
+  void applyFilters(Filters newFilter) {
+    search(searchVal, 30, context, newFilter).then((value) {
       redrawItems(value, false);
     });
   }
