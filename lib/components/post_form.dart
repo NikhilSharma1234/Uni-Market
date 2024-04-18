@@ -415,10 +415,12 @@ class _PostFormState extends State<PostForm> {
                           // Check form data validitiy
                           setState(() {
                             submitActive = false;
-                            // Update Post Form State
-                            submitting = true;
                           });
                           if (_fbKey.currentState!.saveAndValidate()) {
+                            setState(() {
+                              // Update Post Form State
+                              submitting = true;
+                            });
                             // Store form data in Map for db upload\
                             Map<String, dynamic> formData =
                                 Map.from(_fbKey.currentState!.value);
@@ -729,6 +731,9 @@ class _PostFormState extends State<PostForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to create post')),
         );
+        if (kDebugMode) {
+          print(e);
+        }
       }
       setState(() {
         submitting = false;
