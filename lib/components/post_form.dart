@@ -194,13 +194,17 @@ class _PostFormState extends State<PostForm> {
     }
 
     return submitting
-        ? const Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(child: CircularProgressIndicator()),
-              ],
+        ? SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: const Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                ],
+              ),
             ),
           )
         : FormBuilder(
@@ -344,43 +348,48 @@ class _PostFormState extends State<PostForm> {
                         shadowColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6.0))),
-                    onPressed: () async {
-                      if (kIsWeb) {
-                        List<XFile> clientImageFiles =
-                            await multiImagePicker(context);
+                    onPressed: submitActive ==
+                            false // disables button while waiting for response from API
+                        ? null
+                        : () async {
+                            if (kIsWeb) {
+                              List<XFile> clientImageFiles =
+                                  await multiImagePicker(context);
 
-                        if (clientImageFiles.isNotEmpty) {
-                          List<String> dataUrls =
-                              await convertXFilesToDataUrls(clientImageFiles);
+                              if (clientImageFiles.isNotEmpty) {
+                                List<String> dataUrls =
+                                    await convertXFilesToDataUrls(
+                                        clientImageFiles);
 
-                          // Show the pop-up dialog for image confirmation
-                          if (context.mounted) {
-                            String confirmSelection = await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                // Assign the captured context
-                                return ImageCarouselDialog(
-                                    imageDataUrls: dataUrls);
-                              },
-                            );
+                                // Show the pop-up dialog for image confirmation
+                                if (context.mounted) {
+                                  String confirmSelection = await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      // Assign the captured context
+                                      return ImageCarouselDialog(
+                                          imageDataUrls: dataUrls);
+                                    },
+                                  );
 
-                            // Check if the user confirmed selected images
-                            if (confirmSelection == 'yes') {
-                              setState(() {
-                                _imageDataUrls = dataUrls;
-                              });
+                                  // Check if the user confirmed selected images
+                                  if (confirmSelection == 'yes') {
+                                    setState(() {
+                                      _imageDataUrls = dataUrls;
+                                    });
 
-                              if (await moderateSelectedImages(dataUrls) ==
-                                  true) {
-                                _flag(true);
+                                    if (await moderateSelectedImages(
+                                            dataUrls) ==
+                                        true) {
+                                      _flag(true);
+                                    }
+                                  }
+                                }
                               }
+                            } else {
+                              showOptions(context);
                             }
-                          }
-                        }
-                      } else {
-                        showOptions(context);
-                      }
-                    },
+                          },
                     child: Column(
                       children: [
                         const Text("Upload Image(s)",
@@ -406,10 +415,11 @@ class _PostFormState extends State<PostForm> {
                           // Check form data validitiy
                           setState(() {
                             submitActive = false;
+                            // Update Post Form State
+                            submitting = true;
                           });
                           if (_fbKey.currentState!.saveAndValidate()) {
                             // Store form data in Map for db upload\
-                            setState(() {});
                             Map<String, dynamic> formData =
                                 Map.from(_fbKey.currentState!.value);
                             String inputText = formData["title"] +
@@ -430,7 +440,8 @@ class _PostFormState extends State<PostForm> {
                             }
 
                             // ignore: use_build_context_synchronously
-                            _createPost(context, formData, _imageDataUrls);
+                            await _createPost(
+                                context, formData, _imageDataUrls);
                             setState(() {
                               submitActive = true;
                             });
@@ -448,7 +459,10 @@ class _PostFormState extends State<PostForm> {
                       shadowColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6.0))),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: submitActive ==
+                          false // disables button while waiting for response from API
+                      ? null
+                      : () => Navigator.pop(context),
                   child: const Text('Cancel'),
                 ),
               ],
@@ -621,9 +635,6 @@ class _PostFormState extends State<PostForm> {
         const SnackBar(content: Text('Creating your post')),
       );
 
-      // Update Post Form State
-      setState(() => submitting = true);
-
       // Upload images to firebase storage before generating post document
       try {
         Completer<List<String>> completer = Completer<List<String>>();
@@ -719,6 +730,9 @@ class _PostFormState extends State<PostForm> {
           const SnackBar(content: Text('Failed to create post')),
         );
       }
+      setState(() {
+        submitting = false;
+      });
       throw ("failed async for create post");
     }
   }
