@@ -7,7 +7,7 @@ getDrawer(
     TextEditingController lowerPrice,
     TextEditingController upperPrice,
     Filters filter,
-    Function applyFilters,
+    Function(Filters) applyFilters,
     Function(Condition) setFilters,
     Function(List<Widget>, bool, [bool? start]) redrawItems,
     Widget tags) {
@@ -160,10 +160,23 @@ getDrawer(
                         ),
                         onPressed: () {
                           redrawItems([], false);
-                          applyFilters();
+                          applyFilters(filter);
                           Navigator.pop(context);
                         },
-                        child: const Text('Apply Filters')))
+                        child: const Text('Apply Filters'))),
+                Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: TextButton(
+                        style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll<Color>(Colors.red),
+                        ),
+                        onPressed: () {
+                          redrawItems([], false);
+                          applyFilters(Filters.none());
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Clear Filters')))
               ]),
         )),
   );
