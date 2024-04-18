@@ -30,7 +30,7 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
 
   void updateSuggestions(String typedText) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(const Duration(milliseconds: 200), () {
       searchSuggestions(typedText, 5).then((value) {
         setState(() {
           suggestions = List<ListTile>.generate(5, (int index) {

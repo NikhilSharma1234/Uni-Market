@@ -79,7 +79,7 @@ Future<void> loadCurrentUser(email) async {
       verifiedUniStudent: userData['verifiedUniStudent'],
       verifiedBy: userData['verifiedBy'],
       verifiedAt: userData['verifiedAt'],
-      venmoId: userData['venmoId'],
+      venmoId: userData['venmoId'], // error here?
       wishlist: userData['wishlist']);
 }
 
@@ -159,20 +159,20 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
 
   String filterString = 'price:[${filter.lowerPrice}..${filter.upperPrice}]';
 
-  String sort = '_text_match:desc';
+  String sort = '';
 
   switch (filter.sort) {
     case Sort.newestToOldest:
-      sort += ',createdAt:desc';
+      sort = 'createdAt:desc';
       break;
     case Sort.oldestToNewest:
-      sort += ',createdAt:asc';
+      sort = 'createdAt:asc';
       break;
     case Sort.highToLow:
-      sort += ',price:desc';
+      sort = 'price:desc';
       break;
     case Sort.lowToHigh:
-      sort += ',price:asc';
+      sort = 'price:asc';
       break;
     default:
       break;
@@ -192,8 +192,17 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
       break;
   }
 
+  var tagString;
+  if (filter.tags.isEmpty) {
+    tagString = "*";
+  } else {
+    for (var tag in filter.tags) {
+      tagString = "&&tags:=$tag";
+    }
+  }
+
   filterString +=
-      "&&buyerId:=None&&deletedAt:=0.0&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=${data_store.user.blockedUsers}";
+      "&&buyerId:=None&&deletedAt:=0.0&&marketplaceId:=${data_store.user.marketplaceId}${filter.showFlagged ? '&&isFlagged:=[true, false]' : '&&isFlagged:=false'}&&sellerId:!=${data_store.user.blockedUsers}$tagString";
   if (searchTerm == "") {
     searchTerm = "*";
   }
@@ -325,4 +334,9 @@ getBookbyName(String searchName) async {
   }
 
   return data;
+}
+
+makeItemBoxFromItem(Item item, BuildContext context) {
+  AbstractItemFactory factory = AbstractItemFactory();
+  return factory.buildItemBox(item, context);
 }
