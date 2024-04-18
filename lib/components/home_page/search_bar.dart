@@ -74,6 +74,8 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
             child: SearchAnchor.bar(
                 barElevation: MaterialStateProperty.all(0),
                 barHintText: "Search items",
+                viewConstraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.4),
                 searchController: controller,
                 onSubmitted: (value) {
                   widget.setPageState([], false);
@@ -89,6 +91,7 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
                 },
                 suggestionsBuilder: (BuildContext context, controller) {
                   return suggestions;
+                  // TODO known issue: this will call but not update on the screen when text is typed, it only updates when you click on the typed text
                 })));
   }
 }
