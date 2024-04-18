@@ -8,7 +8,7 @@ getDrawer(
     TextEditingController upperPrice,
     Filters filter,
     Function(Filters) applyFilters,
-    Function(Condition) setFilters,
+    Function(Condition) setCondition,
     Function(List<Widget>, bool, [bool? start]) redrawItems,
     Widget tags) {
   return Drawer(
@@ -129,24 +129,28 @@ getDrawer(
                         leading: Radio<Condition>(
                             value: Condition.newItem,
                             groupValue: filter.condition,
+                            toggleable: true,
                             onChanged: (value) {
-                              setFilters(value!);
+                              setCondition(value ?? Condition.none);
                             })),
                     ListTile(
                         title: const Text("Used"),
                         leading: Radio<Condition>(
                             value: Condition.usedItem,
                             groupValue: filter.condition,
+                            toggleable: true,
                             onChanged: (value) {
-                              setFilters(value!);
+                              print(value);
+                              setCondition(value ?? Condition.none);
                             })),
                     ListTile(
                         title: const Text("Worn"),
                         leading: Radio<Condition>(
                             value: Condition.wornItem,
                             groupValue: filter.condition,
+                            toggleable: true,
                             onChanged: (value) {
-                              setFilters(value!);
+                              setCondition(value ?? Condition.none);
                             })),
                   ],
                 ),
