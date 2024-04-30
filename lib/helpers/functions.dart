@@ -196,8 +196,9 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
   if (filter.tags.isEmpty) {
     tagString = "*";
   } else {
+    tagString = "";
     for (var tag in filter.tags) {
-      tagString = "&&tags:=$tag";
+      tagString += "&&tags:=$tag";
     }
   }
 
@@ -238,6 +239,10 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
     }
 
     data_store.itemBoxes = widgets;
+
+    if (widgets.isEmpty) {
+      widgets.add(const Text("No items found"));
+    }
 
     return widgets;
   } on FirebaseFunctionsException catch (error) {

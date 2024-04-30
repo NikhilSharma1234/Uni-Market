@@ -59,7 +59,9 @@ class _HomePageState extends State<HomePage> {
         child: InkWell(
           child: Container(
               decoration: BoxDecoration(
-                  color: background,
+                  color: background == Colors.white
+                      ? Colors.grey[200]
+                      : Colors.black,
                   border: Border.all(
                       color: background == Colors.white
                           ? Colors.black
@@ -98,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                   color:
                       Theme.of(context).colorScheme.background == Colors.white
-                          ? Colors.white70
+                          ? Colors.grey[200]
                           : Colors.black,
                   borderRadius: const BorderRadius.all(Radius.circular(15))),
               child: Padding(
@@ -122,8 +124,6 @@ class _HomePageState extends State<HomePage> {
   redrawItems(List<Widget> newItems, bool append, [bool? start]) {
     setState(() {
       if (start ?? false) {
-        // bad fix for loading thing at the end but I DO NOT CARE LITERALLY F OFF BRO
-        items.removeLast();
         items = newItems + items;
       } else {
         if (append) {
@@ -177,8 +177,11 @@ class _HomePageState extends State<HomePage> {
     Widget body;
 
     Widget tagsWidget = Column(children: [
-      const Text("Click Tags to select them, type to search",
-          style: TextStyle(fontSize: 24), textAlign: TextAlign.center),
+      const Tooltip(
+        message: "Enter search for tags below and select tag by clicking it",
+        child: Text("Tags",
+            style: TextStyle(fontSize: 24), textAlign: TextAlign.center),
+      ),
       TextField(
         controller: _tagsController,
         onChanged: ((value) {
@@ -335,6 +338,18 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.only(top: 16),
               child: Text('Awaiting result or no items exist...'),
+            ),
+          ],
+        ),
+      );
+    } else if (items.length == 1 && items[0] is Text) {
+      body = const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'No items found',
+              style: TextStyle(fontSize: 32),
             ),
           ],
         ),
