@@ -140,7 +140,6 @@ getDrawer(
                             groupValue: filter.condition,
                             toggleable: true,
                             onChanged: (value) {
-                              print(value);
                               setCondition(value ?? Condition.none);
                             })),
                     ListTile(
@@ -163,9 +162,29 @@ getDrawer(
                               MaterialStatePropertyAll<Color>(Colors.green),
                         ),
                         onPressed: () {
-                          redrawItems([], false);
-                          applyFilters(filter);
-                          Navigator.pop(context);
+                          if (filter.lowerPrice > filter.upperPrice) {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Invalid Price Range'),
+                                    content: const Text(
+                                        'The lower price must be less than the upper price.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                });
+                          } else {
+                            redrawItems([], false);
+                            applyFilters(filter);
+                            Navigator.pop(context);
+                          }
                         },
                         child: const Text('Apply Filters'))),
                 Padding(
