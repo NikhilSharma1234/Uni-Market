@@ -196,8 +196,10 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
                                           },
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.flag),
-                                    selectedIcon: const Icon(Icons.flag,
+                                    icon: const Icon(
+                                        Icons.report_problem_rounded),
+                                    selectedIcon: const Icon(
+                                        Icons.report_problem_rounded,
                                         color: Colors.orange),
                                     iconSize: 36,
                                     tooltip: widget.itemData.isFlagged
