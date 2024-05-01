@@ -111,7 +111,7 @@ class ChatModel {
       String userName = await getCurrentUserName();
 
       String messageContent =
-          "$userName SUGEESTED -- $locationName at $schoolName to be the trade location";
+          "$userName Suggested -- $locationName at $schoolName to be the trade location";
 
       await firestore
           .collection('chat_sessions')
