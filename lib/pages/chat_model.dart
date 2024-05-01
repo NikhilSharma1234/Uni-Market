@@ -139,7 +139,6 @@ class ChatModel {
   }
 
   Future<void> sendVenmoLink(BuildContext context, String chatSessionId) async {
-    String userName = await getCurrentUserName();
     String? venmoId = data_store.user.venmoId;
     if (venmoId == null) {
       // ignore: use_build_context_synchronously
@@ -153,7 +152,7 @@ class ChatModel {
       return;
     }
 
-    String messageContent = "$userName SHARED -- Venmo Id: $venmoId";
+    String messageContent = "ID: $venmoId";
 
     await firestore
         .collection('chat_sessions')
