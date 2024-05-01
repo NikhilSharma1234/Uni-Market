@@ -72,7 +72,8 @@ class _UserNavBarDesktopState extends State<UserNavBarDesktop> {
                     ),
                   );
                 },
-                child: const Text('Chat'),
+                //use a inbox icon
+                child: const Icon(Icons.message_rounded),
               )
             : const SizedBox(width: 0, height: 0),
         !widget.mobile

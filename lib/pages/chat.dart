@@ -183,17 +183,17 @@ class _ChatPageState extends State<ChatPage> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     Color senderBubbleColorLight = Colors.blueGrey.shade700;
-    Color receiverBubbleColorLight = Colors.blueGrey.shade700;
+    Color receiverBubbleColorLight = const Color.fromARGB(255, 68, 65, 65);
     Color senderBubbleColorDark = Colors.white;
-    Color receiverBubbleColorDark = Colors.grey.shade200;
+    Color receiverBubbleColorDark = const Color.fromARGB(150, 198, 220, 248);
     Color locationBubbleColor =
-        isDarkMode ? Colors.white : Colors.blueGrey.shade700;
+        isDarkMode ? const Color.fromARGB(255, 203, 196, 196) : const Color.fromARGB(255, 43, 79, 128);
 
     Color bubbleColor = isSentByMe
         ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight)
         : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
     Color textColor = isDarkMode ? Colors.black : Colors.white;
-
+ 
     final messageData = message.data() as Map<String, dynamic>?;
 
     bool isLocationMessage = messageData?.containsKey('type') == true &&
