@@ -193,6 +193,7 @@ class _ChatPageState extends State<ChatPage> {
         ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight)
         : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
     Color textColor = isDarkMode ? Colors.black : Colors.white;
+    Color transactionTextColor = isDarkMode ? Colors.black : Colors.white;
  
     final messageData = message.data() as Map<String, dynamic>?;
 
@@ -290,8 +291,8 @@ class _ChatPageState extends State<ChatPage> {
                     children: [
                       Text(
                         message.get('content'),
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: transactionTextColor,
                           fontSize: 9.0,
                         ),
                       )
