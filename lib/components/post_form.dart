@@ -315,7 +315,7 @@ class _PostFormState extends State<PostForm> {
                   maxLength: 30,
                   onChanged: (value) {
                     if (_debounce?.isActive ?? false) _debounce?.cancel();
-                    _debounce = Timer(const Duration(milliseconds: 200), () {
+                    _debounce = Timer(const Duration(milliseconds: 350), () {
                       searchTags(value!, maxTags, _tags).then((value) {
                         setState(() => _suggestedTags = value);
                       });

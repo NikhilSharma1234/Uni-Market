@@ -79,7 +79,7 @@ Future<void> loadCurrentUser(email) async {
       verifiedUniStudent: userData['verifiedUniStudent'],
       verifiedBy: userData['verifiedBy'],
       verifiedAt: userData['verifiedAt'],
-      venmoId: userData['venmoId'], // error here?
+      venmoId: userData['venmoId'],
       wishlist: userData['wishlist']);
 }
 
@@ -192,7 +192,7 @@ search(String searchTerm, int number, BuildContext context, Filters filter,
       break;
   }
 
-  var tagString;
+  var tagString = "";
   if (filter.tags.isEmpty) {
     tagString = "*";
   } else {
