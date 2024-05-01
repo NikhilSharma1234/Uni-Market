@@ -35,6 +35,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
   late Future<Map<String, dynamic>?> _sessionDetailsFuture;
+  late bool _seenTransactionWarning = false;
   bool _isDialogShown = false; // Add this flag
 
   bool _isWidgetActive = true;
@@ -282,14 +283,20 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   InkWell(
                       onTap: () async {
-                        final venmoUrl = Uri.parse(message.get('url'));
-                        if (await canLaunchUrl(venmoUrl)) {
-                          await launchUrl(venmoUrl);
-                        } else {
-                          throw 'Could not launch $venmoUrl';
-                        }
+                        _showTransactionWarning(context, message);
                       },
                       child: Image.asset("assets/venmo_logo_title.png")),
+                  Column(
+                    children: [
+                      Text(
+                        message.get('content'),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 9.0,
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -410,6 +417,40 @@ class _ChatPageState extends State<ChatPage> {
 
   void _showVenmoLink(context) async {
     _chatController.sendVenmoLink(context, widget.chatSessionId);
+  }
+
+  void _showTransactionWarning(BuildContext context, var message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('WARNING!'),
+          content: const Text(
+              'Do not proceed with venmo transactions until you have desired items in hand'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (context.mounted) {
+                  setState(() {
+                    _seenTransactionWarning = true;
+                  });
+                  Navigator.of(context).pop();
+                  final venmoUrl = Uri.parse(message.get('url'));
+                  if (_seenTransactionWarning) {
+                    if (await canLaunchUrl(venmoUrl)) {
+                      await launchUrl(venmoUrl);
+                    } else {
+                      throw 'Could not launch $venmoUrl';
+                    }
+                  }
+                }
+              },
+              child: const Text('Click to Continue'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showLocationsModal() async {
