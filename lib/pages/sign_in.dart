@@ -1,13 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:uni_market/components/input_containers.dart';
 import 'package:uni_market/pages/forgot_password.dart';
-// import 'package:uni_market/pages/forgot_password.dart';
+import 'package:uni_market/pages/home.dart';
 
 class SignInPage extends StatefulWidget {
   final String title;
@@ -148,40 +145,45 @@ class _SignInFormState extends State<SignInForm> {
     TextEditingController passwordController,
   ) async {
     setState(() => submitting = true);
-    try {
-      // Get user input from text field controllers (Remove ending whitespaces)
-      String userEmail = emailController.text.trim();
-      String password = passwordController.text.trim();
+    // try {
+    //   // Get user input from text field controllers (Remove ending whitespaces)
+    //   String userEmail = emailController.text.trim();
+    //   String password = passwordController.text.trim();
 
-      // Use Firebase Authentication to sign in the user
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: userEmail, password: password);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logging in')),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (kDebugMode) {
-        print(e.code);
-      }
-      if (e.code == 'too-many-requests') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Too many retries, please reset password')),
-        );
-        setState(() => submitting = false);
-        return;
-      }
-      if (e.code == 'invalid-credential') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid Credentials Provided')),
-        );
-        setState(() => submitting = false);
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error Logging In')),
-      );
-      setState(() => submitting = false);
-    }
+    //   // Use Firebase Authentication to sign in the user
+    //   await FirebaseAuth.instance
+    //       .signInWithEmailAndPassword(email: userEmail, password: password);
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Logging in')),
+    //   );
+    // } on FirebaseAuthException catch (e) {
+    //   if (kDebugMode) {
+    //     print(e.code);
+    //   }
+    //   if (e.code == 'too-many-requests') {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //           content: Text('Too many retries, please reset password')),
+    //     );
+    //     setState(() => submitting = false);
+    //     return;
+    //   }
+    //   if (e.code == 'invalid-credential') {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(content: Text('Invalid Credentials Provided')),
+    //     );
+    //     setState(() => submitting = false);
+    //     return;
+    //   }
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Error Logging In')),
+    //   );
+    //   setState(() => submitting = false);
+    // }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ),
+    );
   }
 }
