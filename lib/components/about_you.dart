@@ -1,22 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_market/components/dialog.dart';
-import 'package:uni_market/helpers/filters.dart';
-import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
 import 'package:uni_market/pages/home.dart';
 import 'package:uni_market/services/firebase_upload_service.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:uni_market/helpers/stepper_states.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 Step aboutYou(int index) {
   return Step(
@@ -26,7 +21,7 @@ Step aboutYou(int index) {
       child: const AboutYouContent(),
     ),
     isActive: index == 2,
-    state: stepperState(index, 2),
+    // state: stepperState(index, 2),
   );
 }
 
@@ -332,12 +327,14 @@ class _AboutYouContentState extends State<AboutYouContent> {
 
   Future<Map<String, String>> getListOfSchools() async {
     final Map<String, String> list = {};
-    await FirebaseFirestore.instance.collection('schools').get().then((value) {
-      for (var doc in value.docs) {
-        var name = doc.data()['name'];
-        list[name] = doc.id.toString();
-      }
-    });
+    // await FirebaseFirestore.instance.collection('schools').get().then((value) {
+    //   for (var doc in value.docs) {
+    //     var name = doc.data()['name'];
+    //     list[name] = doc.id.toString();
+    //   }
+    // });
+    list['University of Nevada, Reno'] = '123';
+    list['Truckee Meadows Community College'] = '456';
     return list;
   }
 
@@ -371,50 +368,50 @@ class _AboutYouContentState extends State<AboutYouContent> {
           return;
         }
         // Use uploadFile function for both files
-        String? uploadedFileName1 = fileResult1 != null
-            ? await uploadFile(fileResult1!, firstFileName!)
-            : await uploadImage(imageResult1!, firstFileName!);
-        String? uploadedFileName2 = fileResult2 != null
-            ? await uploadFile(fileResult2!, secondFileName!)
-            : await uploadImage(imageResult2!, secondFileName!);
+        // String? uploadedFileName1 = fileResult1 != null
+        //     ? await uploadFile(fileResult1!, firstFileName!)
+        //     : await uploadImage(imageResult1!, firstFileName!);
+        // String? uploadedFileName2 = fileResult2 != null
+        //     ? await uploadFile(fileResult2!, secondFileName!)
+        //     : await uploadImage(imageResult2!, secondFileName!);
 
-        if (uploadedFileName1 != null && uploadedFileName2 != null) {
-          var marketplaceId = '';
-          //  Get marketplace id and save to variable
-          await FirebaseFirestore.instance
-              .collection('marketplace')
-              .where('schoolIds', arrayContains: selectedSchool)
-              .get()
-              .then((value) => marketplaceId = value.docs[0].id);
-          // Update the user with marketplace and school id
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(FirebaseAuth.instance.currentUser!.email)
-              .update({
-            'schoolId': selectedSchool,
-            'marketplaceId': marketplaceId,
-            'verificationDocsUploaded': true
-          });
-          await loadCurrentUser(FirebaseAuth.instance.currentUser!.email);
-          // Additional actions after successful upload
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Upload successful!')),
-          );
-          await search("*", 10, context, Filters.none());
-          isSubmitting.value = false;
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
-          );
-        } else {
-          // Handle the case where file upload failed
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('File upload failed. Please try again.')),
-          );
-          isSubmitting.value = false;
-        }
+        // if (uploadedFileName1 != null && uploadedFileName2 != null) {
+        //   var marketplaceId = '';
+        //   //  Get marketplace id and save to variable
+        //   await FirebaseFirestore.instance
+        //       .collection('marketplace')
+        //       .where('schoolIds', arrayContains: selectedSchool)
+        //       .get()
+        //       .then((value) => marketplaceId = value.docs[0].id);
+        //   // Update the user with marketplace and school id
+        //   await FirebaseFirestore.instance
+        //       .collection('users')
+        //       .doc(FirebaseAuth.instance.currentUser!.email)
+        //       .update({
+        //     'schoolId': selectedSchool,
+        //     'marketplaceId': marketplaceId,
+        //     'verificationDocsUploaded': true
+        //   });
+        //   await loadCurrentUser(FirebaseAuth.instance.currentUser!.email);
+        // Additional actions after successful upload
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Upload successful!')),
+        );
+        // await search("*", 10, context, Filters.none());
+        isSubmitting.value = false;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+        // } else {
+        //   // Handle the case where file upload failed
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //         content: Text('File upload failed. Please try again.')),
+        //   );
+        //   isSubmitting.value = false;
+        // }
       } catch (e) {
         // Handle errors in file upload
         ScaffoldMessenger.of(context).showSnackBar(

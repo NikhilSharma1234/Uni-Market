@@ -1,15 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:uni_market/helpers/stepper_states.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 Step verify(index, tapped) {
   return Step(
     title: const Text('Verify'),
     content: Center(child: Verification(tapped: tapped)),
     isActive: index == 1,
-    state: stepperState(index, 1),
+    // state: stepperState(index, 1),
   );
 }
 
@@ -50,25 +46,30 @@ class _VerificationState extends State<Verification>
           ),
           ElevatedButton(
             onPressed: () {
+              // toggleVerification();
+              // Timer(const Duration(seconds: 4), () async {
+              //   await FirebaseAuth.instance.currentUser?.reload();
+              //   bool isVerified =
+              //       FirebaseAuth.instance.currentUser!.emailVerified;
+              //   if (isVerified) {
+              //     // Update user to email verified in db
+              //     await FirebaseFirestore.instance
+              //         .collection('users')
+              //         .doc(FirebaseAuth.instance.currentUser?.email)
+              //         .update({"emailVerified": true});
+              //     setVerified();
+              //     toggleVerification();
+              //     Timer(const Duration(seconds: 2), () async {
+              //       widget.tapped();
+              //     });
+              //     return;
+              //   }
+              //   toggleVerification();
+              // });
               toggleVerification();
-              Timer(const Duration(seconds: 4), () async {
-                await FirebaseAuth.instance.currentUser?.reload();
-                bool isVerified =
-                    FirebaseAuth.instance.currentUser!.emailVerified;
-                if (isVerified) {
-                  // Update user to email verified in db
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(FirebaseAuth.instance.currentUser?.email)
-                      .update({"emailVerified": true});
-                  setVerified();
-                  toggleVerification();
-                  Timer(const Duration(seconds: 2), () async {
-                    widget.tapped();
-                  });
-                  return;
-                }
+              Timer(const Duration(seconds: 2), () async {
                 toggleVerification();
+                widget.tapped();
               });
             },
             style: ElevatedButton.styleFrom(

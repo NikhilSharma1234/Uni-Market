@@ -1,27 +1,24 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/helpers/stepper_states.dart';
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uni_market/helpers/profile_pic_shuffler.dart';
 import 'package:uni_market/components/input_containers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Step register(index, tapped, [focusNode]) {
   focusNode = focusNode ?? focusNode;
   return Step(
-      title: const Text('Register'),
-      content: Container(
-        alignment: Alignment.centerLeft,
-        child: Registiration(
-          tapped: tapped,
-          focusNode: focusNode,
-        ),
+    title: const Text('Register'),
+    content: Container(
+      alignment: Alignment.centerLeft,
+      child: Registiration(
+        tapped: tapped,
+        focusNode: focusNode,
       ),
-      isActive: index == 0,
-      state: stepperState(index, 0));
+    ),
+    isActive: index == 0,
+    // state: stepperState(index, 0)
+  );
 }
 
 class Registiration extends StatefulWidget {
@@ -119,56 +116,56 @@ class _RegistirationState extends State<Registiration> {
   ) async {
     try {
       setState(() => submitting = true);
-      // Get user input from text field controllers (Remove ending whitespaces)
-      String userEmail = emailController.text.trim().toLowerCase();
-      String password = passwordController.text.trim();
-      String displayName = nameController.text.trim();
+      // // Get user input from text field controllers (Remove ending whitespaces)
+      // String userEmail = emailController.text.trim().toLowerCase();
+      // String password = passwordController.text.trim();
+      // String displayName = nameController.text.trim();
 
-      // Use Firebase Authentification to create a user with email and password
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: userEmail, password: password);
+      // // Use Firebase Authentification to create a user with email and password
+      // await FirebaseAuth.instance
+      //     .createUserWithEmailAndPassword(email: userEmail, password: password);
 
-      // If the form is valid, display a snackbar. In the real world,
-      // you'd often call a server or save the information in a database.
+      // // If the form is valid, display a snackbar. In the real world,
+      // // you'd often call a server or save the information in a database.
 
-      // Add Users' Display Name
-      await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
+      // // Add Users' Display Name
+      // await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
 
-      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+      // await FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: userEmail, password: password);
+      // await FirebaseAuth.instance
+      //     .signInWithEmailAndPassword(email: userEmail, password: password);
 
       // Set starting profile picture
-      String? chosenProfilePicPath =
-          "profile_pics/${const ProfilePicShuffler().reveal()}";
+      // String? chosenProfilePicPath =
+      //     "profile_pics/${const ProfilePicShuffler().reveal()}";
 
-      final user = <String, dynamic>{
-        "blockedUsers": [],
-        "createdAt": Timestamp.now(),
-        "updatedAt": Timestamp.now(),
-        "deletedAt": null,
-        "name": displayName,
-        "email": userEmail,
-        "schoolId": null,
-        "marketplaceId": null,
-        "darkMode": 0,
-        "emailVerified": false,
-        "verificationDocsUploaded": false,
-        "verifiedUniStudent": false,
-        "verifiedBy": null,
-        "verifiedAt": null,
-        "venmoId": null,
-        "assignable_profile_pic": null,
-        "starting_profile_pic": chosenProfilePicPath,
-        "wishlist": []
-      };
+      // final user = <String, dynamic>{
+      //   "blockedUsers": [],
+      //   "createdAt": Timestamp.now(),
+      //   "updatedAt": Timestamp.now(),
+      //   "deletedAt": null,
+      //   "name": displayName,
+      //   "email": userEmail,
+      //   "schoolId": null,
+      //   "marketplaceId": null,
+      //   "darkMode": 0,
+      //   "emailVerified": false,
+      //   "verificationDocsUploaded": false,
+      //   "verifiedUniStudent": false,
+      //   "verifiedBy": null,
+      //   "verifiedAt": null,
+      //   "venmoId": null,
+      //   "assignable_profile_pic": null,
+      //   "starting_profile_pic": chosenProfilePicPath,
+      //   "wishlist": []
+      // };
 
       // Add user to users database
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userEmail)
-          .set(user);
+      // await FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(userEmail)
+      //     .set(user);
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Creating your account')),
