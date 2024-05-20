@@ -1,13 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/data_store.dart';
-import 'package:uni_market/helpers/functions.dart';
-import 'package:uni_market/pages/chat_service.dart';
-import 'package:uni_market/pages/chat.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 
 class ItemPageInfo extends StatefulWidget {
@@ -43,7 +38,6 @@ class _ItemPageInfoState extends State<ItemPageInfo> {
       child: const Text('Contact Seller'),
     );
     if (user.email == widget.itemData.sellerId) {
-      var db = FirebaseFirestore.instance;
       itemButton = ElevatedButton(
         onPressed: null,
         style: ElevatedButton.styleFrom(

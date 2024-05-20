@@ -2,21 +2,15 @@ import 'dart:typed_data';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
-import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/components/image_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:uni_market/helpers/functions.dart';
-import 'package:uni_market/pages/item_page.dart';
 import 'dart:convert';
 import 'dialog.dart';
-import 'package:uni_market/helpers/profanity_checker.dart';
-import 'package:uni_market/data_store.dart' as data_store;
 
 class PostForm extends StatefulWidget {
   final Function(List<Widget> newItems, bool append, [bool? start])
@@ -52,8 +46,8 @@ class _PostFormState extends State<PostForm> {
 
   @override
   initState() {
-    searchTags("", maxTags, [])
-        .then((value) => setState(() => _suggestedTags = value));
+    // searchTags("", maxTags, [])
+    //     .then((value) => setState(() => _suggestedTags = value));
     super.initState();
   }
 
@@ -124,75 +118,6 @@ class _PostFormState extends State<PostForm> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    // shows the books dialog and handles logic
-    AlertDialog showBooks(value) {
-      return AlertDialog(
-          insetPadding: EdgeInsets.all(screenWidth * 0.05),
-          title: const Center(
-            child: Text(
-                'Here are the books we found, please scroll through and select the correct one'),
-          ),
-          content: SizedBox(
-            width: screenWidth * 0.9,
-            height: screenHeight * 0.7,
-            child: ListView(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                children: [
-                  for (var book in value['docs'])
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            // update form info with book autofill
-                            _titleController.text =
-                                book['title'] ?? 'Not Found';
-                            if (_titleController.text.length > 50) {
-                              _titleController.text.substring(0, 50);
-                            }
-                            if (book['isbn'] != null && book['isbn'] != []) {
-                              _descriptionController.text =
-                                  "Isbn: ${book['isbn'][0] ?? 'Not Found'}\nAuthor: ${book['author_name'][0] ?? 'Not Found'}";
-                            } else {
-                              _descriptionController.text =
-                                  "Info on book not found";
-                            }
-
-                            _tags.add('book');
-                            if (_suggestedTags.contains('book')) {
-                              _suggestedTags.remove('book');
-                            } else {
-                              _suggestedTags.removeLast();
-                            }
-                            // update tags with book related ones
-                            searchTags('book', maxTags, _tags).then((value) {
-                              setState(() => _suggestedTags = value);
-                            });
-                          });
-                          Navigator.of(context).pop();
-                        },
-                        child: book['cover_i'] != null
-                            ? makeBookImage(book['cover_i'], book['title'])
-                            : Align(
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  height: 500,
-                                  width: 316,
-                                  child: Text(
-                                    "No image found for ${book['title']} \n\nAuthor: ${book['author_name'][0]} \n\nISBN: ${book['isbn'] ?? 'Not Found'}",
-                                  ),
-                                ),
-                              ),
-                      ),
-                    )
-                ]),
-          ));
-    }
-
     return submitting
         ? SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -228,29 +153,12 @@ class _PostFormState extends State<PostForm> {
                 FormBuilderTextField(
                   name: 'title',
                   style: const TextStyle(fontSize: 13),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       labelText: 'Title',
                       suffixIcon: Tooltip(
                         message: 'Search for book by title entered',
-                        child: IconButton(
-                            onPressed: () {
-                              getBookbyName(_titleController.value.text)
-                                  .then((value) {
-                                if (value['num_found'] > 0) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return showBooks(value);
-                                      });
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Book not found, try again!')));
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.book)),
+                        child:
+                            IconButton(onPressed: null, icon: Icon(Icons.book)),
                       )),
                   controller: _titleController,
                   validator: FormBuilderValidators.required(context),
@@ -348,48 +256,7 @@ class _PostFormState extends State<PostForm> {
                         shadowColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6.0))),
-                    onPressed: submitActive ==
-                            false // disables button while waiting for response from API
-                        ? null
-                        : () async {
-                            if (kIsWeb) {
-                              List<XFile> clientImageFiles =
-                                  await multiImagePicker(context);
-
-                              if (clientImageFiles.isNotEmpty) {
-                                List<String> dataUrls =
-                                    await convertXFilesToDataUrls(
-                                        clientImageFiles);
-
-                                // Show the pop-up dialog for image confirmation
-                                if (context.mounted) {
-                                  String confirmSelection = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      // Assign the captured context
-                                      return ImageCarouselDialog(
-                                          imageDataUrls: dataUrls);
-                                    },
-                                  );
-
-                                  // Check if the user confirmed selected images
-                                  if (confirmSelection == 'yes') {
-                                    setState(() {
-                                      _imageDataUrls = dataUrls;
-                                    });
-
-                                    if (await moderateSelectedImages(
-                                            dataUrls) ==
-                                        true) {
-                                      _flag(true);
-                                    }
-                                  }
-                                }
-                              }
-                            } else {
-                              showOptions(context);
-                            }
-                          },
+                    onPressed: null,
                     child: Column(
                       children: [
                         const Text("Upload Image(s)",
@@ -408,49 +275,7 @@ class _PostFormState extends State<PostForm> {
                       shadowColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6.0))),
-                  onPressed: submitActive ==
-                          false // disables button while waiting for response from API
-                      ? null
-                      : () async {
-                          // Check form data validitiy
-                          setState(() {
-                            submitActive = false;
-                          });
-                          if (_fbKey.currentState!.saveAndValidate()) {
-                            setState(() {
-                              // Update Post Form State
-                              submitting = true;
-                            });
-                            // Store form data in Map for db upload\
-                            Map<String, dynamic> formData =
-                                Map.from(_fbKey.currentState!.value);
-                            String inputText = formData["title"] +
-                                " " +
-                                formData["description"];
-
-                            if (isFlagged != true) {
-                              try {
-                                await checkProfanity(inputText,
-                                        checkStrength: false)
-                                    .then((value) => _flag(value));
-                              } catch (e) {
-                                if (kDebugMode) {
-                                  print(
-                                      "Failed to perform profanity checking: $e");
-                                }
-                              }
-                            }
-
-                            // ignore: use_build_context_synchronously
-                            await _createPost(
-                                context, formData, _imageDataUrls);
-                            setState(() {
-                              submitActive = true;
-                            });
-                          } else {
-                            setState(() => submitActive = true);
-                          }
-                        },
+                  onPressed: null,
                   child: const Text('Submit'),
                 ),
                 const SizedBox(height: 8),
@@ -626,121 +451,6 @@ class _PostFormState extends State<PostForm> {
   }
 
   // Helper functions for input form to database document
-  Future<void> _createPost(
-    BuildContext context,
-    Map<String, dynamic> formData,
-    List<String> imageDataUrls,
-  ) async {
-    try {
-      // Pop Up Post Creation Snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Creating your post')),
-      );
-
-      // Upload images to firebase storage before generating post document
-      try {
-        Completer<List<String>> completer = Completer<List<String>>();
-        uploadImages(imageDataUrls, completer);
-        List<String> downloadUrls = await completer.future;
-        formData["images"] = downloadUrls;
-      } catch (e) {
-        if (kDebugMode) {
-          print("Error uploading images: $e");
-        }
-        return;
-      }
-
-      // create userPost map for firebase document data
-      final userPost = <String, dynamic>{
-        "buyerId": null,
-        "condition": formData["condition"],
-        "deletedAt": null,
-        "createdAt": Timestamp.now(),
-        "dateUpdated": Timestamp.now(),
-        "description": formData["description"],
-        "images": formData["images"],
-        "marketplaceId": data_store.user.marketplaceId,
-        "name": formData["title"],
-        "price": double.parse(formData["price"]),
-        "schoolId": data_store.user.schoolId,
-        "sellerId": data_store.user.email,
-        "isFlagged": isFlagged,
-        "tags": FieldValue.arrayUnion(_tags),
-        "lastReviewedBy": null
-      };
-
-      // POTENTIAL PLACEHOLDER FOR UNACCEPTABLE STRING CHECKING (profanity, racism ...)
-
-      // create post in db
-
-      DocumentReference userItemUploaded =
-          await FirebaseFirestore.instance.collection("items").add(userPost);
-
-      userPost['id'] = userItemUploaded.id;
-      userPost['tags'] = _tags;
-      if (userPost['images'].length == 0) {
-        userPost['images'] = [data_store.missingImage];
-      } else {
-        for (int i = 0; i < userPost['images'].length; i++) {
-          userPost['images'][i] = await getURL(userPost['images'][i]);
-        }
-      }
-
-      // show see post dialog upon successful creation
-      if (context.mounted) {
-        // create item and add
-        AbstractItemFactory factory = AbstractItemFactory();
-        widget.setHomeState(
-            [factory.buildItemBox(Item.fromFirebase(userPost), context)],
-            false,
-            true);
-        setState(() {
-          submitting = false;
-        });
-        Navigator.of(context).pop();
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Congratulations!'),
-              content: const Text('You have successfully created a post.'),
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ItemPage(data: Item.fromFirebase(userPost));
-                          },
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text('Click here to view your post'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      // Show failure snackbar
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to create post')),
-        );
-        if (kDebugMode) {
-          print(e);
-        }
-      }
-      setState(() {
-        submitting = false;
-      });
-      throw ("failed async for create post");
-    }
-  }
 
   bool isValidPrice(String? value) {
     if (value == null) {

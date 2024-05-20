@@ -1,10 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_advanced_avatar/flutter_advanced_avatar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +13,7 @@ import 'package:uni_market/helpers/is_mobile.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:uni_market/helpers/theme_provider.dart';
-import 'package:uni_market/pages/item_view.dart';
 import 'package:uni_market/data_store.dart' as data_store;
-import 'package:uni_market/pages/items_bought_view.dart';
-import 'package:uni_market/pages/items_sold_view.dart';
 import 'package:uni_market/pages/sign_up.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -50,17 +44,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     List<dynamic> schoolsInMarketplace = user.schoolsInMarketplace;
     schoolsInMarketplace.remove(user.schoolId);
-
-    // Get available profile pic (starting or assignable)
-    String profilePic;
-
-    if (user.assignable_profile_pic_url == null) {
-      // Starting Pic Exists, New User / User Has not set an assignable profile
-      profilePic = user.starting_profile_pic_url;
-    } else {
-      // Assignable Pic Exists, User has changed profile pics
-      profilePic = user.assignable_profile_pic_url!;
-    }
 
     if (loading) {
       return Scaffold(
@@ -107,7 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const Text('P R O F I L E',
                     textAlign: TextAlign.start, style: TextStyle(fontSize: 24)),
                 const Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 12),
+                  padding: EdgeInsets.only(top: 12, bottom: 12),
                   child: Center(
                     child: InkWell(
                       onTap: null,
@@ -478,58 +461,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return null;
   }
 
-  Future<bool?> _updateProfilePicture(XFile? profilePic) async {
-    if (profilePic != null) {
-      Future<String?> imageDataUrl = convertImageToDataUrl(profilePic);
-      try {
-        String? dataUrl = await imageDataUrl;
-        if (dataUrl != null) {
-          List<String> imageNames = [];
-          Uint8List imageBytes = base64Decode(dataUrl.split(',').last);
-          String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-          final imageRef = FirebaseStorage.instance
-              .ref()
-              .child("profile_pics/$fileName.jpg");
-          try {
-            await imageRef.putData(imageBytes);
-            imageNames.add("profile_pics/$fileName.jpg");
-          } on FirebaseException catch (e) {
-            // Handle Firebase exception
-            if (kDebugMode) {
-              print(e);
-            }
-            return false;
-          }
-
-          try {
-            if (data_store.user.email != "") {
-              await FirebaseFirestore.instance
-                  .collection("users")
-                  .doc(data_store.user.email)
-                  .update({"assignable_profile_pic": imageNames[0]});
-              await loadCurrentUser(data_store.user.email);
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print("Error: $e");
-            }
-          }
-          Completer<List<String>> completer = Completer<List<String>>();
-          completer.complete(imageNames);
-          return true;
-        } else {
-          // Data URL is null
-          return false;
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print("Error updating profile picture: $e");
-        }
-        return false;
-      }
-    }
-    return null;
-  }
 
   Future<String?> convertImageToDataUrl(XFile? imageFile) async {
     if (imageFile != null) {
