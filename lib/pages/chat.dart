@@ -2,7 +2,6 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +11,6 @@ import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/image_data_store.dart';
-import 'package:uni_market/pages/item_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
 
@@ -34,7 +32,6 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
-  late Future<Map<String, dynamic>?> _sessionDetailsFuture;
   late bool _seenTransactionWarning = false;
   bool _isDialogShown = false; // Add this flag
 
@@ -43,8 +40,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _sessionDetailsFuture =
-        _chatController.fetchChatSessionDetails(widget.chatSessionId);
   }
 
   @override
@@ -55,154 +50,96 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    showItemPage(BuildContext context, String productId) {
-      if (context.mounted) {
-        var db = FirebaseFirestore.instance;
-        db.collection('items').doc(widget.productId).get().then((value) async {
-          var data = value.data()!;
-          data['id'] = widget.productId;
-          for (int i = 0; i < data['images'].length; i++) {
-            data['images'][i] = await getURL(data['images'][i]);
-          }
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) {
-              return ItemPage(data: Item.fromFirebase(data));
-            },
-          ));
-        });
-      }
-    }
-
-    return StreamBuilder<bool>(
-      stream: _chatController.getDeletedByUsersStream(widget.chatSessionId),
-      builder: (context, canSendSnapshot) {
-        if (canSendSnapshot.hasData &&
-            !canSendSnapshot.data! &&
-            !_isDialogShown) {
-          _isDialogShown = true; // Indicate that dialog is being shown
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _maybeShowDeletedSessionSnackbar();
-          });
-        }
-        bool canCurrentUserSendMessages = canSendSnapshot.data ?? true;
-
-        return FutureBuilder<Map<String, dynamic>?>(
-          future: _sessionDetailsFuture,
-          builder: (context, sessionSnapshot) {
-            String title = "Chat";
-            String imagePath = "";
-            if (sessionSnapshot.connectionState == ConnectionState.done &&
-                sessionSnapshot.hasData) {
-              final data = sessionSnapshot.data!;
-              title = "${data['buyerName']} - ${data['productName']}";
-              imagePath = data['productImageUrl'] ?? "";
-            }
-
-            return Scaffold(
-              appBar: AppBar(
-                title: InkWell(
-                  onTap: () {
-                    showItemPage(context, widget.productId);
+    return Scaffold(
+      appBar: AppBar(
+        title: const InkWell(
+          onTap: null,
+          child: AppBarTitleWithImage(
+            title: 'Chat',
+            imagePath: null,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.location_on),
+            onPressed: _showLocationsModal,
+          ),
+          const IconButton(
+            icon: Icon(Icons.block),
+            onPressed: null,
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 32),
+        child: Column(
+          children: [
+            Expanded(
+                child: ListView.builder(
+              reverse: true,
+              padding: const EdgeInsets.only(bottom: 0),
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                var message = [
+                  {
+                    'content': 'I\ll see you there!',
+                    'timestamp': Timestamp.now(),
+                    'sender': false
                   },
-                  child: AppBarTitleWithImage(
-                    title: title,
-                    imagePath: imagePath,
-                  ),
-                ),
-                actions: canCurrentUserSendMessages
-                    ? [
-                        IconButton(
-                          icon: const Icon(Icons.location_on),
-                          onPressed: _showLocationsModal,
-                        ),
-                        ...data_store.user.email == widget.sellerId
-                            ? [
-                                IconButton(
-                                  icon: const Icon(Icons.sell),
-                                  onPressed: _confirmSell,
-                                )
-                              ]
-                            : [],
-                        IconButton(
-                          icon: const Icon(Icons.block),
-                          onPressed: _confirmBlock,
-                        ),
-                        ...data_store.user.email == widget.sellerId
-                            ? [
-                                IconButton(
-                                    onPressed: () => _showVenmoLink(context),
-                                    icon: Image.asset('assets/venmo_logo.png'))
-                              ]
-                            : []
-                      ]
-                    : [],
-              ),
-              body: Padding(
-                padding: const EdgeInsets.only(bottom: 32),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: _chatController
-                            .getMessageStream(widget.chatSessionId),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
-                          return ListView.builder(
-                            reverse: true,
-                            padding: EdgeInsets.only(
-                                bottom: canCurrentUserSendMessages ? 0 : 20),
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              var message = snapshot.data!.docs[index];
-                              bool isSentByMe = message['senderId'] ==
-                                  _chatController.chatModel.currentUser?.uid;
-                              return _buildMessageBubble(
-                                  context, message, isSentByMe);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    if (canCurrentUserSendMessages) _buildMessageComposer(),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
+                  {
+                    'type': 'location',
+                    'content':
+                        'Current user suggested -- Joe Crowley Student Union at The University of Nevada, Reno to be the trade location',
+                    'timestamp': Timestamp.now(),
+                    'sender': true
+                  },
+                  {
+                    'content': 'I want to buy your item',
+                    'timestamp': Timestamp.now(),
+                    'sender': true
+                  },
+                  {
+                    'content': 'Hello??',
+                    'timestamp': Timestamp.now(),
+                    'sender': true
+                  }
+                ][index];
+                return _buildMessageBubble(context, message);
+              },
+            )),
+            _buildMessageComposer(),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildMessageBubble(BuildContext context,
-      QueryDocumentSnapshot<Object?> message, bool isSentByMe) {
+  Widget _buildMessageBubble(BuildContext context, var message) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    bool isSentByMe = message['sender'];
 
     Color senderBubbleColorLight = Colors.blueGrey.shade700;
     Color receiverBubbleColorLight = const Color.fromARGB(255, 68, 65, 65);
     Color senderBubbleColorDark = Colors.white;
     Color receiverBubbleColorDark = const Color.fromARGB(150, 198, 220, 248);
-    Color locationBubbleColor =
-        isDarkMode ? const Color.fromARGB(255, 203, 196, 196) : const Color.fromARGB(255, 43, 79, 128);
+    Color locationBubbleColor = isDarkMode
+        ? const Color.fromARGB(255, 203, 196, 196)
+        : const Color.fromARGB(255, 43, 79, 128);
 
     Color bubbleColor = isSentByMe
         ? (isDarkMode ? senderBubbleColorDark : senderBubbleColorLight)
         : (isDarkMode ? receiverBubbleColorDark : receiverBubbleColorLight);
     Color textColor = isDarkMode ? Colors.black : Colors.white;
     Color transactionTextColor = isDarkMode ? Colors.black : Colors.white;
- 
-    final messageData = message.data() as Map<String, dynamic>?;
 
-    bool isLocationMessage = messageData?.containsKey('type') == true &&
-        messageData?['type'] == 'location';
-    bool isTransactionMessage = messageData?.containsKey('type') == true &&
-        messageData?['type'] == 'transaction';
-    bool isVenmoLink = messageData?.containsKey('type') == true &&
-        messageData?['type'] == 'venmo';
+    final messageData = message as Map<String, dynamic>;
+
+    bool isLocationMessage = messageData.containsKey('type') == true &&
+        messageData['type'] == 'location';
+    bool isTransactionMessage = messageData.containsKey('type') == true &&
+        messageData['type'] == 'transaction';
+    bool isVenmoLink = messageData.containsKey('type') == true &&
+        messageData['type'] == 'venmo';
 
     double screenWidth = MediaQuery.of(context).size.width;
     double bubbleMaxWidth = screenWidth * 0.6;
@@ -222,21 +159,16 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(fontSize: 16, color: textColor),
               children: [
                 TextSpan(
-                  text: "${message.get('content')} -- ",
+                  text: "${message['content']} -- ",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
-                  text: "view location",
-                  style: const TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold),
-                  recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      _showLocationInfo(
-                          message.get('schoolName'), message.get('address'));
-                    },
-                ),
+                    text: "view location",
+                    style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold),
+                    recognizer: TapGestureRecognizer()..onTap = null),
               ],
             ),
           ),
@@ -258,7 +190,7 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(fontSize: 16, color: textColor),
               children: [
                 TextSpan(
-                  text: "${message.get('content')}",
+                  text: "${message['content']}",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -290,7 +222,7 @@ class _ChatPageState extends State<ChatPage> {
                   Column(
                     children: [
                       Text(
-                        message.get('content'),
+                        message['content'],
                         style: TextStyle(
                           color: transactionTextColor,
                           fontSize: 9.0,
@@ -334,14 +266,14 @@ class _ChatPageState extends State<ChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    message.get('content'),
+                    message['content'],
                     style: TextStyle(color: textColor),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       DateFormat('dd/MM/yy hh:mm a')
-                          .format(message.get('timestamp').toDate()),
+                          .format(message['timestamp'].toDate()),
                       style: TextStyle(
                         color: textColor.withOpacity(0.7),
                         fontSize: 10,
@@ -397,19 +329,15 @@ class _ChatPageState extends State<ChatPage> {
               maxLines: 5,
               minLines: 1,
               textInputAction: TextInputAction.send,
-              onEditingComplete: () {
-                _chatController.sendMessage(widget.chatSessionId);
-
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
+              onEditingComplete: null,
               inputFormatters: [
                 if (kIsWeb) FilteringTextInputFormatter.deny(RegExp('[\n]')),
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () => _chatController.sendMessage(widget.chatSessionId),
+          const IconButton(
+            icon: Icon(Icons.send),
+            onPressed: null,
           ),
         ],
       ),
@@ -455,8 +383,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _showLocationsModal() async {
-    final locations = await _chatController
-        .fetchLocationsBasedOnSession(widget.chatSessionId);
+    final locations = [
+      {'locationName': 'Joe Crowley Student Union'},
+      {'locationName': 'Dandini Campus - TMCC'}
+    ];
 
     if (!mounted) return;
 
@@ -481,17 +411,17 @@ class _ChatPageState extends State<ChatPage> {
                   for (var location in locations) ...[
                     ListTile(
                       title: Text(
-                        location['locationName'],
+                        location['locationName']!,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       onTap: () {
                         Navigator.of(context).pop();
-                        _chatController.sendLocationMessage(
-                          widget.chatSessionId,
-                          location['locationName'],
-                          location['schoolName'],
-                          location['address'],
-                        );
+                        // _chatController.sendLocationMessage(
+                        //   widget.chatSessionId,
+                        //   location['locationName']!,
+                        //   location['schoolName']!,
+                        //   location['address']!,
+                        // );
                       },
                     ),
                     const Divider()
@@ -501,7 +431,6 @@ class _ChatPageState extends State<ChatPage> {
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color(0xFF041E42),
                         padding: const EdgeInsets.all(16.0),
                         textStyle: const TextStyle(fontSize: 20),
                       ),
