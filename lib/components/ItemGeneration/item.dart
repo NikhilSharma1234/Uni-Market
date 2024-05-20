@@ -55,7 +55,8 @@ class Item {
     isFlagged = map['isFlagged'];
     deletedAt = map['deletedAt'] == 0
         ? null
-        : DateTime.fromMicrosecondsSinceEpoch(map['deletedAt'].toInt() * 1000000);
+        : DateTime.fromMicrosecondsSinceEpoch(
+            map['deletedAt'].toInt() * 1000000);
   }
 
   Item.fromFirebase(Map map)

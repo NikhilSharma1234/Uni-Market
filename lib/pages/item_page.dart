@@ -1,12 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:uni_market/components/item_page_info.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
 import 'dart:ui';
+import 'dart:math';
 
 class ItemPage extends StatefulWidget {
   final Item data;
@@ -23,10 +22,10 @@ class _ItemPageState extends State<ItemPage> {
   int currentIndex = 0;
   late Item itemData;
   late List<String> productImages;
-  late String sellerName;
-  late String sellerProfilePic;
-  late int? sellerItemsSold;
-  late int? sellerItemsBought;
+  String sellerName = 'Seller\'s Name';
+  String sellerProfilePic = 'assets/portraits/nikhil.jpeg';
+  int sellerItemsSold = Random().nextInt(10);
+  int sellerItemsBought = Random().nextInt(10);
 
   @override
   void initState() {
@@ -35,38 +34,8 @@ class _ItemPageState extends State<ItemPage> {
   }
 
   Future<String> loadImages() {
-    return Future.delayed(const Duration(seconds: 1), () async {
-      productImages = itemData.imagePath;
-      await FirebaseFirestore.instance
-          .collection('items')
-          .where('sellerId', isEqualTo: itemData.sellerId)
-          .where('buyerId', isNull: false)
-          .count()
-          .get()
-          .then((response) => sellerItemsSold = response.count);
-      await FirebaseFirestore.instance
-          .collection('items')
-          .where('buyerId', isEqualTo: itemData.sellerId)
-          .count()
-          .get()
-          .then((response) => sellerItemsBought = response.count);
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(itemData.sellerId)
-          .get()
-          .then((value) async {
-        sellerName = value.data()!['name'].toString();
-        if (value.data()?['assignable_profile_pic'] == null) {
-          sellerProfilePic = await FirebaseStorage.instance
-              .ref(value.data()?['starting_profile_pic'])
-              .getDownloadURL();
-        } else {
-          sellerProfilePic = await FirebaseStorage.instance
-              .ref(value.data()?['assignable_profile_pic'])
-              .getDownloadURL();
-        }
-      });
-      return 'asdads';
+    return Future.delayed(const Duration(seconds: 2), () {
+      return 'hello';
     });
   }
 
@@ -113,7 +82,7 @@ class _ItemPageState extends State<ItemPage> {
                                           horizontal: 5.0),
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
-                                            image: NetworkImage(i),
+                                            image: AssetImage(i),
                                             fit: BoxFit.cover),
                                       ),
                                       child: Stack(children: <Widget>[
@@ -130,7 +99,7 @@ class _ItemPageState extends State<ItemPage> {
                                         Positioned.fill(
                                             child: Align(
                                           alignment: Alignment.center,
-                                          child: Image.network(i,
+                                          child: Image.asset(i,
                                               fit: BoxFit.fitHeight),
                                         ))
                                       ]),
@@ -185,8 +154,7 @@ class _ItemPageState extends State<ItemPage> {
                                       horizontal: 1.0),
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: NetworkImage(i),
-                                        fit: BoxFit.fill),
+                                        image: AssetImage(i), fit: BoxFit.fill),
                                   ),
                                   child: Stack(children: <Widget>[
                                     Center(
@@ -204,8 +172,8 @@ class _ItemPageState extends State<ItemPage> {
                                     Positioned.fill(
                                         child: Align(
                                       alignment: Alignment.center,
-                                      child: Image.network(i,
-                                          fit: BoxFit.fitHeight),
+                                      child:
+                                          Image.asset(i, fit: BoxFit.fitHeight),
                                     ))
                                   ]),
                                 );

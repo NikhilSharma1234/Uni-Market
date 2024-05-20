@@ -20,6 +20,7 @@ import 'package:uni_market/pages/item_view.dart';
 import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/pages/items_bought_view.dart';
 import 'package:uni_market/pages/items_sold_view.dart';
+import 'package:uni_market/pages/sign_up.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -92,68 +93,6 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
 
-    Future getImageFromCamera() async {
-      XFile? image = await ImagePicker().pickImage(source: ImageSource.camera);
-
-      if (image != null) {
-        return image;
-      }
-    }
-
-    Future showOptions(BuildContext context) async {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) => CupertinoActionSheet(
-          actions: [
-            CupertinoActionSheetAction(
-              child: const Text('Photo Gallery'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                // get image from gallery
-                var newProfilePic = await singleImagePicker(context);
-                if (newProfilePic != null) {
-                  setState(() {
-                    loading = true;
-                  });
-                  await _updateProfilePicture(newProfilePic)
-                      .then((success) async {
-                    if (success != null) {
-                      await loadCurrentUser(data_store.user.email);
-                    }
-                  });
-                  setState(() {
-                    loading = false;
-                  });
-                }
-              },
-            ),
-            CupertinoActionSheetAction(
-              child: const Text('Camera'),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                // get image from gallery
-                var newProfilePic = await getImageFromCamera();
-                if (newProfilePic != null) {
-                  setState(() {
-                    loading = true;
-                  });
-                  await _updateProfilePicture(newProfilePic)
-                      .then((success) async {
-                    if (success != null) {
-                      await loadCurrentUser(data_store.user.email);
-                    }
-                  });
-                  setState(() {
-                    loading = false;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-      );
-    }
-
     var child = SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Scrollbar(
@@ -167,51 +106,17 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const Text('P R O F I L E',
                     textAlign: TextAlign.start, style: TextStyle(fontSize: 24)),
-                Padding(
+                const Padding(
                   padding: const EdgeInsets.only(top: 12, bottom: 12),
                   child: Center(
                     child: InkWell(
-                      onTap: () async {
-                        if (!kIsWeb) {
-                          showOptions(context);
-                          return;
-                        }
-                        newProfilePic = await singleImagePicker(context);
-                        if (newProfilePic != null) {
-                          setState(() {
-                            loading = true;
-                          });
-                          _updateProfilePicture(newProfilePic).then((success) {
-                            if (success != null) {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text(
-                                          "Profile Settings Changed!"),
-                                      content:
-                                          const Text("Profile Image Updated"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text("Continue"),
-                                        )
-                                      ],
-                                    );
-                                  });
-                            }
-                          });
-                          await loadCurrentUser(data_store.user.email);
-                        }
-                      },
+                      onTap: null,
                       child: Stack(children: [
                         AdvancedAvatar(
                           size: 160,
-                          image: NetworkImage(profilePic),
+                          image: AssetImage('assets/portraits/elke.jpg'),
                         ),
-                        const Positioned(
+                        Positioned(
                           bottom: 0,
                           right: 0,
                           child: Icon(
@@ -223,27 +128,28 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Name",
+                      Text("Name",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(user.name, style: const TextStyle(fontSize: 12)),
+                      Text('Current User', style: TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                const Padding(
+                  padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Email",
+                      Text("Email",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(user.email, style: const TextStyle(fontSize: 12)),
+                      Text('Current user\'s email',
+                          style: TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
@@ -287,11 +193,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     .setThemeMode(ThemeMode.light);
                                 break;
                             }
-                            await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(user.email)
-                                .update({'darkMode': selection.elementAt(0)});
-                            await loadCurrentUser(data_store.user.email);
+                            // await FirebaseFirestore.instance
+                            //     .collection('users')
+                            //     .doc(user.email)
+                            //     .update({'darkMode': selection.elementAt(0)});
+                            // await loadCurrentUser(data_store.user.email);
                           },
                           showSelectedIcon: false,
                         ),
@@ -299,28 +205,28 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                const Padding(
+                  padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Institution",
+                        Text("Institution",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text(user.institutionFullName,
-                            style: const TextStyle(fontSize: 12)),
+                        Text('University of Nevada, Reno',
+                            style: TextStyle(fontSize: 12)),
                       ]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                const Padding(
+                  padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Other Schools in Marketplace",
+                      Text("Other Schools in Marketplace",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(schoolsInMarketplace.join(', '),
-                          style: const TextStyle(fontSize: 12)),
+                      Text('Truckee Meadows Community College',
+                          style: TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
@@ -351,22 +257,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                         },
                                       ),
                                     ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        updateVenmoId(
-                                            editingController.text.toString());
-                                        flipVenmoEditingState();
-                                      },
-                                      child: const Text("Confirm"),
+                                    const TextButton(
+                                      onPressed: null,
+                                      child: Text("Confirm"),
                                     ),
                                     TextButton(
                                       style: ButtonStyle(
                                           backgroundColor:
                                               MaterialStateProperty.all(
                                                   Colors.red)),
-                                      onPressed: () {
-                                        flipVenmoEditingState();
-                                      },
+                                      onPressed: null,
                                       child: const Text(
                                         "Cancel",
                                       ),
@@ -436,14 +336,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ItemView(sellerID: data_store.user.email),
-                          ),
-                        );
-                      },
+                      onPressed: null,
                       child: const Text("Items you've listed"),
                     ),
                   ),
@@ -461,13 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const ItemsBoughtView(),
-                          ),
-                        );
-                      },
+                      onPressed: null,
                       child: const Text("Items Bought"),
                     ),
                   ),
@@ -485,13 +372,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const ItemsSoldView(),
-                          ),
-                        );
-                      },
+                      onPressed: null,
                       child: const Text("Items Sold"),
                     ),
                   ),
@@ -510,25 +391,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       onPressed: () async {
-                        Navigator.pop(context);
-                        data_store.user.delete();
-                        data_store.itemBoxes = [];
-                        await FirebaseAuth.instance.signOut();
-                        // ignore: use_build_context_synchronously
-                        Provider.of<ThemeProvider>(context, listen: false)
-                            .setThemeMode(ThemeMode.dark);
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpPage(
+                                title: 'Sign Up', signUpStep: 2),
+                          ),
+                        );
                       },
                       child: const Text('LOG OUT'),
                     ),
                   ),
                 ),
                 // Delete Account Button, NO LOGIC
-                Center(
+                const Center(
                   child: TextButton(
-                    onPressed: () {
-                      deleteAccount();
-                    },
-                    child: const Text("Delete Account",
+                    onPressed: null,
+                    child: Text("Delete Account",
                         style: TextStyle(color: Colors.red)),
                   ),
                 ),
@@ -571,113 +449,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () async {
-                  String password = passwordController.text.trim();
-                  // Reauthenticate user (needs to have recently logged in to delete user)
-                  try {
-                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                        email: data_store.user.email, password: password);
-                    // ignore: use_build_context_synchronously
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return const AlertDialog(
-                              title: Text('Account being deleted'),
-                              content: LinearProgressIndicator());
-                        });
-                    // Delete user verifications docs
-                    await FirebaseStorage.instance
-                        .ref('verification/${data_store.user.email}')
-                        .listAll()
-                        .then((value) async {
-                      for (var item in value.items) {
-                        await FirebaseStorage.instance
-                            .ref(item.fullPath)
-                            .delete();
-                      }
-                    });
-                    // Get items to be deleted
-                    var userItemsToBeDeleted = await FirebaseFirestore.instance
-                        .collection('items')
-                        .where('sellerId', isEqualTo: data_store.user.email)
-                        .get();
-
-                    // Get chat sessions to be deleted
-                    var chatSessionsToBeDeleted = await FirebaseFirestore
-                        .instance
-                        .collection('chat_sessions')
-                        .where('sellerId', isEqualTo: data_store.user.email)
-                        .get();
-                    // Get chat sessions to be deleted where this user is the buyer
-                    var chatSessionsAsBuyerToBeDeleted = await FirebaseFirestore
-                        .instance
-                        .collection('chat_sessions')
-                        .where('participantIds',
-                            arrayContains: data_store.user.email)
-                        .get();
-                    // Go through items with sellerid equal to current user
-                    for (var doc in userItemsToBeDeleted.docs) {
-                      // Delete image associated with item
-                      for (var imagePath in doc.data()['images']) {
-                        await FirebaseStorage.instance.ref(imagePath).delete();
-                      }
-                      // Delete the item
-                      await FirebaseFirestore.instance
-                          .collection('items')
-                          .doc(doc.id)
-                          .delete();
-                    }
-                    // Delete the chat session where this user is the buyer
-                    for (var doc in chatSessionsAsBuyerToBeDeleted.docs) {
-                      var deletedBy = doc.data()['deletedByUsers'];
-                      if (!deletedBy.contains(data_store.user.email)) {
-                        deletedBy.add(data_store.user.email);
-                      }
-                      await FirebaseFirestore.instance
-                          .collection('chat_sessions')
-                          .doc(doc.id)
-                          .update({'deletedByUsers': deletedBy});
-                    }
-                    // Delete chat session associated where this user is the seller
-                    for (var doc in chatSessionsToBeDeleted.docs) {
-                      await FirebaseFirestore.instance
-                          .collection('chat_sessions')
-                          .doc(doc.id)
-                          .delete();
-                    }
-                    // If assignable profile pic exists, delete that
-                    if (data_store.user.assignable_profile_pic != null &&
-                        data_store.user.assignable_profile_pic!.isNotEmpty) {
-                      await FirebaseStorage.instance
-                          .ref(data_store.user.assignable_profile_pic)
-                          .delete();
-                    }
-                    // Delete user from firestore
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(data_store.user.email)
-                        .delete();
-                    // Delete user from firebase auth
-                    await FirebaseAuth.instance.currentUser?.delete();
-                  } catch (e) {
-                    if (kDebugMode) {
-                      print(e);
-                    }
-                    // ignore: use_build_context_synchronously
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const AlertDialog(
-                              title: Text('Error'),
-                              content: Text(
-                                  'Invalid password or something went wrong, please contact team'));
-                        });
-                    return;
-                  }
-                },
-                child: const Text('Yes, delete my account'),
+              const TextButton(
+                onPressed: null,
+                child: Text('Yes, delete my account'),
               ),
               TextButton(
                 onPressed: () async {

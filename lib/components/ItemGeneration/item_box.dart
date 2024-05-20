@@ -61,7 +61,7 @@ class _ItemBoxState extends State<ItemBox> {
         fit: BoxFit.fitWidth,
       );
     } else {
-      image = Image.network(
+      image = Image.asset(
         item.imagePath[0],
         fit: BoxFit.fill,
       );

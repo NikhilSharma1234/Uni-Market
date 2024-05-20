@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:uni_market/components/ItemGeneration/item.dart';
+import 'package:uni_market/components/ItemGeneration/item_box.dart';
 import 'package:uni_market/components/home_page/drawer.dart';
 import 'package:uni_market/components/user_bottom_nav_bar.dart';
 import 'package:uni_market/components/user_navbar_desktop.dart';
 import 'package:uni_market/helpers/filters.dart';
 import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/pages/posting_page.dart';
-import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/helpers/functions.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,7 +21,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Widget> items = data_store.itemBoxes;
+  late List<Widget> items = [
+    ItemBox(
+        itemData: Item.fromJSON({
+          'name': 'Sony XM1000',
+          'id': '1',
+          'description': 'Brand new headphones',
+          'condition': 'NEW',
+          'schoolId': 'UNR',
+          'price': 149.99,
+          'createdAt': 1112313,
+          'images': [
+            'assets/headphone1.webp',
+            'assets/headphone2.jpg',
+            'assets/headphone1.jpeg'
+          ],
+          'sellerId': 'selleremail@nevada.unr.edu',
+          'tags': ['headphones', 'sound'],
+          'isFlagged': false,
+          'deletedAt': 0,
+        }),
+        context: context)
+  ];
   String searchVal = "";
   int page = 1;
   bool loadingNewItems = false;
@@ -38,13 +60,12 @@ class _HomePageState extends State<HomePage> {
 
   // Controllers
   late ScrollController _scrollController;
-
   @override
   void initState() {
     // initialize scroll controllers
     _scrollController = ScrollController();
-    searchTags("", maxTags, [])
-        .then((value) => setState(() => _suggestedTags = value));
+    // searchTags("", maxTags, [])
+    //     .then((value) => setState(() => _suggestedTags = value));
 
     super.initState();
   }
@@ -163,9 +184,9 @@ class _HomePageState extends State<HomePage> {
 
   // not sure if Im going to be able to get this to work, but its a stand in for when the filters get applied
   void applyFilters(Filters newFilter) {
-    search(searchVal, 30, context, newFilter).then((value) {
-      redrawItems(value, false);
-    });
+    // search(searchVal, 30, context, newFilter).then((value) {
+    //   redrawItems(value, false);
+    // });
   }
 
   Timer? _debounce;
@@ -187,9 +208,9 @@ class _HomePageState extends State<HomePage> {
         onChanged: ((value) {
           if (_debounce?.isActive ?? false) _debounce?.cancel();
           _debounce = Timer(const Duration(milliseconds: 200), () {
-            searchTags(value, maxTags, _tags).then((value) {
-              setTags(value);
-            });
+            // searchTags(value, maxTags, _tags).then((value) {
+            //   setTags(value);
+            // });
           });
         }),
       ),
@@ -210,10 +231,10 @@ class _HomePageState extends State<HomePage> {
               loadingNewItems = true;
             });
             clearFilters();
-            await search(searchVal, 30, context, filter, pageNum: page)
-                .then((value) {
-              redrawItems(value, false);
-            });
+            // await search(searchVal, 30, context, filter, pageNum: page)
+            //     .then((value) {
+            //   redrawItems(value, false);
+            // });
             setState(() {
               loadingNewItems = false;
             });

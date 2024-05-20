@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_market/components/ItemGeneration/abstract_item_factory.dart';
 import 'package:uni_market/components/ItemGeneration/item.dart';
+import 'package:uni_market/components/ItemGeneration/item_box.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
-import 'package:uni_market/data_store.dart' as data_store;
 
 class WishList extends StatefulWidget {
   final List listOfItemIds;
@@ -60,12 +60,29 @@ class _WishListState extends State<WishList> {
     return image;
   }
 
-  Future<List<Widget>> generateItems(itemIds, darkModeOn) async {
-    List<Widget> itemsList = [];
-    for (var id in itemIds) {
-      var item = await generateItemWidget(id, darkModeOn);
-      itemsList.add(item);
-    }
+  Future<List<Widget>> generateItems(darkModeOn) async {
+    List<Widget> itemsList = [
+      ItemBox(
+          itemData: Item.fromJSON({
+            'name': 'Sony XM1000',
+            'id': '1',
+            'description': 'Brand new headphones',
+            'condition': 'NEW',
+            'schoolId': 'UNR',
+            'price': 149.99,
+            'createdAt': 1112313,
+            'images': [
+              'assets/headphone1.webp',
+              'assets/headphone2.jpg',
+              'assets/headphone1.jpeg'
+            ],
+            'sellerId': 'selleremail@nevada.unr.edu',
+            'tags': ['headphones', 'sound'],
+            'isFlagged': false,
+            'deletedAt': 0,
+          }),
+          context: context)
+    ];
     return itemsList;
   }
 
@@ -81,44 +98,26 @@ class _WishListState extends State<WishList> {
         appBar: AppBar(
           title: const Text("Wishlist Items"),
         ),
-        body: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(data_store.user.email)
-              .snapshots(),
-          builder: (context, streamSnapshot) {
-            if (streamSnapshot.hasData) {
-              return FutureBuilder(
-                  future: generateItems(
-                      streamSnapshot.data!['wishlist'], darkModeOn),
-                  builder: (context, futureSnapshot) {
-                    if (futureSnapshot.hasData) {
-                      var items = futureSnapshot.data ?? [const SizedBox()];
-                      return GridView.count(
-                        physics: const BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics()),
-                        crossAxisCount: (screenWidth / 320).floor(),
-                        childAspectRatio: 20 / 23,
-                        children: items,
-                      );
-                    }
-                    return const Row(
-                      children: [
-                        Expanded(
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      ],
-                    );
-                  });
-            }
-            return const Row(
-              children: [
-                Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ],
-            );
-          },
-        ));
+        body: FutureBuilder(
+            future: generateItems(darkModeOn),
+            builder: (context, futureSnapshot) {
+              if (futureSnapshot.hasData) {
+                var items = futureSnapshot.data ?? [const SizedBox()];
+                return GridView.count(
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  crossAxisCount: (screenWidth / 320).floor(),
+                  childAspectRatio: 20 / 23,
+                  children: items,
+                );
+              }
+              return const Row(
+                children: [
+                  Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ],
+              );
+            }));
   }
 }

@@ -159,39 +159,15 @@ getDrawer(
                     ],
                   ),
                   tags,
-                  Padding(
-                      padding: const EdgeInsets.all(5),
+                  const Padding(
+                      padding: EdgeInsets.all(5),
                       child: TextButton(
-                          style: const ButtonStyle(
+                          style: ButtonStyle(
                             backgroundColor:
                                 MaterialStatePropertyAll<Color>(Colors.green),
                           ),
-                          onPressed: () {
-                            if (filter.lowerPrice > filter.upperPrice) {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Invalid Price Range'),
-                                      content: const Text(
-                                          'The lower price must be less than the upper price.'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            } else {
-                              redrawItems([], false);
-                              applyFilters(filter);
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: const Text('Apply Filters'))),
+                          onPressed: null,
+                          child: Text('Apply Filters'))),
                   Padding(
                       padding: const EdgeInsets.all(5),
                       child: TextButton(
