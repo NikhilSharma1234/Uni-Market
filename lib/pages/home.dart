@@ -34,10 +34,28 @@ class _HomePageState extends State<HomePage> {
           'images': [
             'assets/headphone1.webp',
             'assets/headphone2.jpg',
-            'assets/headphone1.jpeg'
+            'assets/headphone3.jpeg'
           ],
           'sellerId': 'selleremail@nevada.unr.edu',
           'tags': ['headphones', 'sound'],
+          'isFlagged': false,
+          'deletedAt': 0,
+        }),
+        context: context),
+    ItemBox(
+        itemData: Item.fromJSON({
+          'name': 'Chemistry Text Book',
+          'id': '1',
+          'description': 'Used for CHEM 121A',
+          'condition': 'USED',
+          'schoolId': 'UNR',
+          'price': 25.99,
+          'createdAt': 1112323,
+          'images': [
+            'assets/textbook.jpg',
+          ],
+          'sellerId': 'selleremail2@nevada.unr.edu',
+          'tags': ['book', 'textbook'],
           'isFlagged': false,
           'deletedAt': 0,
         }),

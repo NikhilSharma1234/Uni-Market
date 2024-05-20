@@ -77,18 +77,8 @@ class _ItemSearchBarState extends State<ItemSearchBar> {
                 viewConstraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * 0.4),
                 searchController: controller,
-                onSubmitted: (value) {
-                  widget.setPageState([], false);
-                  search(value, 30, context, widget.filter).then((value) {
-                    widget.setPageState(value, false);
-                  });
-                  controller.closeView(value);
-                  FocusScope.of(context).unfocus();
-                },
-                onChanged: (value) {
-                  updateSuggestions(value);
-                  widget.updateSearchText(value);
-                },
+                onSubmitted: null,
+                onChanged: null,
                 suggestionsBuilder: (BuildContext context, controller) {
                   return suggestions;
                   // TODO known issue: this will call but not update on the screen when text is typed, it only updates when you click on the typed text
