@@ -19,7 +19,7 @@ from firebase_functions.firestore_fn import (
 
 initialize_app()
 
-API_KEY = 'eSMjP8YVxHdMKoT164TTKLMkXRS47FdDnPENNAA2Ob8RfEfr'
+API_KEY = ''
 base_url = "https://hawk-perfect-frog.ngrok-free.app"
 
 headers = {
@@ -134,7 +134,7 @@ def search_suggestions_typesense(req: https_fn.CallableRequest) -> any:
 @https_fn.on_call()
 def image_moderation(req: https_fn.CallableRequest) -> any:
   data = {
-    'API_KEY': '2Pv9xBw29ZaqthAphAIcM2Ke4Ey1kbbO',
+    'API_KEY': '',
     'task': 'porn_moderation,drug_moderation,gore_moderation',
     'url_image': req.data['imageUrl'],
   }
@@ -144,7 +144,7 @@ def image_moderation(req: https_fn.CallableRequest) -> any:
 @https_fn.on_call()
 def llm_moderation(req: https_fn.CallableRequest) -> any:
   client = OpenAI(
-    api_key='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',
+    api_key='',
   )
   response = client.moderations.create(input=req.data['input'])
   return response.results[0].flagged
