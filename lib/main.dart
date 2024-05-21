@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uni_market/helpers/web_horizontal_scroll.dart';
-import 'wrapper.dart';
+import 'package:uni_market/pages/sign_up.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:uni_market/helpers/theme_provider.dart';
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       scrollBehavior:
           WebHorizontalScroll(), // just allows web users to scroll horizontally via dragging when available
-      home: const Wrapper(),
+      home: const SignUpPage(title: 'Sign Up', signUpStep: 0),
       title: 'Uni-Market',
       theme: lightTheme,
       darkTheme: darkTheme,

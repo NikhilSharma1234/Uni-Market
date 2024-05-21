@@ -1,15 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_market/helpers/functions.dart';
 import 'package:uni_market/pages/chat_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:intl/intl.dart';
-import 'package:uni_market/data_store.dart' as data_store;
 import 'package:uni_market/image_data_store.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:widget_and_text_animator/widget_and_text_animator.dart';
@@ -33,9 +29,6 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatController _chatController = ChatController();
   late bool _seenTransactionWarning = false;
-  bool _isDialogShown = false; // Add this flag
-
-  bool _isWidgetActive = true;
 
   @override
   void initState() {
@@ -44,7 +37,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    _isWidgetActive = false;
     super.dispose();
   }
 
@@ -82,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 var message = [
                   {
-                    'content': 'I\ll see you there!',
+                    'content': 'I\'ll see you there!',
                     'timestamp': Timestamp.now(),
                     'sender': false
                   },
@@ -289,28 +281,6 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void _maybeShowDeletedSessionSnackbar() {
-    if (_isWidgetActive && mounted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Session Deleted'),
-            content: const Text('This session has been deleted.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
   Widget _buildMessageComposer() {
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -342,10 +312,6 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
-  }
-
-  void _showVenmoLink(context) async {
-    _chatController.sendVenmoLink(context, widget.chatSessionId);
   }
 
   void _showTransactionWarning(BuildContext context, var message) {
@@ -439,177 +405,6 @@ class _ChatPageState extends State<ChatPage> {
                   )
                 ]),
               )
-            ]);
-      },
-    );
-  }
-
-  void _confirmSell() async {
-    var snapshot = await FirebaseFirestore.instance
-        .collection('chat_sessions')
-        .doc(widget.chatSessionId)
-        .get();
-    List<dynamic> participants = snapshot.data()!['participantIds'];
-    String buyerId =
-        participants.where((email) => email != widget.sellerId).toList()[0];
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            title: const Text(
-              "Confirm Transaction",
-              textAlign: TextAlign.center,
-            ),
-            content: Text(
-              "Would you like to mark this item as sold to $buyerId? Other chats for this item will be notified and deleted from your feed.",
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              ElevatedButton(
-                  onPressed: () async {
-                    await FirebaseFirestore.instance
-                        .collection('items')
-                        .doc(widget.productId)
-                        .update({'buyerId': buyerId});
-                    var snapshots = await FirebaseFirestore.instance
-                        .collection('chat_sessions')
-                        .where('productId', isEqualTo: widget.productId)
-                        .get();
-                    String messageContent = "This item has now been sold";
-                    for (var snapshot in snapshots.docs) {
-                      await FirebaseFirestore.instance
-                          .collection('chat_sessions')
-                          .doc(snapshot.id)
-                          .collection('messages')
-                          .add({
-                        'senderId': FirebaseAuth.instance.currentUser!.uid,
-                        'type': 'transaction',
-                        'content': messageContent,
-                        'timestamp': Timestamp.now(),
-                      });
-                      await FirebaseFirestore.instance
-                          .collection('chat_sessions')
-                          .doc(snapshot.id)
-                          .update({
-                        'lastMessage': messageContent,
-                        'lastMessageAt': Timestamp.now(),
-                        'deletedByUsers':
-                            FieldValue.arrayUnion([widget.sellerId])
-                      });
-                    }
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Yes')),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('No'))
-            ]);
-      },
-    );
-  }
-
-  void _showLocationInfo(String schoolName, String address) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Location Info', textAlign: TextAlign.center),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('School: $schoolName'),
-                const SizedBox(height: 8.0),
-                Text('Address: $address'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _confirmBlock() async {
-    var snapshot = await FirebaseFirestore.instance
-        .collection('chat_sessions')
-        .doc(widget.chatSessionId)
-        .get();
-    List<dynamic> participants = snapshot.data()!['participantIds'];
-    String otherUser = participants
-        .where((email) => email != data_store.user.email)
-        .toList()[0];
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-            title: const Text(
-              "Confirm Block",
-              textAlign: TextAlign.center,
-            ),
-            content: const Text(
-              "Would you to block this user? Any chats open with this user will be deleted. You will no longer be able to view any of their items. They will also not be able to view any of your items.",
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              ElevatedButton(
-                  onPressed: () async {
-                    if (data_store.user.blockedUsers.contains(otherUser)) {
-                      return;
-                    }
-                    data_store.user.blockedUsers.add(otherUser);
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(data_store.user.email)
-                        .update({'blockedUsers': data_store.user.blockedUsers});
-                    var sellerUserObject = await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(otherUser)
-                        .get();
-                    if (!sellerUserObject['blockedUsers']
-                        .contains(data_store.user.email)) {
-                      var blockedByOtherUser = sellerUserObject['blockedUsers'];
-                      blockedByOtherUser.add(data_store.user.email);
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(sellerUserObject['email'])
-                          .update({'blockedUsers': blockedByOtherUser});
-                    }
-                    var snapshots = await FirebaseFirestore.instance
-                        .collection('chat_sessions')
-                        .where('participantIds', whereIn: [
-                      [data_store.user.email, otherUser],
-                      [otherUser, data_store.user.email],
-                    ]).get();
-                    for (var snapshot in snapshots.docs) {
-                      await FirebaseFirestore.instance
-                          .collection('chat_sessions')
-                          .doc(snapshot.id)
-                          .update({
-                        'deletedByUsers':
-                            FieldValue.arrayUnion([data_store.user.email])
-                      });
-                    }
-                    await loadCurrentUser(data_store.user.email);
-
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Yes')),
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('No'))
             ]);
       },
     );
