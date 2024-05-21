@@ -78,6 +78,19 @@ class _SignUpPageState extends State<SignUpPage> {
                   const Padding(
                     padding: EdgeInsets.only(bottom: 10.0),
                     child: AutoSizeText(
+                      'This is a demo static version of Uni-Market. Sign in using any valid email and requirement-meeting password to move inside the application',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red),
+                      minFontSize: 16,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    child: AutoSizeText(
                       'Welcome to the marketplace made for students.',
                       style: TextStyle(
                         fontSize: 48,
