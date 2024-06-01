@@ -47,7 +47,7 @@ class _EmailContainerState extends State<EmailContainer> {
       validator: (value) {
         if (value == null || value.isEmpty) return 'Please enter an email';
 
-        const pattern = r"^[A-Za-z0-9._%+-]+@nevada\.unr\.edu$";
+        const pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.+-]+\.edu$";
         final regex = RegExp(pattern);
 
         if (!regex.hasMatch(value)) return 'Enter a valid email address.';

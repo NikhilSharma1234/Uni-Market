@@ -78,13 +78,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   const Padding(
                     padding: EdgeInsets.only(bottom: 10.0),
                     child: AutoSizeText(
-                      'This is a demo static version of Uni-Market. Sign in using any valid email and requirement-meeting password to move inside the application',
+                      'This is a static version of Uni-Market. Mock sign in and move inside the application using any valid email ending with .edu (ex: abc@abc.edu) and a requirement-meeting password (example: Test@12345).',
                       style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.red),
                       minFontSize: 16,
-                      maxLines: 2,
+                      maxFontSize: 24,
                       textAlign: TextAlign.center,
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:uni_market/components/navbar.dart'; // Import NavBar if needed
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:uni_market/components/input_containers.dart';
+import 'package:uni_market/helpers/is_mobile.dart';
 import 'package:uni_market/pages/forgot_password.dart';
 import 'package:uni_market/pages/home.dart';
 
@@ -35,8 +36,9 @@ class _SignInPageState extends State<SignInPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(
-              width:
-                  screenWidth < 500 ? screenWidth * 0.95 : screenWidth * 0.45,
+              width: isMobile(context)
+                  ? MediaQuery.of(context).size.width * 0.8
+                  : MediaQuery.of(context).size.width * 0.6,
               child: const Column(
                 children: <Widget>[
                   Padding(
@@ -101,6 +103,17 @@ class _SignInFormState extends State<SignInForm> {
     return Form(
         key: _formKey,
         child: Column(children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10.0),
+            child: AutoSizeText(
+              'This is a static version of Uni-Market. Mock sign in and move inside the application using any valid email ending with .edu (ex: abc@abc.edu) and a requirement-meeting password (example: Test@12345).',
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.w500, color: Colors.red),
+              minFontSize: 16,
+              maxFontSize: 24,
+              textAlign: TextAlign.center,
+            ),
+          ),
           const SizedBox(height: 50),
           EmailContainer(
               emailController: emailController, focusNode: _focusNode),
